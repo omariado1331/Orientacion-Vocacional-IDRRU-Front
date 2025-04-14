@@ -1,0 +1,17 @@
+header{ 
+    height: 135px;
+    background-image: url(../assets/panel.png);
+    background-color: #32639e ;
+    padding: 10px;
+    align-items:center;
+}
+
+a{
+    font-size: 20px;
+    font-weight: 450;
+}
+
+div.separator{
+    height: 138px;
+    background-color: red;
+}
