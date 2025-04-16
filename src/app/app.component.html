@@ -10,10 +10,10 @@
 
             <ul class="navbar-nav mx-auto mb-6 mt-3">
               <li class="nav-item">
-                <a class="nav-link text-decoration-none text-white link-danger" aria-current="page" href="#">Inicio</a>
+                <a class="nav-link active text-decoration-none text-white link-danger" aria-current="page" [routerLink]="['/orientacion-vocacional']" routerLinkActive="active">Inicio</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link text-decoration-none text-white link-danger" href="#">Estadísticas</a>
+                <a class="nav-link text-decoration-none text-white link-danger" [routerLink]="['/report-orientacion']" routerLinkActive="active">Estadísticas</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link text-decoration-none text-white link-danger" href="#">Control</a>
@@ -22,7 +22,7 @@
                 <a class="nav-link text-decoration-none text-white link-danger" href="#">IDR-DU</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link text-decoration-none text-white link-danger" href="#">Información</a>
+                <a class="nav-link text-decoration-none text-white link-danger" [routerLink]="['/info-orientacion']" routerLinkActive="active">Información</a>
               </li>
             </ul>
           </div>
@@ -30,8 +30,6 @@
     </nav>
 </header>
 </div>
-
-<h5>AQUI LOS COMPONENTES QUE SE VAYAN A CREAR </h5>
 
 
 <router-outlet/>
