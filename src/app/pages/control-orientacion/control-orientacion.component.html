@@ -1,0 +1,129 @@
+<!-- control-orientacion.component.html - Template para el componente de control de orientación -->
+<div class="container mt-4">
+    <!-- Mostrar formulario de login si no está autenticado -->
+    <div class="row" *ngIf="!isAuthenticated">
+      <div class="col-md-6 offset-md-3">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white text-center">
+            <h2>Control de Orientación Vocacional</h2>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+              <!-- Mensaje de error -->
+              <div *ngIf="error" class="alert alert-danger">
+                {{ error }}
+              </div>
+  
+              <!-- Campo de usuario -->
+              <div class="mb-3">
+                <label for="username" class="form-label">Usuario:</label>
+                <input
+                  type="text"
+                  id="username"
+                  formControlName="username"
+                  class="form-control"
+                  [ngClass]="{'is-invalid': loginForm.controls['username'].touched && loginForm.controls['username'].invalid}"
+                />
+                <div *ngIf="loginForm.controls['username'].touched && loginForm.controls['username'].invalid" class="invalid-feedback">
+                  <div *ngIf="loginForm.controls['username'].errors?.['required']">Usuario es requerido</div>
+                  <div *ngIf="loginForm.controls['username'].errors?.['minlength']">Usuario debe tener al menos 3 caracteres</div>
+                </div>
+              </div>
+  
+              <!-- Campo de contraseña -->
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña:</label>
+                <input
+                  type="password"
+                  id="password"
+                  formControlName="password"
+                  class="form-control"
+                  [ngClass]="{'is-invalid': loginForm.controls['password'].touched && loginForm.controls['password'].invalid}"
+                />
+                <div *ngIf="loginForm.controls['password'].touched && loginForm.controls['password'].invalid" class="invalid-feedback">
+                  <div *ngIf="loginForm.controls['password'].errors?.['required']">Contraseña es requerida</div>
+                  <div *ngIf="loginForm.controls['password'].errors?.['minlength']">Contraseña debe tener al menos 6 caracteres</div>
+                </div>
+              </div>
+  
+              <!-- Botón de envío -->
+              <div class="d-grid gap-2">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="loginForm.invalid || loading"
+                >
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+                  Iniciar Sesión
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Mostrar panel de control si está autenticado -->
+    <div *ngIf="isAuthenticated">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Panel de Control - Orientación Vocacional</h1>
+        <button class="btn btn-outline-danger" (click)="logout()">Cerrar Sesión</button>
+      </div>
+  
+      <div class="row">
+        <!-- Tarjeta de estadísticas: Estudiantes -->
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow">
+            <div class="card-body text-center">
+              <h5 class="card-title">Estudiantes Registrados</h5>
+              <div class="display-2 fw-bold text-primary">{{ datosControl.totalEstudiantes }}</div>
+              <p class="card-text">Total de estudiantes que han ingresado al sistema</p>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Tarjeta de estadísticas: Facultades -->
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow">
+            <div class="card-body text-center">
+              <h5 class="card-title">Facultades Activas</h5>
+              <div class="display-2 fw-bold text-success">{{ datosControl.facultadesActivas }}</div>
+              <p class="card-text">Número de facultades participantes</p>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Tarjeta de estadísticas: Orientaciones -->
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow">
+            <div class="card-body text-center">
+              <h5 class="card-title">Orientaciones Completadas</h5>
+              <div class="display-2 fw-bold text-info">{{ datosControl.orientacionesCompletadas }}</div>
+              <p class="card-text">Procesos de orientación finalizados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Sección para futuros reportes o gráficos -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card shadow">
+            <div class="card-header bg-light">
+              <h4>Estadísticas Detalladas</h4>
+            </div>
+            <div class="card-body">
+              <p class="card-text">
+                Esta sección mostrará gráficos y reportes detallados sobre orientación vocacional.
+                Puede incluir distribución por facultades, tendencias temporales, resultados de evaluaciones, etc.
+              </p>
+              <div class="alert alert-info">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                Datos e informes más detallados estarán disponibles en la próxima versión.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

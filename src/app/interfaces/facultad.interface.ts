@@ -1,7 +1,10 @@
-// facultad.interface.ts - Define la estructura de datos para las facultades universitarias
+// facultad.interface.ts
 export interface Facultad {
-  codigo: string;
+  id: number;
   nombre: string;
+  codigo: string;
+  url: string;
+  imgLogo: string;
   carreras: string[];
-  active: boolean;
+  icono: string;
 }
