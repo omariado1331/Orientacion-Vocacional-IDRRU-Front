@@ -1,0 +1,80 @@
+/* informacion.component.css */
+
+/* Variables personalizadas usando variables CSS */
+:root {
+    --umsa-blue: #1a5276;
+    --umsa-light-blue: #3498db;
+    --umsa-dark-blue: #0d3456;
+  }
+  
+  /* Estilos generales */
+  .divider {
+    height: 4px;
+    width: 100px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--umsa-blue), var(--umsa-light-blue));
+  }
+  
+  /* Estilos para la lista de facultades */
+  .list-group-item {
+    transition: all 0.3s ease;
+    border-left: 0;
+    border-right: 0;
+  }
+  
+  .list-group-item:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+  }
+  
+  .list-group-item.active {
+    background-color: rgba(26, 82, 118, 0.8);
+    border-color: rgba(26, 82, 118, 0.8);
+  }
+  
+  .list-group-item.active .facultad-codigo,
+  .list-group-item.active .facultad-nombre {
+    color: white;
+  }
+  
+  .facultad-codigo {
+    font-weight: bold;
+    color: var(--umsa-blue);
+    background-color: rgba(52, 152, 219, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    min-width: 60px;
+    text-align: center;
+  }
+  
+  /* Estilos para las tarjetas */
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .card-header {
+    background: linear-gradient(90deg, var(--umsa-blue), var(--umsa-light-blue));
+  }
+  
+  /* Animaciones */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .row {
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .facultad-codigo {
+      min-width: 50px;
+      font-size: 0.8rem;
+    }
+  }

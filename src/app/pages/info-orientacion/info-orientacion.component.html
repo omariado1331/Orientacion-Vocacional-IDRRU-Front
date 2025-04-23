@@ -1,1 +1,43 @@
-<h5>INFORMACION SOBRE FACULTADES</h5>
+<div class="container-fluid py-5 bg-light">
+  <div style="max-width: 80%; margin: 0 auto;">
+
+    <div class="row">
+      <div class="col-12 text-center mb-5">
+        <h1 class="display-4 text-primary fw-bold">Instituto de Desarrollo Regional y Desconcentración Universitaria </h1>
+        <h2 class="h3 text-secondary">Información Academica</h2>
+        <div class="divider my-4 bg-primary mx-auto" style="width: 80px; height: 3px;"></div>
+      </div>
+    </div>
+
+    <div *ngIf="cargando" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="mt-3 text-muted">Cargando información de facultades...</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger text-center" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      Ha ocurrido un error al cargar la información. Por favor, intenta nuevamente.
+    </div>
+
+    <div *ngIf="!cargando && !error" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <div *ngFor="let facultad of facultades" class="col">
+        <div class="card h-100 shadow-lg rounded-3 border-0">
+          <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+            <div class="text-center mb-3">
+              <i class="bi bi-mortarboard-fill text-primary" style="font-size: 2.5rem;"></i>
+            </div>
+            <h5 class="card-title fw-bold text-primary text-center">{{facultad.nombre}}</h5>
+            <p class="card-text text-muted text-center small">{{facultad.codigo}}</p>
+            <button (click)="seleccionarFacultad(facultad)" class="btn btn-primary btn-sm mt-3 rounded-pill">
+              Ver pagina de la facultad
+            </button>
+          </div>
+          <div class="card-footer bg-transparent border-top pt-3 text-center">
+            </div>
+        </div>
+      </div>
+    </div>
+
+  </div> </div>
