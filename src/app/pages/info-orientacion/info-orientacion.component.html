@@ -17,14 +17,8 @@
     <p>Cargando información de facultades...</p>
   </div>
 
-  <!-- Error message -->
-  <div *ngIf="error" class="umsa-error">
-    <i class="bi bi-exclamation-triangle-fill"></i>
-    <p>Ha ocurrido un error al cargar la información. Por favor, intenta nuevamente.</p>
-  </div>
-
   <!-- Content -->
-  <div *ngIf="!cargando && !error" class="umsa-content">
+  <div *ngIf="!cargando" class="umsa-content">
     <!-- Facultades Grid -->
     <div class="umsa-facultades-grid">
       <div *ngFor="let facultad of facultades" class="umsa-facultad-card"

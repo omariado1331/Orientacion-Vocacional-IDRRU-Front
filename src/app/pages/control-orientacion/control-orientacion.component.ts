@@ -1,11 +1,13 @@
-// control-orientacion.component.ts - Componente que maneja login y muestra información del control
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { LoginRequest } from '../../interfaces/auth.interface';
 
+/**
+ * Componente para manejar el inicio de sesion
+ * y mostrar datos basicos de control.
+ */
 @Component({
   selector: 'app-control-orientacion',
   templateUrl: './control-orientacion.component.html',
@@ -18,72 +20,78 @@ export class ControlOrientacionComponent implements OnInit {
   isAuthenticated = false;
   loading = false;
   error = '';
-  returnUrl: string = '/';
-  
-  // Datos de control que se mostrarán después del login
+  logoUrl: String = '';
+  /**
+   * Datos de ejemplo para el panel de control.
+   */
   datosControl = {
     totalEstudiantes: 0,
     facultadesActivas: 0,
     orientacionesCompletadas: 0
   };
 
+  /**
+   * Constructor del componente.
+   * Inicializa el formulario de login.
+   * @param formBuilder Para construir el formulario reactivo.
+   * @param authService Servicio de autenticacion.
+   */
   constructor(
     private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute
+    private authService: AuthService
   ) {
     this.loginForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(4)]]
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required]],
     });
   }
 
+  /**
+   * Metodo de ciclo de vida que se ejecuta al inicializar.
+   * Verifica si el usuario esta autenticado y carga datos si es asi.
+   */
   ngOnInit(): void {
+    this.logoUrl = 'assets/escudo.png';
     this.isAuthenticated = this.authService.isAuthenticated();
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/control-orientacion';
     if (this.isAuthenticated) {
       this.cargarDatosControl();
     }
   }
 
   /**
-   * Manejar envío del formulario de login
+   * Maneja el envio del formulario de login.
+   * Intenta autenticar al usuario.
+   * @returns void
    */
   onSubmit(): void {
     if (this.loginForm.invalid) {
       return;
     }
-  
+
     this.loading = true;
     this.error = '';
-  
+
     const credentials: LoginRequest = {
       username: this.loginForm.controls['username'].value,
       password: this.loginForm.controls['password'].value
     };
-  
+
     this.authService.login(credentials)
       .subscribe({
         next: () => {
           this.isAuthenticated = true;
           this.loading = false;
           this.cargarDatosControl();
-          
-          if (this.returnUrl !== '/control-orientacion') {
-            this.router.navigateByUrl(this.returnUrl);
-          }
         },
-        error: err => {
-          this.error = 'Credenciales inválidas. Por favor intente nuevamente.';
+        error: () => {
+          this.error = 'Credenciales invalidas. Por favor intente nuevamente.';
           this.loading = false;
-          console.error('Error de autenticación:', err);
         }
       });
   }
 
   /**
-   * Cerrar sesión del usuario
+   * Cierra la sesion del usuario.
    */
   logout(): void {
     this.authService.logout();
@@ -91,10 +99,10 @@ export class ControlOrientacionComponent implements OnInit {
   }
 
   /**
-   * Cargar datos para el panel de control
-   * En un caso real, esto debería obtener datos de un servicio
+   * Carga datos para el panel de control.
    */
   private cargarDatosControl(): void {
+
     this.datosControl = {
       totalEstudiantes: 250,
       facultadesActivas: 13,

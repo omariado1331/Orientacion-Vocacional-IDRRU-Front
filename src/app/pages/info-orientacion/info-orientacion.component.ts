@@ -1,79 +1,84 @@
-// info-orientacion.component.ts - Componente mejorado para las facultades de la UMSA
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+// info-orientacion.component.ts - Componente simplificado para las facultades de la UMSA
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
 
-import { FacultadService } from '../../services/facultad.service';
-import { Facultad } from '../../interfaces/facultad.interface';
+/**
+ * Define la estructura de datos para una Facultad.
+ */
+interface Facultad {
+  id: number;
+  nombre: string;
+  codigo: string;
+  url: string;
+  imgLogo: string;
+  carreras: string[];
+}
 
-const FACULTADES_DATA = [
+/**
+ * Datos de ejemplo para las facultades.
+ */
+const FACULTADES_DATA: Facultad[] = [
   {
     id: 1,
-    nombre: "Facultad de Agronomía",
+    nombre: "Facultad de Agronomia",
     codigo: "FA",
     url: "/facultades/agronomia",
     imgLogo: "assets/logos-facultades/FA.png",
     carreras: [
-      "Ingeniería Agronómica",
-      "Ingeniería en Producción y Comercialización Agropecuaria",
+      "Ingenieria Agronomica",
+      "Ingenieria en Produccion y Comercializacion Agropecuaria",
       "Programa Medicina Veterinaria y Zootecnia"
     ],
-    icono: "bi-tree"
   },
   {
     id: 2,
-    nombre: "Facultad de Arquitectura, Artes, Diseño y Urbanismo",
+    nombre: "Facultad de Arquitectura, Artes, Diseno y Urbanismo",
     codigo: "FAADU",
     url: "/facultades/arquitectura",
     imgLogo: "assets/logos-facultades/FAADU.png",
     carreras: [
       "Arquitectura",
-      "Artes Plásticas",
-      "Diseño Gráfico",
-      "Prog. Arquitectura para la Amazonía"
+      "Artes Plasticas",
+      "Diseno Grafico",
+      "Prog. Arquitectura para la Amazonia"
     ],
-    icono: "bi-buildings"
   },
   {
     id: 3,
-    nombre: "Facultad de Ciencias Económicas y Financieras",
+    nombre: "Facultad de Ciencias Economicas y Financieras",
     codigo: "FCEF",
     url: "/facultades/economicas",
     imgLogo: "assets/logos-facultades/FCEF.png",
     carreras: [
-      "Administración de Empresas",
-      "Contaduría Pública",
-      "Economía"
+      "Administracion de Empresas",
+      "Contaduria Publica",
+      "Economia"
     ],
-    icono: "bi-cash-coin"
   },
   {
     id: 4,
-    nombre: "Facultad de Ciencias Farmacéuticas y Bioquímicas",
+    nombre: "Facultad de Ciencias Farmaceuticas y Bioquimicas",
     codigo: "FCFB",
     url: "/facultades/farmaceuticas",
     imgLogo: "assets/logos-facultades/FCFB.png",
     carreras: [
-      "Bioquímica",
-      "Química Farmacéutica"
+      "Bioquimica",
+      "Quimica Farmaceutica"
     ],
-    icono: "bi-capsule"
   },
   {
     id: 5,
-    nombre: "Facultad de Ciencias Geológicas",
+    nombre: "Facultad de Ciencias Geologicas",
     codigo: "FCG",
     url: "/facultades/geologicas",
     imgLogo: "assets/logos-facultades/FCG.png",
     carreras: [
-      "Ingeniería Geográfica",
-      "Ingeniería Geológica",
+      "Ingenieria Geografica",
+      "Ingenieria Geologica",
       "Programa Catastro y Ordenamiento Territorial",
-      "Programa Geología de Minas"
+      "Programa Geologia de Minas"
     ],
-    icono: "bi-gem"
   },
   {
     id: 6,
@@ -82,14 +87,13 @@ const FACULTADES_DATA = [
     url: "/facultades/ciencias-puras",
     imgLogo: "assets/logos-facultades/FCPN.png",
     carreras: [
-      "Biología",
-      "Ciencias Químicas",
-      "Estadística",
-      "Física",
-      "Informática",
-      "Matemática"
+      "Biologia",
+      "Ciencias Quimicas",
+      "Estadistica",
+      "Fisica",
+      "Informatica",
+      "Matematica"
     ],
-    icono: "bi-atom"
   },
   {
     id: 7,
@@ -98,121 +102,118 @@ const FACULTADES_DATA = [
     url: "/facultades/ciencias-sociales",
     imgLogo: "assets/logos-facultades/FCS.png",
     carreras: [
-      "Antropología y Arqueología",
-      "Ciencias de la Comunicación Social",
-      "Sociología",
+      "Antropologia y Arqueologia",
+      "Ciencias de la Comunicacion Social",
+      "Sociologia",
       "Trabajo Social"
     ],
-    icono: "bi-people"
   },
   {
     id: 8,
-    nombre: "Facultad de Derecho y Ciencias Políticas",
+    nombre: "Facultad de Derecho y Ciencias Politicas",
     codigo: "FDCP",
     url: "/facultades/derecho",
     imgLogo: "assets/logos-facultades/FDCP.png",
     carreras: [
       "Derecho",
-      "Ciencias Políticas y Gestión Pública",
+      "Ciencias Politicas y Gestion Publica",
       "Programa Derecho de las Naciones Originarias"
     ],
-    icono: "bi-balance-scale"
   },
   {
     id: 9,
-    nombre: "Facultad de Humanidades y Ciencias de la Educación",
+    nombre: "Facultad de Humanidades y Ciencias de la Educacion",
     codigo: "FHCE",
     url: "/facultades/humanidades",
     imgLogo: "assets/logos-facultades/FHCE.png",
     carreras: [
-      "Ciencias de la Información, Archivología - Bibliotecología - Documentación - Museología",
-      "Ciencias de la Educación",
-      "Filosofía",
+      "Ciencias de la Informacion, Archivologia - Bibliotecologia - Documentacion - Museologia",
+      "Ciencias de la Educacion",
+      "Filosofia",
       "Historia",
-      "Lingüística e Idiomas",
+      "Linguistica e Idiomas",
       "Literatura",
-      "Psicología",
+      "Psicologia",
       "Turismo"
     ],
-    icono: "bi-book"
   },
   {
     id: 10,
-    nombre: "Facultad de Ingeniería",
+    nombre: "Facultad de Ingenieria",
     codigo: "FI",
     url: "/facultades/ingenieria",
     imgLogo: "assets/logos-facultades/FI.png",
     carreras: [
-      "Ingeniería Ambiental",
-      "Ingeniería de Alimentos",
-      "Ingeniería Civil",
-      "Ingeniería Eléctrica",
-      "Ingeniería Mecánica y Electromecánica",
-      "Ingeniería Electrónica",
-      "Ingeniería Industrial",
-      "Mecatrónica (MEC)",
-      "Ingeniería Metalúrgica y Materiales",
-      "Ingeniería Petrolera",
-      "Ingeniería Química",
-      "Programa de Ing. Industrial Amazónica",
-      "Programa de Ing. Petroquímica",
-      "Programa de Ing. Producción Industrial",
+      "Ingenieria Ambiental",
+      "Ingenieria de Alimentos",
+      "Ingenieria Civil",
+      "Ingenieria Electrica",
+      "Ingenieria Mecanica y Electromecanica",
+      "Ingenieria Electronica",
+      "Ingenieria Industrial",
+      "Mecatronica (MEC)",
+      "Ingenieria Metalurgica y Materiales",
+      "Ingenieria Petrolera",
+      "Ingenieria Quimica",
+      "Programa de Ing. Industrial Amazonica",
+      "Programa de Ing. Petroquimica",
+      "Programa de Ing. Produccion Industrial",
       "Programa de Ing. Seguridad Industrial y Salud Ocupacional"
     ],
-    icono: "bi-gear"
   },
   {
     id: 11,
-    nombre: "Facultad de Medicina, Enfermería, Nutrición y Tecnología Médica",
+    nombre: "Facultad de Medicina, Enfermeria, Nutricion y Tecnologia Medica",
     codigo: "FMENT",
     url: "/facultades/medicina",
     imgLogo: "assets/logos-facultades/FMENT.png",
     carreras: [
       "Medicina",
-      "Enfermería",
-      "Nutrición y Dietética",
-      "Tecnología Médica"
+      "Enfermeria",
+      "Nutricion y Dietetica",
+      "Tecnologia Medica"
     ],
-    icono: "bi-hospital"
   },
   {
     id: 12,
-    nombre: "Facultad de Odontología",
+    nombre: "Facultad de Odontologia",
     codigo: "FO",
     url: "/facultades/odontologia",
     imgLogo: "assets/logos-facultades/FO.png",
     carreras: [
-      "Odontología"
+      "Odontologia"
     ],
-    icono: "bi-emoji-smile"
   },
   {
     id: 13,
-    nombre: "Facultad de Tecnología",
+    nombre: "Facultad de Tecnologia",
     codigo: "FT",
     url: "/facultades/tecnologia",
     imgLogo: "assets/logos-facultades/FT.png",
     carreras: [
-      "Aeronáutica",
+      "Aeronautica",
       "Construcciones Civiles",
       "Electricidad Industrial",
-      "Electrónica y Telecomunicaciones",
-      "Electromecánica",
-      "Mecánica Automotriz",
-      "Mecánica Industrial",
-      "Química Industrial",
-      "Geodesia, Topografía y Geomática",
-      "Programa Tec. Sup. Construcción",
-      "Programa Tec. Sup. Electromecánica",
-      "Programa Tec. Sup. Mecánica Automotriz",
-      "Programa Tec. Med. Mecánica Automotriz",
-      "Programa Tecnología de Alimentos",
-      "Programa Tec. Sup. Procesos Químicos"
+      "Electronica y Telecomunicaciones",
+      "Electromecanica",
+      "Mecanica Automotriz",
+      "Mecanica Industrial",
+      "Quimica Industrial",
+      "Geodesia, Topografia y Geomatica",
+      "Programa Tec. Sup. Construccion",
+      "Programa Tec. Sup. Electromecanica",
+      "Programa Tec. Sup. Mecanica Automotriz",
+      "Programa Tec. Med. Mecanica Automotriz",
+      "Programa Tecnologia de Alimentos",
+      "Programa Tec. Sup. Procesos Quimicos"
     ],
-    icono: "bi-tools"
   }
 ];
 
+/**
+ * Componente para mostrar informacion de las facultades de la UMSA.
+ * Permite seleccionar una facultad para ver detalles.
+ */
 @Component({
   selector: 'app-informacion',
   templateUrl: './info-orientacion.component.html',
@@ -220,80 +221,36 @@ const FACULTADES_DATA = [
   standalone: true,
   imports: [CommonModule]
 })
-export class InfoOrientacionComponent implements OnInit, OnDestroy {
-  facultades: Facultad[] = [];
+export class InfoOrientacionComponent {
+
+  facultades: Facultad[] = FACULTADES_DATA;
+
   facultadSeleccionada: Facultad | null = null;
-  cargando = true;
+
+  cargando = false;
   error = false;
-  private destroy$ = new Subject<void>();
-  mostrarCarreras = false;
 
-  constructor(
-    private facultadService: FacultadService,
-    private router: Router
-  ) { }
+  /**
+   * Constructor del componente.
+   * @param router Para la navegacion entre rutas.
+   */
+  constructor(private router: Router) { }
 
-  ngOnInit(): void {
-    console.log('Iniciando carga de facultades');
-    this.cargarFacultades();
-    this.facultadService.facultades$.subscribe(data => {
-      console.log('BehaviorSubject actualizado:', data);
-    });
-    
-    this.router.events.pipe(
-      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-      filter(event => event.url.includes('info-orientacion')),
-      takeUntil(this.destroy$)
-    ).subscribe(() => this.cargarFacultades());
-  }
-
-  cargarFacultades(): void {
-    this.cargando = true;
-    this.error = false;
-
-    // Cargar datos locales mientras no se use la API
-    setTimeout(() => {
-      this.facultades = FACULTADES_DATA;
-      this.cargando = false;
-    }, 500);
-
-    /*
-    // Primero intenta usar datos del BehaviorSubject si ya están disponibles
-    this.facultadService.facultades$.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (cachedFacultades) => {
-        if (cachedFacultades && cachedFacultades.length > 0) {
-          this.facultades = cachedFacultades;
-          this.cargando = false;
-        }
-      },
-      error: () => {
-        this.error = true;
-        this.cargando = false;
-      }
-    });
-
-    // Si no hay datos en caché, intenta cargar desde API
-    this.facultadService.cargarFacultades()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (facultades) => {
-          this.facultades = facultades;
-          this.cargando = false;
-        },
-        error: (err) => {
-          console.error('Error al cargar facultades:', err);
-          this.error = true;
-          this.cargando = false;
-        }
-      });
-    */
-  }
-
+  /**
+   * Selecciona una facultad y navega a su URL.
+   * @param facultad La facultad seleccionada.
+   */
   seleccionarFacultad(facultad: Facultad): void {
     this.facultadSeleccionada = facultad;
     this.router.navigate([facultad.url]);
   }
-  toggleCarreras(facultad: any, event: Event) {
+
+  /**
+   * Alterna la visibilidad de las carreras de una facultad.
+   * @param facultad La facultad cuyas carreras se alternaran.
+   * @param event El evento del click para evitar propagacion.
+   */
+  toggleCarreras(facultad: Facultad, event: Event): void {
     event.stopPropagation();
     if (this.facultadSeleccionada && this.facultadSeleccionada.id === facultad.id) {
       this.facultadSeleccionada = null;
@@ -303,10 +260,5 @@ export class InfoOrientacionComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
     }, 10);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

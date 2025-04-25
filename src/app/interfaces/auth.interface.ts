@@ -1,22 +1,27 @@
-// auth.interface.ts - Define las estructuras de datos para autenticación
+// auth.interface.ts
+/**
+ * Representa los datos de un usuario.
+ */
 export interface Usuario {
-    // id?: number;
-    username: string;
-    // password?: string;
-    nombre?: string;
-    // apellido?: string;
-    rol?: string;
-    // token?: string;
-  }
-  
-  export interface LoginRequest {
-    username: string;
-    password: string;
-  }
-  
-  export interface LoginResponse {
-    token: string;
-    username: string;
-    nombre: string; 
-    rol: string;
-  }
+  username: string;
+  nombre?: string;
+  rol?: string;
+}
+
+/**
+ * Representa la estructura de datos para una solicitud de inicio de sesión.
+ */
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+/**
+ * Representa la estructura de datos de la respuesta de inicio de sesión exitoso.
+ */
+export interface LoginResponse {
+  token: string;
+  username: string;
+  nombre: string;
+  rol: string;
+}
