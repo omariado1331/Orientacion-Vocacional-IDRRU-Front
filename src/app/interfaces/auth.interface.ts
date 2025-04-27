@@ -5,7 +5,6 @@
 export interface Usuario {
   username: string;
   nombre?: string;
-  rol?: string;
 }
 
 /**
@@ -23,5 +22,4 @@ export interface LoginResponse {
   token: string;
   username: string;
   nombre: string;
-  rol: string;
 }
