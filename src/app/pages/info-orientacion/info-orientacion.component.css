@@ -30,31 +30,6 @@
   text-align: center;
 }
 
-.umsa-logo-container {
-  margin-bottom: 20px;
-}
-
-.umsa-logo {
-  width: 120px;
-  height: 120px;
-  background-color: var(--umsa-blue);
-  border-radius: 50%;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: 2rem;
-  font-weight: bold;
-  box-shadow: 0 4px 15px var(--umsa-shadow);
-}
-
-.umsa-logo::before {
-  content: "UMSA";
-  color: white;
-  font-weight: bold;
-}
-
 .umsa-title h1 {
   color: var(--umsa-blue);
   font-size: 2rem;
@@ -165,17 +140,17 @@
 
 /* Logo de la facultad */
 .umsa-facultad-logo {
-  width: 50px;
-  height: 50px;
+  width: 80px;
+  height: 80px;
   margin-right: 15px;
-  border-radius: 50%;
+
   overflow: hidden;
-  background-color: white;
+  background-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+
 }
 
 .umsa-facultad-logo img {
