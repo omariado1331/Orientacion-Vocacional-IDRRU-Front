@@ -12,16 +12,21 @@ import { Router } from '@angular/router';
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const urlsProtegidas = [
-    '/auth/logout',
-    '/estudiante',
-    '/provincia',
-  ];
-
-  const necesitaToken = urlsProtegidas.some(url => req.url.includes(url));
   const router = inject(Router);
 
-  if (necesitaToken) { 
+  const parsedUrl = new URL(req.url);
+  const path = parsedUrl.pathname;
+
+  const urlsProtegidas = [
+    '/auth/logout', 
+    '/estudiante', 
+    '/resultado',
+    '/facultad',
+    '/holland',
+    '/chaside',];
+  const necesitaToken = urlsProtegidas.some(url => path.startsWith(url));
+  
+  if (necesitaToken) {
     const token = authService.getToken();
     if (token) {
       const authReq = req.clone({
@@ -30,11 +35,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }
       });
       return next(authReq);
-    }else {
+    } else {
       console.warn('Acceso denegado: Token no encontrado para ruta protegida.');
-      router.navigate(['/control-orientacion']); 
-      return EMPTY; 
+      router.navigate(['/control-orientacion']);
+      return EMPTY;
     }
   }
+
   return next(req);
 };
