@@ -6,7 +6,7 @@ import { Observable, of } from 'rxjs';
   providedIn: 'root'
 })
 export class EstudianteService {
-  private apiUrl = 'http://localhost:8080/estudiante/';
+  private apiUrl = 'http://localhost:8080/estudiante';
 
   constructor(private http: HttpClient) { }
 
@@ -15,7 +15,7 @@ export class EstudianteService {
   }
 
   getById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
   create(estudiante: any): Observable<any> {
@@ -23,15 +23,11 @@ export class EstudianteService {
   }
 
   update(id: number, estudiante: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}${id}`, estudiante);
+    return this.http.put<any>(`${this.apiUrl}/${id}`, estudiante);
   }
 
   delete(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}${id}`);
-  }
-
-  verificarCiExistente(ci: string): Observable<boolean> {
-    return this.http.get<boolean>(`${this.apiUrl}verificar-ci/${ci}`);
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 
 }

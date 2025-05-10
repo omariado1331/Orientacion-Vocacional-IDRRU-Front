@@ -196,168 +196,280 @@
     <!-- Modal para Ver Perfil de Estudiante -->
     <div class="modal fade" [ngClass]="{'show d-block': modalPerfilVisible}" tabindex="-1"
       [ngStyle]="{'display': modalPerfilVisible ? 'block' : 'none'}" aria-labelledby="perfilEstudianteModalLabel"
-      aria-hidden="true" >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header bg-primary text-white">
             <h5 class="modal-title" id="perfilEstudianteModalLabel">
               <i class="bi bi-person-badge me-2"></i>
               Perfil del Estudiante
             </h5>
-            <button type="button" class="btn-close" (click)="cerrarModalPerfil()"></button>
+            <button type="button" class="btn-close btn-close-white" (click)="cerrarModalPerfil()"></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body p-0">
             <!-- Spinner de carga -->
             <div *ngIf="loading" class="text-center py-5">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Cargando...</span>
               </div>
-              <p class="mt-2">Cargando información del estudiante...</p>
+              <p class="mt-2 text-muted">Cargando información del estudiante...</p>
             </div>
 
             <!-- Contenido del perfil -->
             <div *ngIf="!loading && estudianteSeleccionado" class="perfil-container">
-              <!-- Información personal -->
-              <div class="card mb-4">
-                <div class="card-header bg-light">
-                  <h5 class="mb-0">
-                    <i class="bi bi-person-lines-fill me-2"></i>
-                    Datos Personales
+              <!-- Banner y datos principales -->
+              <div class="bg-light p-4 mb-3 border-bottom position-relative">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <div class="bg-primary text-white d-flex align-items-center justify-content-center px-3 py-2 rounded-circle">
+                      <span class="fs-1">{{ estudianteSeleccionado.nombre.charAt(0) }}{{
+                        estudianteSeleccionado.apPaterno.charAt(0) }}</span>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <h4 class="mb-1">{{ estudianteSeleccionado.nombre }} {{ estudianteSeleccionado.apPaterno }} {{
+                      estudianteSeleccionado.apMaterno }}</h4>
+                    <div class="d-flex flex-wrap gap-3 text-muted">
+                      <div><i class="bi bi-credit-card me-1"></i> {{ estudianteSeleccionado.ciEstudiante }}</div>
+                      <div><i class="bi bi-mortarboard me-1"></i> {{ estudianteSeleccionado.curso }}</div>
+                      <div><i class="bi bi-building me-1"></i> {{ estudianteSeleccionado.colegio }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="px-4">
+                <!-- Información personal -->
+                <div class="card mb-4 border-0 shadow-sm">
+                  <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                      <i class="bi bi-person-lines-fill me-2 text-primary"></i>
+                      Datos Personales
+                    </h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">CI:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.ciEstudiante }}</p>
+                        </div>
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Nombre Completo:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.nombre }} {{ estudianteSeleccionado.apPaterno
+                            }} {{ estudianteSeleccionado.apMaterno }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Edad:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.edad }} años</p>
+                        </div>
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Celular:</label>
+                          <p class="mb-0 fs-5">
+                            <span *ngIf="estudianteSeleccionado.celular">
+                              <i class="bi bi-telephone me-1"></i>{{ estudianteSeleccionado.celular }}
+                            </span>
+                            <span *ngIf="!estudianteSeleccionado.celular" class="text-muted fst-italic">No
+                              especificado</span>
+                          </p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Colegio:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.colegio }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Curso:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.curso }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Resultados de Orientación -->
+                <div *ngIf="resultadoEstudiante && resultadoEstudiante.length > 0">
+                  <h5 class="mb-3 d-flex align-items-center">
+                    <span class="badge bg-primary rounded-pill me-2">{{ resultadoEstudiante.length }}</span>
+                    <i class="bi bi-graph-up me-2 text-primary"></i>
+                    Resultados de Orientación Vocacional
                   </h5>
-                </div>
-                <div class="card-body">
-                  <div class="row g-3">
-                    <div class="col-md-6">
-                      <div class="mb-3">
-                        <label class="fw-bold">CI:</label>
-                        <span class="ms-2">{{ estudianteSeleccionado.ciEstudiante }}</span>
-                      </div>
-                      <div class="mb-3">
-                        <label class="fw-bold">Nombre:</label>
-                        <span class="ms-2">{{ estudianteSeleccionado.nombre }} {{ estudianteSeleccionado.apPaterno }} {{
-                          estudianteSeleccionado.apMaterno }}</span>
-                      </div>
-                      <div class="mb-3">
-                        <label class="fw-bold">Edad:</label>
-                        <span class="ms-2">{{ estudianteSeleccionado.edad }} años</span>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="mb-3">
-                        <label class="fw-bold">Colegio:</label>
-                        <span class="ms-2">{{ estudianteSeleccionado.colegio }}</span>
-                      </div>
-                      <div class="mb-3">
-                        <label class="fw-bold">Curso:</label>
-                        <span class="ms-2">{{ estudianteSeleccionado.curso }}</span>
-                      </div>
-                      <div class="mb-3">
-                        <label class="fw-bold">Celular:</label>
-                        <span class="ms-2">{{ estudianteSeleccionado.celular || 'No especificado' }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              <!-- Resultados de Orientación -->
-              <h5 class="mb-3" *ngIf="resultadoEstudiante && resultadoEstudiante.length > 0">
-                <i class="bi bi-graph-up me-2"></i>
-                Resultados de Orientación Vocacional
-              </h5>
+                  <!-- Tabs para múltiples resultados -->
+                  <ul class="nav nav-tabs mb-3" *ngIf="resultadoEstudiante.length > 1">
+                    <li class="nav-item" *ngFor="let resultado of resultadoEstudiante; let i = index">
+                      <button class="nav-link" [ngClass]="{'active': i === 0}" data-bs-toggle="tab"
+                        [attr.data-bs-target]="'#resultado-' + i">
+                        Resultado {{ i + 1 }}
+                        <small class="ms-2 text-muted">{{ resultado.fecha | date:'dd/MM/yyyy' }}</small>
+                      </button>
+                    </li>
+                  </ul>
 
-              <div class="card mb-4" *ngFor="let resultado of resultadoEstudiante; let i = index">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                  <h6 class="mb-0">
-                    Resultado {{ i + 1 }}
-                    <small class="text-muted ms-2">{{ resultado.fecha | date:'dd/MM/yyyy HH:mm' }}</small>
-                  </h6>
-                </div>
-                <div class="card-body">
-                  <!-- Información básica del resultado -->
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <div class="mb-2">
-                        <label class="fw-bold">Interés:</label>
-                        <span class="ms-2">{{ resultado.interes }}</span>
-                        <!-- <div class="progress mt-1" style="height: 10px;">
-                          <div class="progress-bar bg-success" role="progressbar"
-                            [style.width]="resultado.interes + '%'" [attr.aria-valuenow]="resultado.interes"
-                            aria-valuemin="0" aria-valuemax="100"></div>
-                        </div> -->
-                      </div>
-                      <div class="mb-2">
-                        <label class="fw-bold">Aptitud:</label>
-                        <span class="ms-2">{{ resultado.aptitud }}</span>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="mb-2">
-                        <label class="fw-bold">Puntaje Holland:</label>
-                        <span class="ms-2">{{ resultado.puntajeHolland }}</span>
-                      </div>
-                      <div class="mb-2" *ngIf="resultado.facultad?.nombre">
-                        <label class="fw-bold">Facultad recomendada:</label>
-                        <span class="ms-2">{{ resultado.facultad.nombre }}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Datos CHASIDE específicos de este resultado -->
-                  <div class="card mb-3 bg-light" *ngIf="resultado.chaside">
-                    <div class="card-body py-2">
-                      <h6 class="card-title">
-                        <i class="bi bi-clipboard-data me-2"></i>
-                        Información CHASIDE
-                      </h6>
-                      <div class="row">
-                        <div class="col-12">
-                          <label class="fw-bold">CHASIDE:</label>
-                          <span class="ms-2">{{ resultado.chaside.codigo }}</span>
+                  <div class="tab-content">
+                    <div class="tab-pane fade show" [ngClass]="{'active': i === 0}"
+                      *ngFor="let resultado of resultadoEstudiante; let i = index" [attr.id]="'resultado-' + i">
+                      <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                          <h6 class="mb-0 d-flex align-items-center">
+                            <i class="bi bi-calendar-check me-2 text-primary"></i>
+                            Evaluación del {{ resultado.fecha | date:'dd/MM/yyyy HH:mm' }}
+                          </h6>
+                          <span class="badge bg-success">Completado</span>
                         </div>
-                        <!-- Agregar más campos según la estructura de tus datos CHASIDE -->
-                      </div>
-                    </div>
-                  </div>
+                        <div class="card-body">
+                          <div class="row mb-4">
+                            <div class="col-md-6">
+                              <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                  <h6 class="card-title text-primary">
+                                    <i class="bi bi-star me-2"></i>Interés y Aptitud
+                                  </h6>
+                                  <div class="mb-3">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Interés:</label>
+                                    <div class="d-flex align-items-center">
+                                      <span class="fs-5 me-2">{{ resultado.interes }}</span>
+                                      <!-- <div class="progress flex-grow-1" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar"
+                                          [style.width]="(resultado.interes / 100) * 100 + '%'" aria-valuemin="0"
+                                          aria-valuemax="100"></div>
+                                      </div> -->
+                                    </div>
+                                  </div>
+                                  <div class="mb-0">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Aptitud:</label>
+                                    <div class="d-flex align-items-center">
+                                      <span class="fs-5 me-2">{{ resultado.aptitud }}</span>
+                                      <!-- <div class="progress flex-grow-1" style="height: 8px;">
+                                        <div class="progress-bar bg-info" role="progressbar"
+                                          [style.width]="(resultado.aptitud / 100) * 100 + '%'" aria-valuemin="0"
+                                          aria-valuemax="100"></div>
+                                      </div> -->
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                  <h6 class="card-title text-primary">
+                                    <i class="bi bi-award me-2"></i>Evaluación Holland
+                                  </h6>
+                                  <div class="mb-3">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Puntaje Holland:</label>
+                                    <p class="mb-0 fs-5">{{ resultado.puntajeHolland }}</p>
+                                  </div>
+                                  <div *ngIf="resultado.facultad?.nombre">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Facultad
+                                      recomendada:</label>
+                                    <p class="mb-0 fs-5">
+                                      <span class="badge bg-primary me-2">
+                                        <i class="bi bi-building me-1"></i>
+                                      </span>
+                                      {{ resultado.facultad.nombre }}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
 
-                  <!-- Datos Holland específicos de este resultado -->
-                  <div class="card bg-light" *ngIf="resultado.holland">
-                    <div class="card-body py-2">
-                      <h6 class="card-title">
-                        <i class="bi bi-person-bounding-box me-2"></i>
-                        Información Holland
-                      </h6>
-                      <div class="row">
-                        <div class="col-12">
-                          <label class="fw-bold">Tipo de personalidad:</label>
-                          <span class="ms-2">{{ resultado.holland.personalidad }}</span>
+                          <!-- Resultados detallados -->
+                          <div class="row mb-3">
+                            <!-- Datos CHASIDE específicos -->
+                            <div class="col-md-6 mb-3" *ngIf="resultado.chaside">
+                              <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                  <h6 class="card-title text-primary d-flex align-items-center">
+                                    <i class="bi bi-clipboard-data me-2"></i>
+                                    Test CHASIDE
+                                  </h6>
+                                  <div class="mb-0">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Código CHASIDE:</label>
+                                    <div class="chaside-code">
+                                      <span class="text-uppercase fw-bold me-1">
+                                        {{ resultado.chaside.codigo }}
+              
+                                      </span>
+                                    </div>
+                                    <p class="mt-2 small text-muted mb-0">
+                                      C: Administrativas y Contables, H: Humanísticas, A: Artísticas, S: Medicina y Cs.
+                                      de la Salud,
+                                      I: Ingeniería, D: Defensa y Seguridad, E: Ciencias Exactas
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Datos Holland específicos -->
+                            <div class="col-md-6 mb-3" *ngIf="resultado.holland">
+                              <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                  <h6 class="card-title text-primary d-flex align-items-center">
+                                    <i class="bi bi-person-bounding-box me-2"></i>
+                                    Test Holland
+                                  </h6>
+                                  <div class="mb-0">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Tipo de
+                                      personalidad:</label>
+                                    <p class="mb-0 fs-5">{{ resultado.holland.personalidad }}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Recomendaciones específicas -->
+                          <div class="card border-0 bg-primary bg-opacity-10 mb-0">
+                            <div class="card-body">
+                              <h6 class="card-title text-primary">
+                                <i class="bi bi-lightbulb me-2"></i>
+                                Recomendaciones
+                              </h6>
+                              <p class="mb-0">
+                                Basado en los resultados de los tests, se recomienda explorar carreras relacionadas con
+                                <strong>{{ resultado.facultad?.nombre || 'las áreas de mayor puntaje' }}</strong>.
+                                Es importante complementar estos resultados con una orientación personalizada.
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <!-- Agregar más campos según la estructura de tus datos Holland -->
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="alert alert-info" *ngIf="!resultadoEstudiante?.length">
-                <i class="bi bi-info-circle me-2"></i>
-                Este estudiante aún no tiene resultados de orientación vocacional registrados.
+                <div class="alert alert-info d-flex align-items-center" *ngIf="!resultadoEstudiante?.length">
+                  <i class="bi bi-info-circle fs-4 me-3"></i>
+                  <div>
+                    <h6 class="mb-1">Sin resultados disponibles</h6>
+                    <p class="mb-0">Este estudiante aún no tiene resultados de orientación vocacional registrados.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-success" *ngIf="estudianteSeleccionado" (click)="exportarPerfilPDF()">
-              <i class="bi bi-file-earmark-pdf me-2"></i>
-              Exportar PDF
-            </button>
-            <button type="button" class="btn btn-secondary" (click)="cerrarModalPerfil()">
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalPerfil()">
               <i class="bi bi-x-circle me-2"></i>
               Cerrar
+            </button>
+            <button type="button" class="btn btn-primary" *ngIf="estudianteSeleccionado" (click)="exportarPerfilPDF()">
+              <i class="bi bi-file-earmark-pdf me-2"></i>
+              Exportar PDF
             </button>
           </div>
         </div>
       </div>
     </div>
+
 
     <!-- Modal para Editar Estudiante -->
     <div class="modal fade" [ngClass]="{'show d-block': modalEditarVisible}" tabindex="-1"
