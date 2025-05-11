@@ -22,10 +22,15 @@
     "@angular/router": "^19.1.0",
     "@angular/ssr": "^19.1.6",
     "@popperjs/core": "^2.11.8",
+    "@types/xlsx": "^0.0.35",
     "bootstrap": "^5.3.5",
     "express": "^4.18.2",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.23",
+    "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {

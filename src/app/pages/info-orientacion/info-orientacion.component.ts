@@ -23,7 +23,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 1,
     nombre: "Facultad de Agronomia",
     codigo: "FA",
-    url: "/facultades/agronomia",
+    url: "http://agro.umsa.bo/",
     imgLogo: "assets/logos-facultades/FA.png",
     carreras: [
       "Ingenieria Agronomica",
@@ -35,7 +35,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 2,
     nombre: "Facultad de Arquitectura, Artes, Diseno y Urbanismo",
     codigo: "FAADU",
-    url: "/facultades/arquitectura",
+    url: "http://faadu.umsa.bo/",
     imgLogo: "assets/logos-facultades/FAADU.png",
     carreras: [
       "Arquitectura",
@@ -48,7 +48,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 3,
     nombre: "Facultad de Ciencias Economicas y Financieras",
     codigo: "FCEF",
-    url: "/facultades/economicas",
+    url: "https://fcef.umsa.bo/",
     imgLogo: "assets/logos-facultades/FCEF.png",
     carreras: [
       "Administracion de Empresas",
@@ -60,7 +60,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 4,
     nombre: "Facultad de Ciencias Farmaceuticas y Bioquimicas",
     codigo: "FCFB",
-    url: "/facultades/farmaceuticas",
+    url: "http://www.farbio.edu.bo/",
     imgLogo: "assets/logos-facultades/FCFB.png",
     carreras: [
       "Bioquimica",
@@ -71,7 +71,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 5,
     nombre: "Facultad de Ciencias Geologicas",
     codigo: "FCG",
-    url: "/facultades/geologicas",
+    url: "http://fcg.umsa.bo/",
     imgLogo: "assets/logos-facultades/FCG.png",
     carreras: [
       "Ingenieria Geografica",
@@ -84,7 +84,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 6,
     nombre: "Facultad de Ciencias Puras y Naturales",
     codigo: "FCPN",
-    url: "/facultades/ciencias-puras",
+    url: "http://www.fcpn.edu.bo/fcpn/",
     imgLogo: "assets/logos-facultades/FCPN.png",
     carreras: [
       "Biologia",
@@ -99,7 +99,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 7,
     nombre: "Facultad de Ciencias Sociales",
     codigo: "FCS",
-    url: "/facultades/ciencias-sociales",
+    url: "http://fcs.umsa.bo/",
     imgLogo: "assets/logos-facultades/FCS.png",
     carreras: [
       "Antropologia y Arqueologia",
@@ -112,7 +112,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 8,
     nombre: "Facultad de Derecho y Ciencias Politicas",
     codigo: "FDCP",
-    url: "/facultades/derecho",
+    url: "http://www.fdcp.umsa.bo/",
     imgLogo: "assets/logos-facultades/FDCP.png",
     carreras: [
       "Derecho",
@@ -124,7 +124,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 9,
     nombre: "Facultad de Humanidades y Ciencias de la Educacion",
     codigo: "FHCE",
-    url: "/facultades/humanidades",
+    url: "https://fhce.umsa.bo/",
     imgLogo: "assets/logos-facultades/FHCE.png",
     carreras: [
       "Ciencias de la Informacion, Archivologia - Bibliotecologia - Documentacion - Museologia",
@@ -141,7 +141,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 10,
     nombre: "Facultad de Ingenieria",
     codigo: "FI",
-    url: "/facultades/ingenieria",
+    url: "http://200.87.114.154/ffing/index.php",
     imgLogo: "assets/logos-facultades/FI.png",
     carreras: [
       "Ingenieria Ambiental",
@@ -165,7 +165,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 11,
     nombre: "Facultad de Medicina, Enfermeria, Nutricion y Tecnologia Medica",
     codigo: "FMENT",
-    url: "/facultades/medicina",
+    url: "http://fment.umsa.bo/",
     imgLogo: "assets/logos-facultades/FMENT.png",
     carreras: [
       "Medicina",
@@ -178,7 +178,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 12,
     nombre: "Facultad de Odontologia",
     codigo: "FO",
-    url: "/facultades/odontologia",
+    url: "http://fo.umsa.bo/",
     imgLogo: "assets/logos-facultades/FO.png",
     carreras: [
       "Odontologia"
@@ -188,7 +188,7 @@ const FACULTADES_DATA: Facultad[] = [
     id: 13,
     nombre: "Facultad de Tecnologia",
     codigo: "FT",
-    url: "/facultades/tecnologia",
+    url: "http://ft.umsa.bo/",
     imgLogo: "assets/logos-facultades/FT.png",
     carreras: [
       "Aeronautica",
