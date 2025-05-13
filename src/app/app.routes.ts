@@ -6,10 +6,18 @@ import { ReportOrientacionComponent } from './pages/report-orientacion/report-or
 import { ControlOrientacionComponent } from './pages/control-orientacion/control-orientacion.component';
 
 
+import { FormEstudianteComponent } from './pages/forms/form-estudiante/form-estudiante.component';
+import { ResultFormComponent } from './pages/forms/result-form/result-form.component';
+
 export const routes: Routes = [
     {path: '', redirectTo: 'orientacion-vocacional', pathMatch: 'full'},
-    {path: 'orientacion-vocacional', component: OrientacionVocacionalComponent},
-    {path: 'info-orientacion', component: InfoOrientacionComponent},
-    {path: 'report-orientacion', component: ReportOrientacionComponent},
+    {path:'orientacion-vocacional', component: OrientacionVocacionalComponent},
+    {path:'info-orientacion', component: InfoOrientacionComponent },
+    {path:'report-orientacion', component: ReportOrientacionComponent},
     {path: 'control-orientacion', component: ControlOrientacionComponent},
+    {path: 'formulario', children:[
+        {path: 'estudiante', component: FormEstudianteComponent},
+        {path: 'resultado', component: ResultFormComponent}
+    ]}
 ];
+ 

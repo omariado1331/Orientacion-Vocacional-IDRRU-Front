@@ -1,0 +1,13 @@
+export class Municipio{
+    constructor(
+        public id: number,
+        public nombre: string,
+        public idProvincia: string
+    ){}
+}
+
+export interface MunicipioI {
+    id: number;
+    nombre: string;
+    id_provincia: number;
+}
