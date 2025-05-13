@@ -1,13 +1,11 @@
-
-import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ResultadoDto } from '../../interfaces/resultado-interface';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { LoginRequest } from '../../interfaces/auth.interface';
 import { EstudianteService } from '../../services/estudiante.service';
-import { DatePipe } from '@angular/common';
 import { ResultadoService } from '../../services/resultado.service';
 import { ProvinciaService } from '../../services/provincia.service';
 import { MunicipioService } from '../../services/municipio.service';
@@ -18,9 +16,8 @@ import { NotificacionService } from '../../services/notificacion.service';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Subject } from 'rxjs';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { debounceTime, distinctUntilChanged, forkJoin, Observable, Subject, of, takeUntil } from 'rxjs';
+import { ToastrModule } from 'ngx-toastr';
 
 /**
  * Componente para manejar el inicio de sesión
@@ -104,10 +101,19 @@ export class ControlOrientacionComponent implements OnInit {
   // Nuevas propiedades para datos adicionales
   chasideData: any = null;
   hollandData: any = null;
-
   private searchTerms = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
-
+  // FormArray para manejar los resultados
+  resultadosForm: FormArray;
+  resultadoForm: FormGroup;
+  // Opciones para los selectores
+  chasideOpciones: any[] = [];
+  hollandOpciones: any[] = [];
+  facultadOpciones: any[] = [];
+  get resultadoFormGroup(): FormGroup {
+    return this.resultadoForm as FormGroup;
+  }
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private formBuilder: FormBuilder,
@@ -128,7 +134,7 @@ export class ControlOrientacionComponent implements OnInit {
       password: ['', [Validators.required]],
     });
 
-    // Añadir formulario para edición
+    //formulario para edición
     this.editarForm = this.formBuilder.group({
       ciEstudiante: ['', [Validators.required]],
       nombre: ['', [Validators.required]],
@@ -140,6 +146,15 @@ export class ControlOrientacionComponent implements OnInit {
       celular: ['', [Validators.pattern('^[0-9]*$')]],
       id_municipio: [null, [Validators.required]]
     });
+    this.resultadoForm = this.formBuilder.group({
+      fecha: ['', Validators.required],
+      idChaside: ['', Validators.required], 
+      idHolland: ['', Validators.required], 
+      idFacultad: ['', Validators.required], 
+      puntajeHolland: ['', Validators.required],
+      aptitud: ['', Validators.required],
+    });
+     this.resultadosForm = this.inicializarFormArrayResultados();
     // Configurar el debounce para la búsqueda
     this.searchTerms.pipe(
       debounceTime(300),
@@ -156,7 +171,10 @@ export class ControlOrientacionComponent implements OnInit {
       this.cargarDatos();
     }
   }
-
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
   /**
    * Carga todos los datos necesarios para la vista
    */
@@ -223,8 +241,8 @@ export class ControlOrientacionComponent implements OnInit {
     });
   }
   /**
-     * Carga las provincias disponibles
-     */
+  * Carga las provincias disponibles
+  */
   cargarProvincias(): void {
     this.provinciaService.getProvincias().subscribe({
       next: (data) => {
@@ -244,8 +262,8 @@ export class ControlOrientacionComponent implements OnInit {
     });
   }
   /**
-     * Carga los municipios de una provincia específica
-     */
+  * Carga los municipios de una provincia específica
+  */
   cargarMunicipiosPorProvincia(idProvincia: number): void {
     this.municipioService.getMunicipios(idProvincia).subscribe({
       next: (data) => {
@@ -263,8 +281,8 @@ export class ControlOrientacionComponent implements OnInit {
     });
   }
   /**
- * Actualiza la lista de municipios cuando cambia la provincia seleccionada
- */
+  * Actualiza la lista de municipios cuando cambia la provincia seleccionada
+  */
   onProvinciaChange(idProvincia: string): void {
     this.filtros.provincia = idProvincia;
     this.filtros.municipio = '';
@@ -280,13 +298,12 @@ export class ControlOrientacionComponent implements OnInit {
     this.filtrarEstudiantes();
   }
   /**
- * Actualiza los filtros de fecha con validación
- */
+  * Actualiza los filtros de fecha con validación
+  */
   aplicarFiltroFecha(): void {
     if (this.filtros.fechaInicio && this.filtros.fechaFin) {
       const inicio = new Date(this.filtros.fechaInicio);
       const fin = new Date(this.filtros.fechaFin);
-
       if (fin < inicio) {
         this.mostrarNotificacion('La fecha final debe ser mayor o igual a la fecha inicial', 'error');
         return;
@@ -537,52 +554,259 @@ export class ControlOrientacionComponent implements OnInit {
   /**
    * Métodos para los modales
    */
+
+  inicializarFormArrayResultados(): FormArray {
+    return this.formBuilder.array([]);
+  }
+
+  /**
+   * Crea un FormGroup para un resultado individual
+   */
+  crearFormularioResultado(resultado?: any): FormGroup {
+    return this.formBuilder.group({
+      idResultado: [resultado?.idResultado || null],
+      interes: [resultado?.interes || null, [Validators.required, Validators.min(0), Validators.max(100)]],
+      aptitud: [resultado?.aptitud || null, [Validators.required, Validators.min(0), Validators.max(100)]],
+      puntajeHolland: [resultado?.puntajeHolland || ''],
+      fecha: [resultado?.fecha ? this.formatearFechaParaInput(resultado.fecha) : this.formatearFechaParaInput(new Date().toISOString())],
+      idEstudiante: [resultado?.idEstudiante || null],
+      idChaside: [resultado?.idChaside || null],
+      idHolland: [resultado?.idHolland || null],
+      idFacultad: [resultado?.idFacultad || null]
+    });
+  }
+
+  /**
+   * Formatea la fecha para el input datetime-local
+   */
+  formatearFechaParaInput(fechaString: string): string {
+    if (!fechaString) return '';
+    const fecha = new Date(fechaString);
+    return fecha.toISOString().slice(0, 16); // formato: "YYYY-MM-DDThh:mm"
+  }
+
+  /**
+   * Carga los datos necesarios para los selectores de resultados
+   */
+  cargarDatosParaResultados(): void {
+    // Cargar opciones de CHASIDE
+    this.chasideService.getAll().subscribe({
+      next: (data) => {
+        this.chasideOpciones = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar opciones CHASIDE', err);
+        this.mostrarNotificacion('No se pudieron cargar las opciones de CHASIDE', 'error');
+      }
+    });
+
+    // Cargar opciones de Holland
+    this.hollandService.getAll().subscribe({
+      next: (data) => {
+        this.hollandOpciones = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar opciones Holland', err);
+        this.mostrarNotificacion('No se pudieron cargar las opciones de Holland', 'error');
+      }
+    });
+
+    // Cargar opciones de Facultad
+    this.facultadService.getAll().subscribe({
+      next: (data) => {
+        this.facultadOpciones = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar opciones de Facultad', err);
+        this.mostrarNotificacion('No se pudieron cargar las opciones de Facultad', 'error');
+      }
+    });
+  }
+
+  /**
+   * Abre el modal para editar un estudiante y sus resultados
+   */
   abrirModalEditar(estudiante: any): void {
     this.estudianteSeleccionado = { ...estudiante };
-    if (this.editarForm) {
-      this.editarForm.patchValue({
-        ciEstudiante: estudiante.ciEstudiante,
-        nombre: estudiante.nombre,
-        apPaterno: estudiante.apPaterno,
-        apMaterno: estudiante.apMaterno,
-        colegio: estudiante.colegio,
-        curso: estudiante.curso,
-        edad: estudiante.edad,
-        celular: estudiante.celular,
-        id_municipio: estudiante.id_municipio
+
+    // Resetear formularios
+    if (!this.editarForm) {
+      this.editarForm = this.formBuilder.group({
+        ciEstudiante: ['', [Validators.required]],
+        nombre: ['', [Validators.required]],
+        apPaterno: ['', [Validators.required]],
+        apMaterno: [''],
+        colegio: ['', [Validators.required]],
+        curso: ['', [Validators.required]],
+        edad: [null, [Validators.required, Validators.min(10), Validators.max(30)]],
+        celular: ['', [Validators.pattern('^[0-9]*$')]],
+        id_municipio: [null, [Validators.required]]
       });
     }
 
-    this.modalEditarVisible = true;
+    // Inicializar el FormArray para resultados
+    this.resultadosForm = this.inicializarFormArrayResultados();
+
+    // Asegurarse de que los datos selectores estén cargados
+    this.cargarDatosParaResultados();
+
+    // Completar el formulario con los datos del estudiante
+    this.editarForm.patchValue({
+      ciEstudiante: estudiante.ciEstudiante,
+      nombre: estudiante.nombre,
+      apPaterno: estudiante.apPaterno,
+      apMaterno: estudiante.apMaterno,
+      colegio: estudiante.colegio,
+      curso: estudiante.curso,
+      edad: estudiante.edad,
+      celular: estudiante.celular,
+      id_municipio: estudiante.id_municipio
+    });
+
+    // Cargar los resultados existentes del estudiante
+    this.resultadoService.getByEstudianteId(estudiante.idEstudiante).subscribe({
+      next: (resultados: ResultadoDto[]) => {
+        if (resultados.length > 0) {
+          resultados.forEach(resultado => {
+            this.resultadosForm.push(this.crearFormularioResultado(resultado));
+          });
+        } else {
+          // Si no hay resultados, crear uno vacío
+          this.agregarNuevoResultado();
+        }
+        this.modalEditarVisible = true;
+      },
+      error: (err) => {
+        console.error('Error al cargar resultados del estudiante', err);
+        this.mostrarNotificacion('No se pudieron cargar los resultados de orientación', 'error');
+        // Crear un resultado vacío incluso en caso de error para permitir la edición
+        this.agregarNuevoResultado();
+        this.modalEditarVisible = true;
+      }
+    });
   }
 
+  /**
+   * Agrega un nuevo resultado vacío al formulario
+   */
+  agregarNuevoResultado(): void {
+    const nuevoResultado = this.crearFormularioResultado({
+      idEstudiante: this.estudianteSeleccionado?.idEstudiante
+    });
+    this.resultadosForm.push(nuevoResultado);
+  }
+
+  /**
+   * Elimina un resultado del formulario
+   */
+  eliminarResultado(index: number): void {
+    this.resultadosForm.removeAt(index);
+  }
+
+  /**
+   * Verifica si el formulario completo (estudiante + resultados) es válido
+   */
+  esFormularioValido(): boolean {
+    if (!this.editarForm || this.editarForm.invalid) {
+      return false;
+    }
+
+    // Verificar que cada resultado en el FormArray sea válido
+    for (let i = 0; i < this.resultadosForm.length; i++) {
+      const resultadoForm = this.resultadosForm.at(i) as FormGroup;
+      if (resultadoForm.invalid) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Guarda la edición completa (estudiante y sus resultados)
+   */
+  guardarEdicionCompletaEstudiante(): void {
+    if (!this.esFormularioValido() || !this.estudianteSeleccionado) {
+      this.mostrarNotificacion('Por favor, complete todos los campos requeridos', 'error');
+      return;
+    }
+
+    this.loading = true;
+
+    // Primero guardar los datos del estudiante
+    const estudianteActualizado = {
+      ...this.estudianteSeleccionado,
+      ...(this.editarForm?.value || {})
+    };
+
+    this.estudianteService.update(estudianteActualizado.idEstudiante, estudianteActualizado).subscribe({
+      next: (estudianteGuardado) => {
+        // Después guardar cada uno de los resultados
+        const resultadosOperaciones: Observable<any>[] = [];
+
+        for (let i = 0; i < this.resultadosForm.length; i++) {
+          const resultadoForm = this.resultadosForm.at(i) as FormGroup;
+          const resultadoData = resultadoForm.value;
+          resultadoData.idEstudiante = estudianteActualizado.idEstudiante;
+
+          // Si tiene ID, actualizar; sino, crear nuevo
+          if (resultadoData.idResultado) {
+            resultadosOperaciones.push(
+              this.resultadoService.update(resultadoData.idResultado, resultadoData)
+            );
+          } else {
+            resultadosOperaciones.push(
+              this.resultadoService.create(resultadoData)
+            );
+          }
+        }
+
+        // Si no hay resultados que guardar, terminar el proceso
+        if (resultadosOperaciones.length === 0) {
+          this.loading = false;
+          this.mostrarNotificacion('Estudiante actualizado con éxito', 'success');
+          this.cerrarModalEditar();
+          this.cargarEstudiantes();
+          return;
+        }
+
+        // Procesar todas las operaciones de resultados usando forkJoin
+        import('rxjs').then(({ forkJoin, of }) => {
+          forkJoin(resultadosOperaciones.length ? resultadosOperaciones : [of(null)]).subscribe({
+            next: () => {
+              this.loading = false;
+              this.mostrarNotificacion('Estudiante y resultados actualizados con éxito', 'success');
+              this.cerrarModalEditar();
+              this.cargarEstudiantes();
+            },
+            error: (err) => {
+              this.loading = false;
+              console.error('Error al guardar resultados', err);
+              this.mostrarNotificacion('Datos del estudiante actualizados, pero hubo errores con los resultados', 'warning');
+              this.cerrarModalEditar();
+              this.cargarEstudiantes();
+            }
+          });
+        });
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error al actualizar estudiante', err);
+        this.mostrarNotificacion('No se pudo actualizar el estudiante', 'error');
+      }
+    });
+  }
+
+  /**
+   * Cierra el modal de edición
+   */
   cerrarModalEditar(): void {
     this.modalEditarVisible = false;
     this.estudianteSeleccionado = null;
     if (this.editarForm) {
       this.editarForm.reset();
     }
-  }
-
-  guardarEdicionEstudiante(): void {
-    if (this.editarForm?.valid && this.estudianteSeleccionado) {
-      const estudianteActualizado = {
-        ...this.estudianteSeleccionado,
-        ...this.editarForm.value
-      };
-
-      this.estudianteService.update(estudianteActualizado.idEstudiante, estudianteActualizado).subscribe({
-        next: () => {
-          this.mostrarNotificacion('Estudiante actualizado con éxito', 'success');
-          this.cerrarModalEditar();
-          this.cargarEstudiantes();
-        },
-        error: (err) => {
-          console.error('Error al actualizar estudiante', err);
-          this.mostrarNotificacion('No se pudo actualizar el estudiante', 'error');
-        }
-      });
-    }
+    this.resultadosForm = this.inicializarFormArrayResultados();
   }
 
   verPerfilEstudiante(id: number): void {
@@ -645,7 +869,7 @@ export class ControlOrientacionComponent implements OnInit {
               .catch(err => {
                 console.error('Error al procesar los resultados', err);
                 this.mostrarNotificacion('Hubo un error al procesar los resultados', 'error');
-                this.resultadoEstudiante = resultados; 
+                this.resultadoEstudiante = resultados;
                 this.modalPerfilVisible = true;
                 this.loading = false;
               });
@@ -675,6 +899,9 @@ export class ControlOrientacionComponent implements OnInit {
     this.resultadoEstudiante = [];
     this.chasideData = null;
     this.hollandData = null;
+    setTimeout(() => {
+      document.body.focus();
+    }, 0);
   }
   /**
    * Exporta la información del perfil del estudiante a PDF
