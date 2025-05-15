@@ -18,11 +18,8 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { debounceTime, distinctUntilChanged, forkJoin, Observable, Subject, of, takeUntil } from 'rxjs';
 import { ToastrModule } from 'ngx-toastr';
+import Swal from 'sweetalert2';
 
-/**
- * Componente para manejar el inicio de sesión
- * y mostrar datos de control de orientación vocacional.
- */
 @Component({
   selector: 'app-control-orientacion',
   templateUrl: './control-orientacion.component.html',
@@ -31,28 +28,46 @@ import { ToastrModule } from 'ngx-toastr';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, ToastrModule],
   providers: [DatePipe, NotificacionService]
 })
-export class ControlOrientacionComponent implements OnInit {
-  // Variables públicas para usar en el template
+export class ControlOrientacionComponent implements OnInit, OnDestroy {
+  // CONSTANTES Y UTILIDADES
   Math = Math;
   logoUrl = 'assets/escudo.png';
-
-  // Estados del componente
+  logoIDRU = 'assets/idrdu.png';
+  // ESTADO DE AUTENTICACIÓN
   isAuthenticated = false;
   loading = false;
   error = '';
+
+  // ESTADO DE LA INTERFAZ
   exportando = false;
   searchQuery = '';
+  private searchTerms = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
-  // Formularios
-  loginForm: FormGroup;
-  // Formulario para edición
-  editarForm: FormGroup | undefined;
+  // FORMULARIOS
+  loginForm!: FormGroup;
+  editarForm!: FormGroup;
+  resultadoForm!: FormGroup;
+  resultadosForm!: FormArray;
 
-  // Datos de estudiantes y filtrado
+  // GESTIÓN DE ESTUDIANTES
   estudiantes: any[] = [];
   estudiantesFiltrados: any[] = [];
+  estudianteSeleccionado: any = null;
+  resultadoEstudiante: ResultadoDto[] = [];
 
-  // Opciones para filtros
+  // OPCIONES PARA SELECTORES
+  chasideOpciones: any[] = [];
+  hollandOpciones: any[] = [];
+  facultadOpciones: any[] = [];
+  provincias: any[] = [];
+  municipiosPorProvincia: { [provinciaId: number]: any[] } = {};
+  municipios: any[] = [];
+  // DATOS ADICIONALES PARA VISUALIZACIONES
+  chasideData: any = null;
+  hollandData: any = null;
+
+  // CONFIGURACIÓN DE FILTROS
   opcionesFiltros = {
     provincias: [] as { nombre: string; idProvincia: number }[],
     municipios: [] as { nombre: string; idMunicipio: number }[],
@@ -61,8 +76,7 @@ export class ControlOrientacionComponent implements OnInit {
     fechasRegistro: [] as string[]
   };
 
-  // Estado de los filtros
-  filtros: { [key in 'provincia' | 'municipio' | 'colegio' | 'curso' | 'fecha' | 'nombre' | 'fechaInicio' | 'fechaFin']: string } = {
+  filtros = {
     provincia: '',
     municipio: '',
     colegio: '',
@@ -72,48 +86,28 @@ export class ControlOrientacionComponent implements OnInit {
     fechaInicio: '',
     fechaFin: ''
   };
-  // Configuración de paginación
+
+  // CONFIGURACIÓN DE PAGINACIÓN
   paginacion = {
     paginaActual: 1,
     itemsPorPagina: 10,
     totalPaginas: 1
   };
 
-  // Configuración de ordenamiento
+  // CONFIGURACIÓN DE ORDENAMIENTO
   ordenamiento = {
     columna: 'nombre',
     direccion: 'asc' as 'asc' | 'desc'
   };
-  // Para modales
-  estudianteSeleccionado: any = null;
+
+  // ESTADO DE MODALES
   modalEditarVisible = false;
   modalPerfilVisible = false;
 
-  // Para resultados de orientación
-
-  resultadoEstudiante: ResultadoDto[] = [];
-
-  // Para filtros adicionales
-  provincias: any[] = [];
-  municipiosPorProvincia: { [provinciaId: number]: any[] } = {}
-  filtroFechaInicio: string = '';
-  filtroFechaFin: string = '';
-  // Nuevas propiedades para datos adicionales
-  chasideData: any = null;
-  hollandData: any = null;
-  private searchTerms = new Subject<string>();
-  private destroy$ = new Subject<void>();
-
-  // FormArray para manejar los resultados
-  resultadosForm: FormArray;
-  resultadoForm: FormGroup;
-  // Opciones para los selectores
-  chasideOpciones: any[] = [];
-  hollandOpciones: any[] = [];
-  facultadOpciones: any[] = [];
-  get resultadoFormGroup(): FormGroup {
-    return this.resultadoForm as FormGroup;
+  get resultadosFormGroups(): FormArray<FormGroup> {
+    return this.resultadosForm as FormArray<FormGroup>;
   }
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private formBuilder: FormBuilder,
@@ -128,13 +122,18 @@ export class ControlOrientacionComponent implements OnInit {
     private datePipe: DatePipe,
     private notificacionService: NotificacionService
   ) {
-    // Inicialización de formularios
+    this.inicializarFormularios();
+    this.configurarBusqueda();
+  }
+
+  // INICIALIZACIÓN
+
+  private inicializarFormularios(): void {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]],
     });
 
-    //formulario para edición
     this.editarForm = this.formBuilder.group({
       ciEstudiante: ['', [Validators.required]],
       nombre: ['', [Validators.required]],
@@ -146,19 +145,24 @@ export class ControlOrientacionComponent implements OnInit {
       celular: ['', [Validators.pattern('^[0-9]*$')]],
       id_municipio: [null, [Validators.required]]
     });
+
     this.resultadoForm = this.formBuilder.group({
       fecha: ['', Validators.required],
-      idChaside: ['', Validators.required], 
-      idHolland: ['', Validators.required], 
-      idFacultad: ['', Validators.required], 
+      idChaside: ['', Validators.required],
+      idHolland: ['', Validators.required],
+      idFacultad: ['', Validators.required],
       puntajeHolland: ['', Validators.required],
       aptitud: ['', Validators.required],
     });
-     this.resultadosForm = this.inicializarFormArrayResultados();
-    // Configurar el debounce para la búsqueda
+
+    this.resultadosForm = this.inicializarFormArrayResultados();
+  }
+
+  private configurarBusqueda(): void {
     this.searchTerms.pipe(
       debounceTime(300),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
     ).subscribe(term => {
       this.searchQuery = term;
       this.filtrarEstudiantes();
@@ -166,27 +170,28 @@ export class ControlOrientacionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.resultadoForm = this.formBuilder.group({});
     this.isAuthenticated = this.authService.isAuthenticated();
     if (this.isAuthenticated) {
       this.cargarDatos();
     }
   }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
-  /**
-   * Carga todos los datos necesarios para la vista
-   */
+
   private cargarDatos(): void {
     this.cargarEstudiantes();
     this.cargarProvincias();
+    this.cargarMunicipios();
   }
-  /**
-   * Maneja el envío del formulario de login
-   */
+
+  // AUTENTICACIÓN
+
   onSubmit(): void {
-    if (this.loginForm.invalid) {
+    if (this.loginForm?.invalid) {
       return;
     }
 
@@ -194,8 +199,8 @@ export class ControlOrientacionComponent implements OnInit {
     this.error = '';
 
     const credentials: LoginRequest = {
-      username: this.loginForm.controls['username'].value,
-      password: this.loginForm.controls['password'].value
+      username: this.loginForm?.controls['username'].value,
+      password: this.loginForm?.controls['password'].value
     };
 
     this.authService.login(credentials)
@@ -212,17 +217,13 @@ export class ControlOrientacionComponent implements OnInit {
       });
   }
 
-  /**
-   * Cierra la sesión del usuario
-   */
   logout(): void {
     this.authService.logout();
     this.isAuthenticated = false;
   }
 
-  /**
-   * Carga la lista de estudiantes
-   */
+  // CARGA DE DATOS
+
   cargarEstudiantes(): void {
     this.estudianteService.getAll().subscribe({
       next: (data) => {
@@ -240,9 +241,7 @@ export class ControlOrientacionComponent implements OnInit {
       }
     });
   }
-  /**
-  * Carga las provincias disponibles
-  */
+
   cargarProvincias(): void {
     this.provinciaService.getProvincias().subscribe({
       next: (data) => {
@@ -251,9 +250,7 @@ export class ControlOrientacionComponent implements OnInit {
           nombre: p.nombre,
           idProvincia: p.id
         }));
-        data.forEach(provincia => {
-          this.cargarMunicipiosPorProvincia(provincia.id);
-        });
+
       },
       error: (err) => {
         console.error('Error al cargar provincias', err);
@@ -261,59 +258,52 @@ export class ControlOrientacionComponent implements OnInit {
       }
     });
   }
-  /**
-  * Carga los municipios de una provincia específica
-  */
-  cargarMunicipiosPorProvincia(idProvincia: number): void {
-    this.municipioService.getMunicipios(idProvincia).subscribe({
-      next: (data) => {
-        this.municipiosPorProvincia[idProvincia] = data.map(m => ({
-          nombre: m.nombre,
-          idMunicipio: m.id
-        }));
-        if (this.filtros.provincia && parseInt(this.filtros.provincia) === idProvincia) {
-          this.opcionesFiltros.municipios = this.municipiosPorProvincia[idProvincia];
+  cargarMunicipios(): void {
+    this.municipioService.getAll().subscribe({
+      next: (municipios: any[]) => {
+        this.municipios = municipios;
+        this.municipiosPorProvincia = {};
+        this.municipios.forEach(m => {
+          if (!this.municipiosPorProvincia[m.idProvincia]) {
+            this.municipiosPorProvincia[m.idProvincia] = [];
+          }
+          this.municipiosPorProvincia[m.idProvincia].push(m);
+        });
+        if (this.filtros.provincia) {
+          this.onProvinciaChange(this.filtros.provincia);
         }
       },
       error: (err) => {
-        console.error(`Error al cargar municipios de la provincia ${idProvincia}`, err);
+        console.error('Error al cargar municipios', err);
       }
     });
   }
-  /**
-  * Actualiza la lista de municipios cuando cambia la provincia seleccionada
-  */
-  onProvinciaChange(idProvincia: string): void {
-    this.filtros.provincia = idProvincia;
-    this.filtros.municipio = '';
-    if (idProvincia && this.municipiosPorProvincia[parseInt(idProvincia)]) {
-      this.opcionesFiltros.municipios = this.municipiosPorProvincia[parseInt(idProvincia)].map(m => ({
-        nombre: m.nombre,
-        idMunicipio: m.idMunicipio
-      }));
-    } else {
-      this.opcionesFiltros.municipios = [];
-    }
+  getMunicipioNombre(id: number): string {
+    const municipio = this.municipios.find(m => m.idMunicipio === id);
+    return municipio ? municipio.nombre : 'Desconocido';
+  }
 
-    this.filtrarEstudiantes();
-  }
-  /**
-  * Actualiza los filtros de fecha con validación
-  */
-  aplicarFiltroFecha(): void {
-    if (this.filtros.fechaInicio && this.filtros.fechaFin) {
-      const inicio = new Date(this.filtros.fechaInicio);
-      const fin = new Date(this.filtros.fechaFin);
-      if (fin < inicio) {
-        this.mostrarNotificacion('La fecha final debe ser mayor o igual a la fecha inicial', 'error');
-        return;
+
+  cargarDatosParaResultados(): void {
+    forkJoin({
+      chaside: this.chasideService.getAll(),
+      holland: this.hollandService.getAll(),
+      facultad: this.facultadService.getAll()
+    }).subscribe({
+      next: (resultado) => {
+        this.chasideOpciones = resultado.chaside;
+        this.hollandOpciones = resultado.holland;
+        this.facultadOpciones = resultado.facultad;
+      },
+      error: (err) => {
+        console.error('Error al cargar opciones para resultados', err);
+        this.mostrarNotificacion('Error al cargar datos necesarios para resultados', 'error');
       }
-    }
-    this.filtrarEstudiantes();
+    });
   }
-  /**
-   * Actualiza las opciones disponibles para los filtros
-   */
+
+  // GESTIÓN DE FILTROS
+
   actualizarOpcionesFiltros(): void {
     this.opcionesFiltros.municipios = Array.from(
       new Set(this.estudiantes.map(e => e.municipio?.nombre || 'No especificado'))
@@ -337,28 +327,32 @@ export class ControlOrientacionComponent implements OnInit {
       new Set(this.estudiantes.map(e => this.formatDate(e.createdAt || new Date().toISOString())))
     );
   }
+  onProvinciaChange(idProvincia: string): void {
+    this.filtros.provincia = idProvincia;
+    this.filtros.municipio = '';
 
-  /**
-   * Formatea una fecha para mostrarla en el formato DD/MM/YYYY
-   */
-  formatDate(dateString: string): string {
-    if (!dateString) return 'No especificado';
-    const date = new Date(dateString);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    if (idProvincia && this.municipios) {
+      const provinciaIdNumerico = parseInt(idProvincia, 10);
+      const municipiosFiltrados = this.municipios.filter(m =>
+        m.idProvincia === provinciaIdNumerico
+      );
+      this.opcionesFiltros.municipios = municipiosFiltrados.map(m => ({
+        nombre: m.nombre,
+        idMunicipio: m.idMunicipio
+      }));
+    } else {
+      this.opcionesFiltros.municipios = [];
+    }
+
+    this.filtrarEstudiantes();
   }
 
-  /**
-   * Aplica un filtro específico
-   */
   aplicarFiltro(tipo: keyof typeof this.filtros, valor: string): void {
     this.filtros[tipo] = valor;
     this.filtrarEstudiantes();
     this.paginacion.paginaActual = 1;
   }
 
-  /**
-   * Limpia todos los filtros
-   */
   limpiarTodosFiltros(): void {
     this.filtros = {
       provincia: '',
@@ -373,12 +367,22 @@ export class ControlOrientacionComponent implements OnInit {
     this.searchQuery = '';
     this.filtrarEstudiantes();
   }
-  /**
-   * Filtra los estudiantes según los criterios actuales
-   */
+
+  aplicarFiltroFecha(): void {
+    if (this.filtros.fechaInicio && this.filtros.fechaFin) {
+      const inicio = new Date(this.filtros.fechaInicio);
+      const fin = new Date(this.filtros.fechaFin);
+      if (fin < inicio) {
+        this.mostrarNotificacion('La fecha final debe ser mayor o igual a la fecha inicial', 'error');
+        return;
+      }
+    }
+    this.filtrarEstudiantes();
+  }
   filtrarEstudiantes(): void {
     let resultados = [...this.estudiantes];
 
+    // Filtro de búsqueda global
     if (this.searchQuery) {
       const busqueda = this.searchQuery.toLowerCase();
       resultados = resultados.filter(estudiante =>
@@ -390,7 +394,7 @@ export class ControlOrientacionComponent implements OnInit {
       );
     }
 
-    // Filtrar por provincia y municipio
+    // Filtros por ubicación
     if (this.filtros.provincia) {
       const idProvincia = parseInt(this.filtros.provincia);
       const municipiosEnProvincia = this.municipiosPorProvincia[idProvincia]?.map(m => m.idMunicipio) || [];
@@ -400,16 +404,14 @@ export class ControlOrientacionComponent implements OnInit {
     }
 
     if (this.filtros.municipio) {
-      resultados = resultados.filter(estudiante =>
-        estudiante.id_municipio === parseInt(this.filtros.municipio)
+      const idMunicipioFiltro = Number(this.filtros.municipio);
+      resultados = resultados.filter(estudiante => (estudiante.id_municipio || estudiante.municipio?.idMunicipio) === idMunicipioFiltro
       );
     }
 
-    // Filtros existentes
+    // Filtros institucionales
     if (this.filtros.colegio) {
-      resultados = resultados.filter(estudiante =>
-        (estudiante.colegio || 'No especificado') === this.filtros.colegio
-      );
+      resultados = resultados.filter(estudiante => (estudiante.colegio || 'No especificado') === this.filtros.colegio);
     }
 
     if (this.filtros.curso) {
@@ -418,14 +420,13 @@ export class ControlOrientacionComponent implements OnInit {
       );
     }
 
-    // Filtro por fecha específica
+    // Filtros temporales
     if (this.filtros.fecha) {
       resultados = resultados.filter(estudiante =>
         this.formatDate(estudiante.createdAt || '') === this.filtros.fecha
       );
     }
 
-    // Filtro por rango de fechas
     if (this.filtros.fechaInicio && this.filtros.fechaFin) {
       const fechaInicio = new Date(this.filtros.fechaInicio);
       const fechaFin = new Date(this.filtros.fechaFin);
@@ -441,9 +442,16 @@ export class ControlOrientacionComponent implements OnInit {
     this.estudiantesFiltrados = resultados;
     this.calcularPaginacion();
   }
-  /**
-   * Aplica ordenamiento a la lista de estudiantes
-   */
+
+  buscarGlobal(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery = input.value;
+    this.filtrarEstudiantes();
+    this.paginacion.paginaActual = 1;
+  }
+
+  // PAGINACIÓN Y ORDENAMIENTO
+
   aplicarOrdenamiento(): void {
     this.estudiantes.sort((a, b) => {
       let valorA: any;
@@ -467,9 +475,6 @@ export class ControlOrientacionComponent implements OnInit {
     this.filtrarEstudiantes();
   }
 
-  /**
-   * Cambia la columna de ordenamiento
-   */
   ordenarPor(columna: string): void {
     if (this.ordenamiento.columna === columna) {
       this.ordenamiento.direccion = this.ordenamiento.direccion === 'asc' ? 'desc' : 'asc';
@@ -480,9 +485,6 @@ export class ControlOrientacionComponent implements OnInit {
     this.aplicarOrdenamiento();
   }
 
-  /**
-   * Calcula la paginación basada en los resultados filtrados
-   */
   calcularPaginacion(): void {
     this.paginacion.totalPaginas = Math.ceil(this.estudiantesFiltrados.length / this.paginacion.itemsPorPagina);
     if (this.paginacion.paginaActual > this.paginacion.totalPaginas) {
@@ -490,85 +492,87 @@ export class ControlOrientacionComponent implements OnInit {
     }
   }
 
-  /**
-   * Cambia a una página específica
-   */
   cambiarPagina(pagina: number): void {
     if (pagina >= 1 && pagina <= this.paginacion.totalPaginas) {
       this.paginacion.paginaActual = pagina;
     }
   }
 
-  /**
-   * Obtiene los estudiantes de la página actual
-   */
   get estudiantesPaginados(): any[] {
     const inicio = (this.paginacion.paginaActual - 1) * this.paginacion.itemsPorPagina;
     const fin = inicio + this.paginacion.itemsPorPagina;
     return this.estudiantesFiltrados.slice(inicio, fin);
   }
 
-  /**
-   * Cambia la cantidad de items por página
-   */
   cambiarItemsPorPagina(items: number): void {
     this.paginacion.itemsPorPagina = items;
-    this.paginacion.paginaActual = 1; // Resetear a primera página
+    this.paginacion.paginaActual = 1;
     this.calcularPaginacion();
   }
 
-  /**
-   * Elimina un estudiante
-   */
-  eliminarEstudiante(id: number): void {
-    if (confirm('¿Está seguro de eliminar este estudiante?')) {
-      this.estudianteService.delete(id).subscribe({
-        next: () => {
-          this.cargarEstudiantes();
-          this.mostrarNotificacion('Estudiante eliminado exitosamente', 'success');
-        },
-        error: (err) => {
-          console.error('Error al eliminar estudiante', err);
-          this.mostrarNotificacion('Error al eliminar estudiante', 'error');
-        }
-      });
-    }
+  // UTILIDADES
+
+  formatDate(dateString: string): string {
+    if (!dateString) return 'No especificado';
+    const date = new Date(dateString);
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   }
 
-  /**
-   * Muestra una notificación al usuario
-   */
+  formatearFechaParaInput(fechaString: string): string {
+    if (!fechaString) return '';
+    const fecha = new Date(fechaString);
+    return fecha.toISOString().slice(0, 16);
+  }
+
   mostrarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'info' | 'warning'): void {
     this.notificacionService.mostrar(mensaje, tipo);
   }
-  /**
-   * Maneja la búsqueda global
-   */
-  buscarGlobal(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchQuery = input.value;
-    this.filtrarEstudiantes();
-    this.paginacion.paginaActual = 1;
+
+  // GESTIÓN DE ESTUDIANTES
+
+  eliminarEstudiante(id: number): void {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      background: '#f7f7f7',
+      color: '#333',
+      buttonsStyling: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.estudianteService.delete(id).subscribe({
+          next: () => {
+            this.cargarEstudiantes();
+            this.notificacionService.mostrar('Estudiante eliminado exitosamente', 'success');
+          },
+          error: (err) => {
+            console.error('Error al eliminar estudiante', err);
+            this.notificacionService.mostrar('Error al eliminar estudiante', 'error');
+          }
+        });
+      }
+    });
   }
 
-  /**
-   * Métodos para los modales
-   */
+  // GESTIÓN DE RESULTADOS
 
   inicializarFormArrayResultados(): FormArray {
     return this.formBuilder.array([]);
   }
 
-  /**
-   * Crea un FormGroup para un resultado individual
-   */
   crearFormularioResultado(resultado?: any): FormGroup {
     return this.formBuilder.group({
       idResultado: [resultado?.idResultado || null],
       interes: [resultado?.interes || null, [Validators.required, Validators.min(0), Validators.max(100)]],
       aptitud: [resultado?.aptitud || null, [Validators.required, Validators.min(0), Validators.max(100)]],
       puntajeHolland: [resultado?.puntajeHolland || ''],
-      fecha: [resultado?.fecha ? this.formatearFechaParaInput(resultado.fecha) : this.formatearFechaParaInput(new Date().toISOString())],
+      fecha: [resultado?.fecha ? this.formatearFechaParaInput(resultado.fecha) :
+        this.formatearFechaParaInput(new Date().toISOString())],
       idEstudiante: [resultado?.idEstudiante || null],
       idChaside: [resultado?.idChaside || null],
       idHolland: [resultado?.idHolland || null],
@@ -576,81 +580,42 @@ export class ControlOrientacionComponent implements OnInit {
     });
   }
 
-  /**
-   * Formatea la fecha para el input datetime-local
-   */
-  formatearFechaParaInput(fechaString: string): string {
-    if (!fechaString) return '';
-    const fecha = new Date(fechaString);
-    return fecha.toISOString().slice(0, 16); // formato: "YYYY-MM-DDThh:mm"
+  agregarNuevoResultado(): void {
+    const nuevoResultado = this.crearFormularioResultado({
+      idEstudiante: this.estudianteSeleccionado?.idEstudiante
+    });
+    this.resultadosForm.push(nuevoResultado);
   }
 
-  /**
-   * Carga los datos necesarios para los selectores de resultados
-   */
-  cargarDatosParaResultados(): void {
-    // Cargar opciones de CHASIDE
-    this.chasideService.getAll().subscribe({
-      next: (data) => {
-        this.chasideOpciones = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar opciones CHASIDE', err);
-        this.mostrarNotificacion('No se pudieron cargar las opciones de CHASIDE', 'error');
-      }
-    });
-
-    // Cargar opciones de Holland
-    this.hollandService.getAll().subscribe({
-      next: (data) => {
-        this.hollandOpciones = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar opciones Holland', err);
-        this.mostrarNotificacion('No se pudieron cargar las opciones de Holland', 'error');
-      }
-    });
-
-    // Cargar opciones de Facultad
-    this.facultadService.getAll().subscribe({
-      next: (data) => {
-        this.facultadOpciones = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar opciones de Facultad', err);
-        this.mostrarNotificacion('No se pudieron cargar las opciones de Facultad', 'error');
-      }
-    });
+  eliminarResultado(index: number): void {
+    this.resultadosForm.removeAt(index);
   }
 
-  /**
-   * Abre el modal para editar un estudiante y sus resultados
-   */
+  esFormularioValido(): boolean {
+    if (!this.editarForm || this.editarForm.invalid || !this.resultadosForm) {
+      return false;
+    }
+
+    for (let i = 0; i < this.resultadosForm.length; i++) {
+      const resultadoForm = this.resultadosForm.at(i) as FormGroup;
+      if (!resultadoForm || resultadoForm.invalid) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // GESTIÓN DE MODALES
+
   abrirModalEditar(estudiante: any): void {
     this.estudianteSeleccionado = { ...estudiante };
 
-    // Resetear formularios
-    if (!this.editarForm) {
-      this.editarForm = this.formBuilder.group({
-        ciEstudiante: ['', [Validators.required]],
-        nombre: ['', [Validators.required]],
-        apPaterno: ['', [Validators.required]],
-        apMaterno: [''],
-        colegio: ['', [Validators.required]],
-        curso: ['', [Validators.required]],
-        edad: [null, [Validators.required, Validators.min(10), Validators.max(30)]],
-        celular: ['', [Validators.pattern('^[0-9]*$')]],
-        id_municipio: [null, [Validators.required]]
-      });
-    }
-
-    // Inicializar el FormArray para resultados
+    this.editarForm.reset();
     this.resultadosForm = this.inicializarFormArrayResultados();
 
-    // Asegurarse de que los datos selectores estén cargados
     this.cargarDatosParaResultados();
 
-    // Completar el formulario con los datos del estudiante
     this.editarForm.patchValue({
       ciEstudiante: estudiante.ciEstudiante,
       nombre: estudiante.nombre,
@@ -663,7 +628,6 @@ export class ControlOrientacionComponent implements OnInit {
       id_municipio: estudiante.id_municipio
     });
 
-    // Cargar los resultados existentes del estudiante
     this.resultadoService.getByEstudianteId(estudiante.idEstudiante).subscribe({
       next: (resultados: ResultadoDto[]) => {
         if (resultados.length > 0) {
@@ -671,7 +635,6 @@ export class ControlOrientacionComponent implements OnInit {
             this.resultadosForm.push(this.crearFormularioResultado(resultado));
           });
         } else {
-          // Si no hay resultados, crear uno vacío
           this.agregarNuevoResultado();
         }
         this.modalEditarVisible = true;
@@ -679,77 +642,39 @@ export class ControlOrientacionComponent implements OnInit {
       error: (err) => {
         console.error('Error al cargar resultados del estudiante', err);
         this.mostrarNotificacion('No se pudieron cargar los resultados de orientación', 'error');
-        // Crear un resultado vacío incluso en caso de error para permitir la edición
         this.agregarNuevoResultado();
         this.modalEditarVisible = true;
       }
     });
   }
 
-  /**
-   * Agrega un nuevo resultado vacío al formulario
-   */
-  agregarNuevoResultado(): void {
-    const nuevoResultado = this.crearFormularioResultado({
-      idEstudiante: this.estudianteSeleccionado?.idEstudiante
-    });
-    this.resultadosForm.push(nuevoResultado);
-  }
-
-  /**
-   * Elimina un resultado del formulario
-   */
-  eliminarResultado(index: number): void {
-    this.resultadosForm.removeAt(index);
-  }
-
-  /**
-   * Verifica si el formulario completo (estudiante + resultados) es válido
-   */
-  esFormularioValido(): boolean {
-    if (!this.editarForm || this.editarForm.invalid) {
-      return false;
+  cerrarModalEditar(): void {
+    this.modalEditarVisible = false;
+    this.estudianteSeleccionado = null;
+    if (this.editarForm) {
+      this.editarForm.reset();
     }
-
-    // Verificar que cada resultado en el FormArray sea válido
-    for (let i = 0; i < this.resultadosForm.length; i++) {
-      const resultadoForm = this.resultadosForm.at(i) as FormGroup;
-      if (resultadoForm.invalid) {
-        return false;
-      }
-    }
-
-    return true;
+    this.resultadosForm = this.inicializarFormArrayResultados();
   }
 
-  /**
-   * Guarda la edición completa (estudiante y sus resultados)
-   */
   guardarEdicionCompletaEstudiante(): void {
     if (!this.esFormularioValido() || !this.estudianteSeleccionado) {
       this.mostrarNotificacion('Por favor, complete todos los campos requeridos', 'error');
       return;
     }
-
     this.loading = true;
-
-    // Primero guardar los datos del estudiante
     const estudianteActualizado = {
       ...this.estudianteSeleccionado,
-      ...(this.editarForm?.value || {})
+      ...this.editarForm.value
     };
-
     this.estudianteService.update(estudianteActualizado.idEstudiante, estudianteActualizado).subscribe({
-      next: (estudianteGuardado) => {
-        // Después guardar cada uno de los resultados
-        const resultadosOperaciones: Observable<any>[] = [];
 
+      next: () => {
+        const resultadosOperaciones: Observable<any>[] = [];
         for (let i = 0; i < this.resultadosForm.length; i++) {
           const resultadoForm = this.resultadosForm.at(i) as FormGroup;
           const resultadoData = resultadoForm.value;
           resultadoData.idEstudiante = estudianteActualizado.idEstudiante;
-
-          // Si tiene ID, actualizar; sino, crear nuevo
           if (resultadoData.idResultado) {
             resultadosOperaciones.push(
               this.resultadoService.update(resultadoData.idResultado, resultadoData)
@@ -760,8 +685,6 @@ export class ControlOrientacionComponent implements OnInit {
             );
           }
         }
-
-        // Si no hay resultados que guardar, terminar el proceso
         if (resultadosOperaciones.length === 0) {
           this.loading = false;
           this.mostrarNotificacion('Estudiante actualizado con éxito', 'success');
@@ -770,23 +693,20 @@ export class ControlOrientacionComponent implements OnInit {
           return;
         }
 
-        // Procesar todas las operaciones de resultados usando forkJoin
-        import('rxjs').then(({ forkJoin, of }) => {
-          forkJoin(resultadosOperaciones.length ? resultadosOperaciones : [of(null)]).subscribe({
-            next: () => {
-              this.loading = false;
-              this.mostrarNotificacion('Estudiante y resultados actualizados con éxito', 'success');
-              this.cerrarModalEditar();
-              this.cargarEstudiantes();
-            },
-            error: (err) => {
-              this.loading = false;
-              console.error('Error al guardar resultados', err);
-              this.mostrarNotificacion('Datos del estudiante actualizados, pero hubo errores con los resultados', 'warning');
-              this.cerrarModalEditar();
-              this.cargarEstudiantes();
-            }
-          });
+        forkJoin(resultadosOperaciones.length ? resultadosOperaciones : [of(null)]).subscribe({
+          next: () => {
+            this.loading = false;
+            this.mostrarNotificacion('Estudiante y resultados actualizados con éxito', 'success');
+            this.cerrarModalEditar();
+            this.cargarEstudiantes();
+          },
+          error: (err) => {
+            this.loading = false;
+            console.error('Error al guardar resultados', err);
+            this.mostrarNotificacion('Datos del estudiante actualizados, pero hubo errores con los resultados', 'warning');
+            this.cerrarModalEditar();
+            this.cargarEstudiantes();
+          }
         });
       },
       error: (err) => {
@@ -795,18 +715,6 @@ export class ControlOrientacionComponent implements OnInit {
         this.mostrarNotificacion('No se pudo actualizar el estudiante', 'error');
       }
     });
-  }
-
-  /**
-   * Cierra el modal de edición
-   */
-  cerrarModalEditar(): void {
-    this.modalEditarVisible = false;
-    this.estudianteSeleccionado = null;
-    if (this.editarForm) {
-      this.editarForm.reset();
-    }
-    this.resultadosForm = this.inicializarFormArrayResultados();
   }
 
   verPerfilEstudiante(id: number): void {
@@ -863,6 +771,14 @@ export class ControlOrientacionComponent implements OnInit {
             Promise.all(resultadosCompletos)
               .then(resultadosFinales => {
                 this.resultadoEstudiante = resultadosFinales;
+                const primerChaside = resultadosFinales.find(r => r.chaside);
+                if (primerChaside) {
+                  this.chasideData = primerChaside.chaside;
+                }
+                const primerHolland = resultadosFinales.find(r => r.holland);
+                if (primerHolland) {
+                  this.hollandData = primerHolland.holland;
+                }
                 this.modalPerfilVisible = true;
                 this.loading = false;
               })
@@ -889,9 +805,6 @@ export class ControlOrientacionComponent implements OnInit {
       }
     });
   }
-  /**
-   * Cierra el modal de perfil del estudiante
-   */
 
   cerrarModalPerfil(): void {
     this.modalPerfilVisible = false;
@@ -903,119 +816,9 @@ export class ControlOrientacionComponent implements OnInit {
       document.body.focus();
     }, 0);
   }
-  /**
-   * Exporta la información del perfil del estudiante a PDF
-   */
-  exportarPerfilPDF(): void {
-    if (!this.estudianteSeleccionado) return;
 
-    const doc = new jsPDF();
-    let y = 20;
+  // EXPORTACIÓN
 
-    // Título
-    doc.setFontSize(18);
-    doc.text('PERFIL DE ORIENTACIÓN VOCACIONAL', 105, y, { align: 'center' });
-
-    // Logo (opcional)
-    // doc.addImage(this.logoUrl, 'PNG', 20, 20, 30, 30);
-
-    // Datos personales
-    y += 15;
-    doc.setFontSize(14);
-    doc.text('Datos Personales', 20, y);
-
-    y += 10;
-    doc.setFontSize(10);
-    doc.text(`CI: ${this.estudianteSeleccionado.ciEstudiante}`, 20, y);
-    y += 7;
-    doc.text(`Nombre: ${this.estudianteSeleccionado.nombre} ${this.estudianteSeleccionado.apPaterno} ${this.estudianteSeleccionado.apMaterno || ''}`, 20, y);
-    y += 7;
-    doc.text(`Edad: ${this.estudianteSeleccionado.edad} años`, 20, y);
-    y += 7;
-    doc.text(`Colegio: ${this.estudianteSeleccionado.colegio}`, 20, y);
-    y += 7;
-    doc.text(`Curso: ${this.estudianteSeleccionado.curso}`, 20, y);
-    y += 7;
-    doc.text(`Celular: ${this.estudianteSeleccionado.celular || 'No especificado'}`, 20, y);
-
-    // Resultados
-    if (this.resultadoEstudiante.length > 0) {
-      this.resultadoEstudiante.forEach((resultado, index) => {
-        y += 15;
-        doc.setFontSize(14);
-        doc.text(`Resultado #${index + 1}`, 20, y);
-
-        y += 10;
-        doc.setFontSize(10);
-        doc.text(`Interés: ${resultado.interes}`, 20, y);
-        y += 7;
-        doc.text(`Aptitud: ${resultado.aptitud}`, 20, y);
-        y += 7;
-        doc.text(`Puntaje Holland: ${resultado.puntajeHolland}`, 20, y);
-
-        if (resultado.facultad?.nombre) {
-          y += 7;
-          doc.text(`Facultad recomendada: ${resultado.facultad.nombre}`, 20, y);
-        }
-      });
-
-      // CHASIDE
-      if (this.chasideData) {
-        y += 15;
-        doc.setFontSize(14);
-        doc.text('Datos CHASIDE', 20, y);
-
-        y += 10;
-        doc.setFontSize(10);
-        doc.text(`Código: ${this.chasideData.codigo}`, 20, y);
-
-        if (this.chasideData.intereses) {
-          y += 7;
-          doc.text(`Intereses: ${this.chasideData.intereses}`, 20, y);
-        }
-        if (this.chasideData.aptitudes) {
-          y += 7;
-          doc.text(`Aptitudes: ${this.chasideData.aptitudes}`, 20, y);
-        }
-      }
-
-      // Holland
-      if (this.hollandData) {
-        y += 15;
-        doc.setFontSize(14);
-        doc.text('Datos Holland', 20, y);
-
-        y += 10;
-        doc.setFontSize(10);
-        doc.text(`Personalidad: ${this.hollandData.personalidad}`, 20, y);
-
-        if (this.hollandData.puntajes) {
-          y += 7;
-          doc.text(`Puntajes: ${this.hollandData.puntajes}`, 20, y);
-        }
-      }
-
-    } else {
-      y += 15;
-      doc.setFontSize(12);
-      doc.text('Este estudiante aún no tiene resultados de orientación vocacional registrados.', 20, y);
-    }
-
-
-    // Fecha de emisión
-    y += 30;
-    doc.setFontSize(10);
-    const fechaEmision = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
-    doc.text(`Fecha de emisión: ${fechaEmision}`, 20, y);
-
-    // Guardar PDF
-    doc.save(`Perfil_${this.estudianteSeleccionado.nombre}_${this.estudianteSeleccionado.apPaterno}.pdf`);
-
-    this.mostrarNotificacion('Perfil exportado a PDF correctamente', 'success');
-  }
-  /**
-   * Implementación de exportar estudiantes a Excel y PDF
-   */
   exportarEstudiantes(formato: 'excel' | 'pdf'): void {
     this.exportando = true;
 
@@ -1026,8 +829,10 @@ export class ControlOrientacionComponent implements OnInit {
     }
   }
 
-  private exportarExcel(): void {
+  private async exportarExcel(): Promise<void> {
     try {
+      this.exportando = true;
+
       // Preparar los datos para Excel
       const datosParaExportar = this.estudiantesFiltrados.map(est => ({
         'CI': est.ciEstudiante,
@@ -1044,9 +849,86 @@ export class ControlOrientacionComponent implements OnInit {
       // Crear el libro de trabajo y la hoja
       const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosParaExportar);
       const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Estudiantes');
 
-      // Ajustar ancho de columnas
+      // Añadir información institucional antes de los datos
+      const infoSheet = XLSX.utils.aoa_to_sheet([
+        ['UNIVERSIDAD MAYOR DE SAN ANDRÉS (2017-2025)'],
+        ['INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA'],
+        [''],
+        ['Sistema de Orientación Vocacional - Listado de Estudiantes'],
+        [''],
+        ['Fecha de generación: ' + this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm')],
+        [''],
+        ['Filtros aplicados:']
+      ]);
+
+      // Añadir información de filtros aplicados
+      let rowIndex = 8;
+      let hayFiltros = false;
+
+      if (this.filtros.provincia) {
+        const provincia = this.provincias.find(p => p.idProvincia === parseInt(this.filtros.provincia));
+        XLSX.utils.sheet_add_aoa(infoSheet, [[`Provincia: ${provincia?.nombre || this.filtros.provincia}`]], { origin: { r: rowIndex++, c: 0 } });
+        hayFiltros = true;
+      }
+
+      if (this.filtros.municipio) {
+        const municipio = this.opcionesFiltros.municipios.find(m => m.idMunicipio === parseInt(this.filtros.municipio));
+        XLSX.utils.sheet_add_aoa(infoSheet, [[`Municipio: ${municipio?.nombre || this.filtros.municipio}`]], { origin: { r: rowIndex++, c: 0 } });
+        hayFiltros = true;
+      }
+
+      if (this.filtros.colegio) {
+        XLSX.utils.sheet_add_aoa(infoSheet, [[`Colegio: ${this.filtros.colegio}`]], { origin: { r: rowIndex++, c: 0 } });
+        hayFiltros = true;
+      }
+
+      if (this.filtros.curso) {
+        XLSX.utils.sheet_add_aoa(infoSheet, [[`Curso: ${this.filtros.curso}`]], { origin: { r: rowIndex++, c: 0 } });
+        hayFiltros = true;
+      }
+
+      if (this.filtros.fechaInicio && this.filtros.fechaFin) {
+        XLSX.utils.sheet_add_aoa(infoSheet, [[`Período: ${this.filtros.fechaInicio} - ${this.filtros.fechaFin}`]], { origin: { r: rowIndex++, c: 0 } });
+        hayFiltros = true;
+      }
+
+      if (!hayFiltros) {
+        XLSX.utils.sheet_add_aoa(infoSheet, [['Sin filtros aplicados']], { origin: { r: rowIndex++, c: 0 } });
+      }
+
+      XLSX.utils.sheet_add_aoa(infoSheet, [
+        [''],
+        [`Total registros: ${this.estudiantesFiltrados.length}`],
+        [''],
+        ['Contacto UMSA:'],
+        ['Teléfono: (591 - 2) 2612298'],
+        ['E-mail: informate@umsa.bo'],
+        ['Av. Villazón N° 1995, Plaza del Bicentenario - Zona Central'],
+        ['Ciudad de La Paz. Estado Plurinacional de Bolivia'],
+        [''],
+        ['Contacto IDRDU:'],
+        ['Teléfono: (591 - 2)'],
+        ['E-mail:'],
+        ['Av. 6 de Agosto. Edificio HOY Nro. 2170 Piso 12']
+      ], { origin: { r: rowIndex, c: 0 } });
+
+      // Añadir estilos personalizados (en la medida que XLSX lo permite)
+      const infoRange = { s: { c: 0, r: 0 }, e: { c: 9, r: rowIndex + 13 } };
+      infoSheet['!merges'] = [
+        // Fusionar celdas para los títulos
+        { s: { c: 0, r: 0 }, e: { c: 9, r: 0 } },
+        { s: { c: 0, r: 1 }, e: { c: 9, r: 1 } },
+        { s: { c: 0, r: 3 }, e: { c: 9, r: 3 } }
+      ];
+
+      // Ajustar ancho de columnas para la hoja de información
+      infoSheet['!cols'] = [{ wch: 60 }];
+
+      // Añadir la hoja de información
+      XLSX.utils.book_append_sheet(workbook, infoSheet, 'Información');
+
+      // Ajustar ancho de columnas para la hoja de datos
       const columnas = [
         { wch: 15 }, // CI
         { wch: 20 }, // Nombre
@@ -1060,8 +942,12 @@ export class ControlOrientacionComponent implements OnInit {
       ];
       worksheet['!cols'] = columnas;
 
+      // Añadir la hoja de datos
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Estudiantes');
+
       // Generar el archivo
-      XLSX.writeFile(workbook, `estudiantes_orientacion_${new Date().toISOString().split('T')[0]}.xlsx`);
+      const fechaActual = new Date().toISOString().split('T')[0];
+      XLSX.writeFile(workbook, `estudiantes_orientacion_umsa_${fechaActual}.xlsx`);
 
       this.exportando = false;
       this.mostrarNotificacion('Datos exportados en formato Excel correctamente', 'success');
@@ -1075,37 +961,45 @@ export class ControlOrientacionComponent implements OnInit {
   private async exportarPDF(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
       try {
+        this.exportando = true;
         await import('jspdf-autotable');
         const doc = new jsPDF('landscape', 'mm', 'a4');
-        const headers = ['CI', 'Nombre', 'Apellidos', 'Colegio', 'Curso', 'Edad'];
-        const data = this.estudiantesFiltrados.map(est => [
-          est.ciEstudiante,
-          est.nombre,
-          `${est.apPaterno} ${est.apMaterno || ''}`,
-          est.colegio,
-          est.curso,
-          est.edad
-        ]);
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 10;
+        try {
+          const logoUMSA = await this.cargarImagen(this.logoUrl);
+          const logoIDRDU = await this.cargarImagen(this.logoIDRU);
+          if (logoUMSA) {
+            doc.addImage(logoUMSA, 'PNG', margin, margin, 30, 30);
+          }
+          if (logoIDRDU) {
+            doc.addImage(logoIDRDU, 'PNG', pageWidth - margin - 30, margin, 30, 30);
+          }
+        } catch (error) {
+          console.warn('No se pudieron cargar las imágenes para el PDF', error);
+        }
+        let yPos = margin + 15;
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth / 2, yPos, { align: 'center' });
 
-        autoTable(doc, {
-          head: [headers],
-          body: data,
-          startY: 40,
-          styles: { fontSize: 10 },
-          margin: { top: 40 }
-        });
+        yPos += 7;
+        doc.setFontSize(14);
+        doc.text('INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA', pageWidth / 2, yPos, { align: 'center' });
 
-        doc.setFontSize(18);
-        doc.text('Listado de Estudiantes - Orientación Vocacional', 149, 20, { align: 'center' });
-        doc.setFontSize(12);
-        doc.text('Universidad Mayor de San Andrés', 149, 30, { align: 'center' });
-        (doc as any).autoTable({
-          head: [headers],
-          body: data,
-          startY: 40,
-          styles: { fontSize: 10 },
-          margin: { top: 40 }
-        });
+        yPos += 10;
+        doc.setFontSize(15);
+        doc.text('SISTEMA DE ORIENTACIÓN VOCACIONAL', pageWidth / 2, yPos, { align: 'center' });
+
+        yPos += 7;
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Listado de Estudiantes', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+
         let filtrosAplicados = 'Filtros aplicados: ';
         let hayFiltros = false;
 
@@ -1135,17 +1029,79 @@ export class ControlOrientacionComponent implements OnInit {
           filtrosAplicados += `Período: ${this.filtros.fechaInicio} - ${this.filtros.fechaFin}, `;
           hayFiltros = true;
         }
-        const yPos = (doc as any).lastAutoTable.finalY + 10;
-        if (hayFiltros) {
-          doc.setFontSize(10);
-          doc.text(filtrosAplicados.slice(0, -2), 14, yPos);
-        }
-        const fechaGeneracion = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
-        doc.setFontSize(10);
-        doc.text(`Total registros: ${this.estudiantesFiltrados.length}`, 14, yPos + 8);
-        doc.text(`Generado el: ${fechaGeneracion}`, 14, yPos + 16);
-        doc.save(`listado_estudiantes_${new Date().toISOString().split('T')[0]}.pdf`);
 
+        if (hayFiltros) {
+          doc.text(filtrosAplicados.slice(0, -2), margin, yPos);
+        } else {
+          doc.text('Sin filtros aplicados', margin, yPos);
+        }
+        const headers = [
+          { header: 'CI', dataKey: 'ci' },
+          { header: 'Nombre', dataKey: 'nombre' },
+          { header: 'Apellidos', dataKey: 'apellidos' },
+          { header: 'Colegio', dataKey: 'colegio' },
+          { header: 'Curso', dataKey: 'curso' },
+          { header: 'Edad', dataKey: 'edad' },
+          { header: 'Celular', dataKey: 'celular' }
+        ];
+        const data = this.estudiantesFiltrados.map(est => ({
+          ci: est.ciEstudiante,
+          nombre: est.nombre,
+          apellidos: `${est.apPaterno} ${est.apMaterno || ''}`.trim(),
+          colegio: est.colegio,
+          curso: est.curso,
+          edad: est.edad,
+          celular: est.celular
+        }));
+        autoTable(doc, {
+          startY: yPos + 5,
+          head: [headers.map(h => h.header)],
+          body: data.map(d => headers.map(h => d[h.dataKey as keyof typeof d])),
+          theme: 'grid',
+          headStyles: {
+            fillColor: [23, 54, 93],
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            halign: 'center'
+          },
+          alternateRowStyles: {
+            fillColor: [240, 240, 240]
+          },
+          styles: {
+            fontSize: 9,
+            cellPadding: 2
+          },
+          columnStyles: {
+            0: { cellWidth: 20 }, // CI
+            1: { cellWidth: 25 }, // Nombre
+            2: { cellWidth: 40 }, // Apellidos
+            3: { cellWidth: 50 }, // Colegio
+            4: { cellWidth: 20 }, // Curso
+            5: { cellWidth: 15 }, // Edad
+            6: { cellWidth: 25 }  // Celular
+          },
+          margin: { left: margin, right: margin }
+        });
+        const finalY = (doc as any).lastAutoTable.finalY + 5;
+
+        doc.setFontSize(9);
+        doc.text(`Total registros: ${this.estudiantesFiltrados.length}`, margin, finalY);
+        const fechaGeneracion = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
+        doc.text(`Generado el: ${fechaGeneracion}`, margin, finalY + 5);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        const footerY = pageHeight - 20;
+        doc.text('UMSA: Teléfono: (591-2) 2612298 | E-mail: informate@umsa.bo', pageWidth / 2, footerY, { align: 'center' });
+        doc.text('Av. Villazón N° 1995, Plaza del Bicentenario - Zona Central, La Paz, Bolivia', pageWidth / 2, footerY + 4, { align: 'center' });
+        doc.text('IDRDU: Av. 6 de Agosto, Edificio HOY Nro. 2170 Piso 12', pageWidth / 2, footerY + 8, { align: 'center' });
+        const totalPages = doc.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - margin);
+        }
+        const fechaActual = new Date().toISOString().split('T')[0];
+        doc.save(`listado_estudiantes_umsa_${fechaActual}.pdf`);
         this.exportando = false;
         this.mostrarNotificacion('Datos exportados en formato PDF correctamente', 'success');
       } catch (error) {
@@ -1157,4 +1113,381 @@ export class ControlOrientacionComponent implements OnInit {
       console.warn('La exportación PDF no está disponible en el servidor.');
     }
   }
+
+  private cargarImagen(url: string): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      if (!url) {
+        resolve(null);
+        return;
+      }
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+        } else {
+          console.error('Failed to get 2D context for canvas');
+        }
+        const dataURL = canvas.toDataURL('image/png');
+        resolve(dataURL);
+      };
+
+      img.onerror = () => {
+        console.warn(`No se pudo cargar la imagen: ${url}`);
+        resolve(null);
+      };
+      img.src = url;
+    });
+  }
+  exportarPerfilPDF(): void {
+    const doc = new jsPDF();
+    const colorAzulUMSA: [number, number, number] = [0, 51, 153];
+    const colorVinoUMSA: [number, number, number] = [128, 0, 32];
+    const colorAzulClaro: [number, number, number] = [235, 245, 255];
+    const colorGrisClaro: [number, number, number] = [240, 240, 240];
+    const colorVerdeClaro: [number, number, number] = [230, 255, 230];
+    const margenIzquierdo = 15;
+    const margenDerecho = 15;
+    const anchoUtil = doc.internal.pageSize.width - margenIzquierdo - margenDerecho;
+    let y = 15;
+    const estudiante = this.estudianteSeleccionado;
+    if (!this.resultadoEstudiante || this.resultadoEstudiante.length === 0) {
+      this.mostrarNotificacion('No hay resultados disponibles para exportar', 'warning');
+      return;
+    }
+
+    const agregarEncabezado = () => {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...colorAzulUMSA);
+      doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', doc.internal.pageSize.width / 2, y, { align: 'center' });
+      y += 6;
+
+      doc.setFontSize(9);
+      doc.text('INSTITUTO DE DESARROLLO REGIONAL', doc.internal.pageSize.width / 2, y, { align: 'center' });
+      y += 4;
+
+      doc.setFontSize(10);
+      doc.setTextColor(...colorVinoUMSA);
+      doc.text('PERFIL DE ORIENTACIÓN VOCACIONAL', doc.internal.pageSize.width / 2, y, { align: 'center' });
+      y += 8;
+    };
+
+    const agregarPiePagina = () => {
+      const pageHeight = doc.internal.pageSize.height;
+      doc.setFontSize(7);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Universidad Mayor de San Andrés - Instituto de Desarrollo Regional', doc.internal.pageSize.width / 2, pageHeight - 10, { align: 'center' });
+      doc.text(`Fecha de emisión: ${this.datePipe.transform(new Date(), 'dd/MM/yyyy')}`, doc.internal.pageSize.width / 2, pageHeight - 7, { align: 'center' });
+    };
+
+    const crearTitulo = (texto: string, color: [number, number, number] = colorAzulUMSA): void => {
+      doc.setDrawColor(...color);
+      doc.setLineWidth(0.5);
+      doc.line(margenIzquierdo, y, doc.internal.pageSize.width - margenDerecho, y);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...color);
+      doc.text(texto, margenIzquierdo, y + 5);
+      y += 8;
+    };
+
+    const obtenerDescripcionArea = (codigo: string): string => {
+      const areas = {
+        'C': 'Administrativas y Contables',
+        'H': 'Humanísticas y Sociales',
+        'A': 'Artísticas',
+        'S': 'Medicina y Cs. de la Salud',
+        'I': 'Ingeniería y Computación',
+        'D': 'Defensa y Seguridad',
+        'E': 'Ciencias Exactas y Agrarias'
+      };
+      return areas[codigo as keyof typeof areas] || '';
+    };
+
+    const obtenerDescripcionHolland = (codigo: 'R' | 'I' | 'A' | 'S' | 'E' | 'C'): string => {
+      const descripciones = {
+        'R': 'Realista: Prefiere trabajar con objetos, máquinas, herramientas, plantas o animales',
+        'I': 'Investigador: Prefiere observar, aprender, investigar, analizar, evaluar o resolver problemas',
+        'A': 'Artístico: Prefiere actividades libres, ambiguas y no sistemáticas que permitan la creatividad',
+        'S': 'Social: Prefiere trabajar con personas, informar, ayudar, formar, curar o orientar',
+        'E': 'Emprendedor: Prefiere actividades para persuadir, liderar y gestionar por objetivos',
+        'C': 'Convencional: Prefiere actividades concretas, ordenadas y sistemáticas'
+      };
+      return descripciones[codigo];
+    };
+
+    const procesarAreasCHASIDE = (chasideData: any) => {
+      if (!chasideData?.codigo) {
+        return { intereses: [], aptitudes: [] };
+      }
+      const partes = chasideData.codigo.replace('Tabla 1', '').split('-');
+      return {
+        intereses: partes[0]?.split('') || [],
+        aptitudes: partes[1]?.split('') || []
+      };
+    };
+
+    const verificarEspacioDisponible = (espacioNecesario: number): boolean => {
+      const espacioDisponible = doc.internal.pageSize.height - y - 20; // 20px de margen inferior
+      if (espacioDisponible < espacioNecesario) {
+        doc.addPage();
+        y = 15;
+        agregarEncabezado();
+        return true;
+      }
+      return false;
+    };
+
+    agregarEncabezado();
+    doc.setDrawColor(...colorAzulUMSA);
+    doc.setFillColor(...colorAzulClaro);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margenIzquierdo, y, anchoUtil, 25, 2, 2, 'FD');
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text('DATOS DEL ESTUDIANTE:', margenIzquierdo + 3, y + 5);
+    doc.setFont('helvetica', 'normal');
+
+    const nombreCompleto = `${estudiante.nombre} ${estudiante.apPaterno} ${estudiante.apMaterno || ''}`;
+    doc.text(`Nombre: ${nombreCompleto}`, margenIzquierdo + 5, y + 11);
+    doc.text(`C.I.: ${estudiante.ciEstudiante}`, margenIzquierdo + 5, y + 17);
+    doc.text(`Edad: ${estudiante.edad} años`, margenIzquierdo + 5, y + 23);
+
+    doc.text(`Colegio: ${estudiante.colegio}`, margenIzquierdo + anchoUtil / 2, y + 11);
+    doc.text(`Celular: ${estudiante.celular || 'No especificado'}`, margenIzquierdo + anchoUtil / 2, y + 17);
+    doc.text(`Curso: ${estudiante.curso}`, margenIzquierdo + anchoUtil / 2, y + 23);
+
+    y += 30;
+    const todosChaside = this.resultadoEstudiante
+      .filter(r => r.chaside)
+      .map((r, idx) => ({
+        data: r.chaside,
+        areas: procesarAreasCHASIDE(r.chaside),
+        orden: idx + 1,
+        fechaCreacion: r.fecha
+      }));
+
+    const todosHolland = this.resultadoEstudiante
+      .filter(r => r.holland)
+      .map((r, idx) => {
+        let codigoHolland = '';
+        switch (r.holland.personalidad) {
+          case 1: codigoHolland = 'RIA'; break;
+          case 2: codigoHolland = 'ISE'; break;
+          case 3: codigoHolland = 'AIS'; break;
+          case 4: codigoHolland = 'SEC'; break;
+          case 5: codigoHolland = 'ECS'; break;
+          case 6: codigoHolland = 'CRI'; break;
+          default: codigoHolland = 'N/A';
+        }
+        return {
+          data: r.holland,
+          codigo: codigoHolland,
+          orden: idx + 1,
+          fechaCreacion: r.fecha
+        };
+      });
+
+    const todasFacultades = this.resultadoEstudiante
+      .filter(r => r.facultad)
+      .map((r, idx) => ({
+        data: r.facultad,
+        orden: idx + 1,
+        fechaCreacion: r.fecha
+      }));
+    if (todosChaside.length > 0) {
+      verificarEspacioDisponible(70);
+      crearTitulo('RESULTADOS TEST CHASIDE');
+      doc.setFillColor(...colorGrisClaro);
+      doc.rect(margenIzquierdo, y, anchoUtil, 10, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.text('Cod.', margenIzquierdo + 5, y + 6);
+      doc.text('Área', margenIzquierdo + 20, y + 6);
+      const anchoColumnaResultado = 15;
+      todosChaside.forEach((chaside, idx) => {
+        const posX = margenIzquierdo + anchoUtil - ((todosChaside.length - idx) * anchoColumnaResultado);
+        const fechaStr = chaside.fechaCreacion
+          ? this.datePipe.transform(new Date(chaside.fechaCreacion), 'dd/MM')
+          : `#${chaside.orden}`;
+        doc.text(`${fechaStr}`, posX, y + 6);
+      });
+      y += 10;
+      const codigosCHASIDE = ['C', 'H', 'A', 'S', 'I', 'D', 'E'];
+      codigosCHASIDE.forEach(codigo => {
+        const tieneAlgunDestacado = todosChaside.some(
+          chaside => chaside.areas.intereses.includes(codigo) || chaside.areas.aptitudes.includes(codigo)
+        );
+
+        if (tieneAlgunDestacado) {
+          doc.setFillColor(255, 255, 200);
+        } else {
+          doc.setFillColor(255, 255, 255);
+        }
+
+        doc.rect(margenIzquierdo, y, anchoUtil, 5, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.text(codigo, margenIzquierdo + 5, y + 3.5);
+        doc.setFont('helvetica', 'normal');
+        doc.text(obtenerDescripcionArea(codigo), margenIzquierdo + 20, y + 3.5);
+        todosChaside.forEach((chaside, idx) => {
+          const posX = margenIzquierdo + anchoUtil - ((todosChaside.length - idx) * anchoColumnaResultado);
+
+          const esInteresDestacado = chaside.areas.intereses.includes(codigo);
+          const esAptitudDestacada = chaside.areas.aptitudes.includes(codigo);
+
+          if (esInteresDestacado && esAptitudDestacada) {
+            doc.setFont('helvetica', 'bold');
+            doc.text('I+A', posX, y + 3.5);
+          } else if (esInteresDestacado) {
+            doc.setFont('helvetica', 'bold');
+            doc.text('Int', posX, y + 3.5);
+          } else if (esAptitudDestacada) {
+            doc.setFont('helvetica', 'bold');
+            doc.text('Apt', posX, y + 3.5);
+          }
+        });
+
+        y += 5;
+      });
+      y += 3;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      todosChaside.forEach((chaside, idx) => {
+        doc.text(`${chaside.orden} : ${chaside.data.codigo || 'N/A'}`,
+          margenIzquierdo, y + (idx * 4));
+      });
+      y += (todosChaside.length * 4) + 5;
+    }
+    if (todosHolland.length > 0) {
+      verificarEspacioDisponible(40);
+      crearTitulo('RESULTADOS TEST HOLLAND');
+      doc.setFillColor(...colorGrisClaro);
+      doc.rect(margenIzquierdo, y, anchoUtil, 10, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.text('Evaluación', margenIzquierdo + 5, y + 6);
+      doc.text('Código', margenIzquierdo + 35, y + 6);
+      doc.text('Preferencias', margenIzquierdo + 60, y + 6);
+      doc.text('Fecha', margenIzquierdo + anchoUtil - 20, y + 6);
+      y += 10;
+
+      todosHolland.forEach((holland, idx) => {
+        const colorFila: [number, number, number] = idx % 2 === 0 ? [255, 255, 255] : [245, 245, 245];
+        doc.setFillColor(...colorFila);
+        doc.rect(margenIzquierdo, y, anchoUtil, 8, 'F');
+
+        const fechaStr = holland.fechaCreacion
+          ? this.datePipe.transform(new Date(holland.fechaCreacion), 'dd/MM/yyyy')
+          : 'No disponible';
+
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${holland.orden}`, margenIzquierdo + 5, y + 5);
+        doc.text(holland.codigo, margenIzquierdo + 35, y + 5);
+        const tiposPrincipales = holland.codigo.split('');
+        if (tiposPrincipales.length > 0) {
+          const descripcion = obtenerDescripcionHolland(tiposPrincipales[0] as 'R' | 'I' | 'A' | 'S' | 'E' | 'C');
+          const descripcionCorta = descripcion.split(':')[1]?.trim() || '';
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(6);
+          doc.text(descripcionCorta, margenIzquierdo + 60, y + 5, {
+            maxWidth: anchoUtil - 100
+          });
+        }
+
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.text(fechaStr || '', margenIzquierdo + anchoUtil - 20, y + 5);
+
+        y += 8;
+      });
+
+      y += 5;
+    }
+    if (todasFacultades.length > 0) {
+      verificarEspacioDisponible(50);
+      crearTitulo('RECOMENDACIONES ACADÉMICAS', colorVinoUMSA);
+      todasFacultades.forEach((facultadItem, idx) => {
+        verificarEspacioDisponible(30);
+        const facultad = facultadItem.data;
+        doc.setFillColor(...colorVerdeClaro);
+        doc.setDrawColor(0, 100, 0);
+        doc.roundedRect(margenIzquierdo, y, anchoUtil, 8, 2, 2, 'FD');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(0, 80, 0);
+        doc.text(`${facultadItem.orden}: ${facultad.nombre}`, margenIzquierdo + 5, y + 5);
+        doc.setTextColor(0, 0, 0);
+        y += 11;
+        const espacioImagen = 40;
+        try {
+          if (facultad.imgLogo) {
+            // doc.addImage(facultad.imgLogo, 'PNG', margenIzquierdo, y, 40, 20);
+            // y += 22;
+          }
+        } catch (error) {
+          console.error('Error al cargar imagen de facultad', error);
+        }
+        if (facultad.carreras && facultad.carreras.length > 0) {
+          doc.setFontSize(7);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Carreras recomendadas:', margenIzquierdo, y);
+          y += 5;
+          const columnasCarreras = 2;
+          const anchoColumna = anchoUtil / columnasCarreras;
+          let columnaActual = 0;
+          (facultad.carreras as string[]).slice(0, 8).forEach((carrera: string, index: number) => {
+            const xPos = margenIzquierdo + (columnaActual * anchoColumna);
+            doc.setFontSize(6);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`• ${carrera}`, xPos + 2, y);
+            columnaActual++;
+            if (columnaActual >= columnasCarreras) {
+              columnaActual = 0;
+              y += 4;
+            }
+          });
+          if (columnaActual > 0) y += 4;
+        }
+        if (facultad.url) {
+          doc.setFontSize(6);
+          doc.setFont('helvetica', 'italic');
+          doc.setTextColor(0, 0, 200);
+          doc.text(`Más información: ${facultad.url}`, margenIzquierdo, y);
+          doc.setTextColor(0, 0, 0);
+        }
+        y += 5;
+      });
+    }
+    verificarEspacioDisponible(30);
+    crearTitulo('CONSIDERACIONES IMPORTANTES', colorVinoUMSA);
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'normal');
+
+    const textoConsejos = [
+      "• Este informe es una guía orientativa basada en tus respuestas a los tests vocacionales.",
+      "• Investiga más sobre las carreras sugeridas, visitando facultades o hablando con profesionales.",
+      "• Considera tus intereses personales, habilidades y el mercado laboral al tomar tu decisión.",
+      "• Puedes solicitar una entrevista con un orientador profesional para profundizar en tus resultados.",
+      "• Tu vocación puede evolucionar con el tiempo y las experiencias que vayas adquiriendo."
+    ];
+    textoConsejos.forEach((consejo, index) => {
+      doc.text(consejo, margenIzquierdo, y);
+      y += 3.5;
+    });
+
+    agregarPiePagina();
+    doc.save(`Perfil_Vocacional_${estudiante.nombre}_${estudiante.apPaterno}.pdf`);
+    this.mostrarNotificacion('Perfil exportado a PDF correctamente', 'success');
+  }
 }
+

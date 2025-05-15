@@ -234,6 +234,8 @@
                       <div><i class="bi bi-credit-card me-1"></i> {{ estudianteSeleccionado.ciEstudiante }}</div>
                       <div><i class="bi bi-mortarboard me-1"></i> {{ estudianteSeleccionado.curso }}</div>
                       <div><i class="bi bi-building me-1"></i> {{ estudianteSeleccionado.colegio }}</div>
+                      <div><i class="bi bi-pin-map me-1"></i> {{ getMunicipioNombre(estudianteSeleccionado.id_municipio)
+                        }}</div>
                     </div>
                   </div>
                 </div>
@@ -521,7 +523,6 @@
                         </div>
                       </div>
                     </div>
-
                     <div class="col-md-6">
                       <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="apMaterno" formControlName="apMaterno"
@@ -529,7 +530,6 @@
                         <label for="apMaterno">Apellido Materno</label>
                       </div>
                     </div>
-
                     <div class="col-md-6">
                       <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="colegio" formControlName="colegio"
@@ -542,7 +542,6 @@
                         </div>
                       </div>
                     </div>
-
                     <div class="col-md-6">
                       <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="curso" formControlName="curso" placeholder="Curso"
@@ -554,7 +553,6 @@
                         </div>
                       </div>
                     </div>
-
                     <div class="col-md-6">
                       <div class="form-floating mb-3">
                         <input type="number" class="form-control" id="edad" formControlName="edad" placeholder="Edad"
@@ -566,7 +564,6 @@
                         </div>
                       </div>
                     </div>
-
                     <div class="col-md-6">
                       <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="celular" formControlName="celular"
@@ -579,19 +576,14 @@
                         </div>
                       </div>
                     </div>
-
                     <div class="col-md-12">
                       <div class="form-floating mb-3">
                         <select class="form-select" id="id_municipio" formControlName="id_municipio"
                           [ngClass]="{'is-invalid': editarForm.controls['id_municipio'].invalid && editarForm.controls['id_municipio'].touched}">
                           <option [value]="null">Seleccione un municipio</option>
-                          <!-- Iterar por todos los municipios de todas las provincias -->
-                          <optgroup *ngFor="let provincia of provincias" [label]="provincia.nombre">
-                            <option *ngFor="let municipio of municipiosPorProvincia[provincia.idProvincia]"
-                              [value]="municipio.idMunicipio">
-                              {{ municipio.nombre }}
-                            </option>
-                          </optgroup>
+                          <option *ngFor="let municipio of municipios" [value]="municipio.idMunicipio">
+                            {{ municipio.nombre }}
+                          </option>
                         </select>
                         <label for="id_municipio">Municipio *</label>
                         <div class="invalid-feedback"
@@ -623,24 +615,24 @@
                   No hay resultados de orientación registrados
                 </div>
 
-                <div *ngFor="let resultadoForm of resultadosForm.controls; let i = index" class="card mb-3 border">
+                <div *ngFor="let resultadoForm of resultadosFormGroups.controls; let i = index"
+                  class="card mb-3 border">
                   <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">Resultado {{ i + 1 }}</h6>
-                    <button class="btn btn-sm btn-outline-danger" (click)="eliminarResultado(i)"
+                    <!-- <button class="btn btn-sm btn-outline-danger" (click)="eliminarResultado(i)"
                       *ngIf="resultadosForm.length > 1">
                       <i class="bi bi-trash me-1"></i> Eliminar
-                    </button>
+                    </button> -->
                   </div>
                   <div class="card-body">
-                    <div [formGroup]="resultadoFormGroup" class="row g-3">
-                      <!-- Campos de Resultado -->
+                    <div [formGroup]="$any(resultadoForm)" class="row g-3">
                       <div class="col-md-6">
                         <div class="form-floating mb-3">
                           <input type="number" class="form-control" formControlName="interes" placeholder="Interés"
-                            [ngClass]="{'is-invalid': resultadoFormGroup.controls['interes'].invalid && resultadoFormGroup.controls['interes'].touched}">
+                            [ngClass]="{'is-invalid': resultadoForm.get('interes')?.invalid && resultadoForm.get('interes')?.touched}">
                           <label>Interés *</label>
                           <div class="invalid-feedback"
-                            *ngIf="resultadoFormGroup.controls['interes'].invalid && resultadoFormGroup.controls['interes'].touched">
+                            *ngIf="resultadoForm.get('interes')?.invalid && resultadoForm.get('interes')?.touched">
                             Ingrese un valor de interés válido
                           </div>
                         </div>
@@ -648,20 +640,19 @@
                       <div class="col-md-6">
                         <div class="form-floating mb-3">
                           <input type="number" class="form-control" formControlName="aptitud" placeholder="Aptitud"
-                            [ngClass]="{'is-invalid': resultadoFormGroup.controls['aptitud'].invalid && resultadoFormGroup.controls['aptitud'].touched}">
+                            [ngClass]="{'is-invalid': resultadoForm.get('aptitud')?.invalid && resultadoForm.get('aptitud')?.touched}">
                           <label>Aptitud *</label>
                           <div class="invalid-feedback"
-                            *ngIf="resultadoFormGroup.controls['aptitud'].invalid && resultadoFormGroup.controls['aptitud'].touched">
+                            *ngIf="resultadoForm.get('aptitud')?.invalid && resultadoForm.get('aptitud')?.touched">
                             Ingrese un valor de aptitud válido
                           </div>
                         </div>
                       </div>
 
-                      <!-- Selector de CHASIDE -->
                       <div class="col-md-4">
                         <div class="form-floating mb-3">
                           <select class="form-select" formControlName="idChaside"
-                            [ngClass]="{'is-invalid': resultadoFormGroup.controls['idChaside'].invalid && resultadoFormGroup.controls['idChaside'].touched}">
+                            [ngClass]="{'is-invalid': resultadoForm.get('idChaside')?.invalid && resultadoForm.get('idChaside')?.touched}">
                             <option [value]="null">Seleccione CHASIDE</option>
                             <option *ngFor="let chaside of chasideOpciones" [value]="chaside.idChaside">
                               {{ chaside.codigo }}
@@ -671,11 +662,10 @@
                         </div>
                       </div>
 
-                      <!-- Selector de Holland -->
                       <div class="col-md-4">
                         <div class="form-floating mb-3">
                           <select class="form-select" formControlName="idHolland"
-                            [ngClass]="{'is-invalid': resultadoFormGroup.controls['idHolland'].invalid && resultadoFormGroup.controls['idHolland'].touched}">
+                            [ngClass]="{'is-invalid': resultadoForm.get('idHolland')?.invalid && resultadoForm.get('idHolland')?.touched}">
                             <option [value]="null">Seleccione Holland</option>
                             <option *ngFor="let holland of hollandOpciones" [value]="holland.idHolland">
                               {{ holland.personalidad }}
@@ -685,13 +675,12 @@
                         </div>
                       </div>
 
-                      <!-- Selector de Facultad -->
                       <div class="col-md-4">
                         <div class="form-floating mb-3">
                           <select class="form-select" formControlName="idFacultad"
-                            [ngClass]="{'is-invalid': resultadoFormGroup.controls['idFacultad'].invalid && resultadoFormGroup.controls['idFacultad'].touched}">
+                            [ngClass]="{'is-invalid': resultadoForm.get('idFacultad')?.invalid && resultadoForm.get('idFacultad')?.touched}">
                             <option [value]="null">Seleccione Facultad</option>
-                            <option *ngFor="let facultad of facultadOpciones" [value]="facultad.idFacultad">
+                            <option *ngFor="let facultad of facultadOpciones" [value]="facultad.id">
                               {{ facultad.nombre }}
                             </option>
                           </select>
@@ -699,12 +688,11 @@
                         </div>
                       </div>
 
-                      <!-- Campos adicionales -->
                       <div class="col-md-6">
                         <div class="form-floating mb-3">
                           <input type="text" class="form-control" formControlName="puntajeHolland"
                             placeholder="Puntaje Holland"
-                            [ngClass]="{'is-invalid': resultadoFormGroup.controls['puntajeHolland'].invalid && resultadoFormGroup.controls['puntajeHolland'].touched}">
+                            [ngClass]="{'is-invalid': resultadoForm.get('puntajeHolland')?.invalid && resultadoForm.get('puntajeHolland')?.touched}">
                           <label>Puntaje Holland</label>
                         </div>
                       </div>
@@ -712,8 +700,13 @@
                         <div class="form-floating mb-3">
                           <input type="datetime-local" class="form-control" formControlName="fecha"
                             placeholder="Fecha de Evaluación"
-                            [ngClass]="{'is-invalid': resultadoFormGroup.controls['fecha'].invalid && resultadoFormGroup.controls['fecha'].touched}">
+                            [ngClass]="{'is-invalid': resultadoForm.get('fecha')?.invalid && resultadoForm.get('fecha')?.touched}">
                           <label>Fecha de Evaluación</label>
+                          <div class="invalid-feedback"
+                            *ngIf="resultadoForm.get('fecha')?.invalid && resultadoForm.get('fecha')?.touched">
+                            Fecha inválida
+                          </div>
+
                         </div>
                       </div>
                     </div>
@@ -791,11 +784,8 @@
                   <i *ngIf="ordenamiento.columna === 'colegio'"
                     [ngClass]="ordenamiento.direccion === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down'"></i>
                 </th>
-                <th class="cursor-pointer" (click)="ordenarPor('curso')">
-                  Celular
-                  <i *ngIf="ordenamiento.columna === 'curso'"
-                    [ngClass]="ordenamiento.direccion === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down'"></i>
-                </th>
+                <th class="cursor-pointer"> Celular </th>
+                <th class="cursor-pointer"> Municipio </th>
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
@@ -812,6 +802,7 @@
                 <td>{{ estudiante.apPaterno }} {{ estudiante.apMaterno }}</td>
                 <td>{{ estudiante.colegio }}</td>
                 <td>{{ estudiante.celular }}</td>
+                <td>{{ getMunicipioNombre(estudiante.id_municipio) }}</td>
 
                 <td class="text-center">
                   <div class="btn-group btn-group-sm" role="group">
