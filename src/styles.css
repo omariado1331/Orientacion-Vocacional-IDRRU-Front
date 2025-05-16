@@ -1,17 +1,23 @@
-/* You can add global styles to this file, and also import other style files */
-body{
+:root {
+    --umsa-blue: #004A98;
+    --umsa-blue-light: #0066CC;
+    --umsa-blue-dark: #00366B;
+    --umsa-accent: #FFCC00;
+    --umsa-gray: #F5F7FA;
+    --umsa-text: #333333;
+    --umsa-shadow: rgba(0, 74, 152, 0.2);
+    --card-border-radius: 12px;
+    --transition-speed: 0.3s;
+}
+
+body {
     background-image: url(../src/assets/fondo.png);
-    background-repeat:initial;
+    background-repeat: initial;
     background-position: left;
     background-size: 8%;
 }
 
-footer{
+footer {
     height: 250px;
-    background-color:#4377b6;
+    background-color: #4377b6;
 }
-
-
-
-
-

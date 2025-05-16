@@ -1,3 +1,4 @@
+//app.routes.ts
 import { Routes } from '@angular/router';
 import { OrientacionVocacionalComponent } from './pages/orientacion-vocacional/orientacion-vocacional.component';
 import { InfoOrientacionComponent } from './pages/info-orientacion/info-orientacion.component';
@@ -15,4 +16,3 @@ export const routes: Routes = [
         {path: 'resultado', component: ResultFormComponent}
     ]}
 ];
- 

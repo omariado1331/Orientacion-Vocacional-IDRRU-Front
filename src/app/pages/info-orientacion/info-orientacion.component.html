@@ -1,1 +1,59 @@
-<h5>INFORMACION SOBRE FACULTADES</h5>
+<!-- info-orientacion.component.html -->
+<div class="umsa-container">
+  <div class="umsa-header">
+    <!-- <div class="umsa-logo-container">
+      <div class="umsa-logo"></div>
+    </div> -->
+    <div class="umsa-title">
+      <h1>Instituto de Desarrollo Regional y Desconcentración Universitaria</h1>
+      <h2>Información Académica</h2>
+      <div class="umsa-divider"></div>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="cargando" class="umsa-loader">
+    <div class="umsa-spinner"></div>
+    <p>Cargando información de facultades...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!cargando" class="umsa-content">
+    <!-- Facultades Grid -->
+    <div class="umsa-facultades-grid">
+      <div *ngFor="let facultad of facultades" class="umsa-facultad-card"
+           [class.active]="facultadSeleccionada && facultadSeleccionada.id === facultad.id">
+        
+        <!-- Facultad Card Header -->
+        <div class="umsa-facultad-header" (click)="toggleCarreras(facultad, $event)">
+          <!-- Logo de la facultad -->
+          <div class="umsa-facultad-logo">
+            <img [src]="facultad.imgLogo" [alt]="'Logo ' + facultad.nombre">
+          </div>
+          <div class="umsa-facultad-info">
+            <h3>{{facultad.nombre}}</h3>
+            <span class="umsa-facultad-codigo">{{facultad.codigo}}</span>
+          </div>
+          <div class="umsa-facultad-toggle">
+            <i class="bi" [ngClass]="(facultadSeleccionada && facultadSeleccionada.id === facultad.id) ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+          </div>
+        </div>
+        
+        <!-- Facultad Carreras (expandible) -->
+        <div class="umsa-facultad-carreras" *ngIf="facultadSeleccionada && facultadSeleccionada.id === facultad.id">
+          <div class="umsa-carreras-list">
+            <h4>Carreras ofrecidas:</h4>
+            <ul>
+              <li *ngFor="let carrera of facultad.carreras">
+                {{carrera}}
+              </li>
+            </ul>
+          </div>
+          <div class="umsa-facultad-footer">
+            <a [href]="facultad.url" class="umsa-btn">Ver página de la facultad</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

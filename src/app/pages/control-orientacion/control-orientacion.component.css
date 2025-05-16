@@ -1,0 +1,56 @@
+/* control-orientacion.component.css - Estilos para el componente de control de orientación */
+
+.container {
+    padding-bottom: 3rem;
+  }
+  
+  .card {
+    border-radius: 10px;
+    border: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    border-radius: 10px 10px 0 0;
+    padding: 1rem;
+  }
+  
+  .shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  .display-2 {
+    font-size: 3rem;
+  }
+  
+  /* Estilo para el spinner de carga */
+  .spinner-border {
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  /* Estilo para botones */
+  .btn-primary {
+    background-color: #1a73e8;
+    border-color: #1a73e8;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1557b0;
+    border-color: #1557b0;
+  }
+  
+  /* Animación para los contadores */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .display-2 {
+    animation: fadeIn 1s ease-out;
+  }

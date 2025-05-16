@@ -1,0 +1,424 @@
+<div class="container mt-4">
+  <!-- Mostrar formulario de login si no está autenticado -->
+  <div class="row" *ngIf="!isAuthenticated">
+    <div class="col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5">
+      <div class="card shadow-lg" style="border-radius: var(--card-border-radius); overflow: hidden; border: none;">
+        <!-- Encabezado con logo y título -->
+        <div class="card-header text-white text-center py-4"
+          style="background-color: var(--umsa-blue); border-bottom: 4px solid var(--umsa-accent); display: flex; align-items: center; justify-content: center;">
+          <div class="me-3">
+            <img src="{{ logoUrl }}" alt="UMSA Logo" height="80" *ngIf="logoUrl" onerror="this.style.display='none'">
+          </div>
+          <h2 class="mb-0" style="font-weight: 400;">Control de Orientación Vocacional</h2>
+        </div>
+
+        <div class="card-body p-4" style="background-color: var(--umsa-gray);">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <!-- Mensaje de error con icono -->
+            <div *ngIf="error" class="alert alert-danger d-flex align-items-center" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <div>{{ error }}</div>
+            </div>
+
+            <!-- Campo de usuario -->
+            <div class="mb-4">
+              <label for="username" class="form-label fw-medium" style="color: var(--umsa-text);">
+                <i class="bi bi-person-fill me-1"></i> Usuario:
+              </label>
+              <div class="input-group">
+                <span class="input-group-text" style="background-color: var(--umsa-blue-light); color: white;">
+                  <i class="bi bi-person"></i>
+                </span>
+                <input type="text" id="username" formControlName="username" class="form-control"
+                  placeholder="Ingrese su nombre de usuario"
+                  [ngClass]="{'is-invalid': loginForm.controls['username'].touched && loginForm.controls['username'].invalid}"
+                  style="transition: all var(--transition-speed);" />
+              </div>
+              <div *ngIf="loginForm.controls['username'].touched && loginForm.controls['username'].invalid"
+                class="invalid-feedback">
+                <div *ngIf="loginForm.controls['username'].errors?.['required']">
+                  <i class="bi bi-info-circle me-1"></i> El usuario es requerido
+                </div>
+                <div *ngIf="loginForm.controls['username'].errors?.['minlength']">
+                  <i class="bi bi-info-circle me-1"></i> El usuario debe tener al menos 3 caracteres
+                </div>
+              </div>
+            </div>
+
+            <!-- Campo de contraseña -->
+            <div class="mb-4">
+              <label for="password" class="form-label fw-medium" style="color: var(--umsa-text);">
+                <i class="bi bi-lock-fill me-1"></i> Contraseña:
+              </label>
+              <div class="input-group">
+                <span class="input-group-text" style="background-color: var(--umsa-blue-light); color: white;">
+                  <i class="bi bi-lock"></i>
+                </span>
+                <input type="password" id="password" formControlName="password" class="form-control"
+                  placeholder="Ingrese su contraseña"
+                  [ngClass]="{'is-invalid': loginForm.controls['password'].touched && loginForm.controls['password'].invalid}"
+                  style="transition: all var(--transition-speed);" />
+              </div>
+              <div *ngIf="loginForm.controls['password'].touched && loginForm.controls['password'].invalid"
+                class="invalid-feedback">
+                <div *ngIf="loginForm.controls['password'].errors?.['required']">
+                  <i class="bi bi-info-circle me-1"></i> La contraseña es requerida
+                </div>
+                <div *ngIf="loginForm.controls['password'].errors?.['minlength']">
+                  <i class="bi bi-info-circle me-1"></i> La contraseña debe tener al menos 6 caracteres
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón de envío -->
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn py-3" [disabled]="loginForm.invalid || loading"
+                style="background-color: var(--umsa-blue); color: white; font-weight: 600; border: none; transition: all var(--transition-speed);"
+                onmouseover="this.style.backgroundColor='var(--umsa-blue-dark)'"
+                onmouseout="this.style.backgroundColor='var(--umsa-blue)'">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                Iniciar Sesión
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer del formulario -->
+        <div class="card-footer py-3 text-center" style="background-color: var(--umsa-blue-dark); color: white;">
+          <small>Sistema de Orientación Vocacional IDRRU © 2025</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mostrar panel de control si está autenticado -->
+  <div *ngIf="isAuthenticated">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Panel de Control - Orientación Vocacional</h1>
+      <div>
+        <!-- <button class="btn btn-success me-2" (click)="abrirModalCrear()">
+          <i class="bi bi-person-plus-fill me-2"></i>Registrar Estudiante
+        </button> -->
+        <button class="btn btn-outline-danger" (click)="logout()">
+          <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Tarjeta de estadísticas: Estudiantes -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow">
+          <div class="card-body text-center">
+            <h5 class="card-title">Estudiantes Registrados</h5>
+            <div class="display-2 fw-bold text-primary">{{ datosControl.totalEstudiantes }}</div>
+            <p class="card-text">Total de estudiantes que han ingresado al sistema</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de estadísticas: Facultades -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow">
+          <div class="card-body text-center">
+            <h5 class="card-title">Facultades Activas</h5>
+            <div class="display-2 fw-bold text-success">{{ datosControl.facultadesActivas }}</div>
+            <p class="card-text">Número de facultades participantes</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de estadísticas: Orientaciones -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow">
+          <div class="card-body text-center">
+            <h5 class="card-title">Orientaciones Completadas</h5>
+            <div class="display-2 fw-bold text-info">{{ datosControl.orientacionesCompletadas }}</div>
+            <p class="card-text">Procesos de orientación finalizados</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección de filtros -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-light">
+        <h4 class="mb-0"><i class="bi bi-funnel-fill me-2"></i>Filtros de Búsqueda</h4>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Filtro por provincia -->
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Provincia:</label>
+            <div class="input-group">
+              <select class="form-select" [(ngModel)]="filtros.provincia"
+                (change)="aplicarFiltro('provincia', filtros.provincia)">
+                <option value="">Todas las provincias</option>
+                <option *ngFor="let provincia of opcionesFiltros.provincias" [value]="provincia.nombre">
+                  {{ provincia.nombre }}
+                </option>
+              </select>
+              <button class="btn btn-outline-secondary" type="button" *ngIf="filtros.provincia"
+                (click)="limpiarFiltro('provincia')">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtro por colegio -->
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Colegio:</label>
+            <div class="input-group">
+              <select class="form-select" [(ngModel)]="filtros.colegio"
+                (change)="aplicarFiltro('colegio', filtros.colegio)">
+                <option value="">Todos los colegios</option>
+                <option *ngFor="let colegio of opcionesFiltros.colegios" [value]="colegio">
+                  {{ colegio }}
+                </option>
+              </select>
+              <button class="btn btn-outline-secondary" type="button" *ngIf="filtros.colegio"
+                (click)="limpiarFiltro('colegio')">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtro por curso -->
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Curso:</label>
+            <div class="input-group">
+              <select class="form-select" [(ngModel)]="filtros.curso" (change)="aplicarFiltro('curso', filtros.curso)">
+                <option value="">Todos los cursos</option>
+                <option *ngFor="let curso of opcionesFiltros.cursos" [value]="curso">
+                  {{ curso }}
+                </option>
+              </select>
+              <button class="btn btn-outline-secondary" type="button" *ngIf="filtros.curso"
+                (click)="limpiarFiltro('curso')">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtro por fecha -->
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Fecha de Registro:</label>
+            <div class="input-group">
+              <select class="form-select" [(ngModel)]="filtros.fecha" (change)="aplicarFiltro('fecha', filtros.fecha)">
+                <option value="">Todas las fechas</option>
+                <option *ngFor="let fecha of opcionesFiltros.fechasRegistro" [value]="fecha">
+                  {{ fecha }}
+                </option>
+              </select>
+              <button class="btn btn-outline-secondary" type="button" *ngIf="filtros.fecha"
+                (click)="limpiarFiltro('fecha')">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón para limpiar todos los filtros -->
+        <div class="text-end">
+          <button class="btn btn-outline-primary" (click)="limpiarTodosFiltros()">
+            <i class="bi bi-arrow-counterclockwise me-2"></i>Limpiar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de estudiantes -->
+    <div class="card shadow">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Lista de Estudiantes</h4>
+        <span class="badge bg-primary">{{ estudiantesFiltrados.length }} estudiantes</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th>CI</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Colegio</th>
+                <th>Curso</th>
+                <th>Edad</th>
+                <th>Provincia</th>
+                <th>Celular</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let estudiante of estudiantesFiltrados">
+                <td>{{ estudiante.ciEstudiante }}</td>
+                <td>{{ estudiante.nombre }}</td>
+                <td>{{ estudiante.apPaterno }} {{ estudiante.apMaterno }}</td>
+                <td>{{ estudiante.colegio }}</td>
+                <td>{{ estudiante.curso }}</td>
+                <td>{{ estudiante.edad }}</td>
+                <td>{{ estudiante.provincia.nombre }}</td>
+                <td>{{ estudiante.celular }}</td>
+                <td>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" (click)="abrirModalEditar(estudiante)">
+                      <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="eliminarEstudiante(estudiante.idEstudiante)">
+                      <i class="bi bi-trash-fill"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mensaje cuando no hay datos -->
+        <div *ngIf="estudiantesFiltrados.length === 0" class="text-center py-5">
+          <i class="bi bi-search display-1 text-muted"></i>
+          <p class="mt-3 text-muted">No se encontraron estudiantes con los filtros seleccionados</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para crear/editar estudiante -->
+    <div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header"
+            [ngClass]="{'bg-primary text-white': modalMode === 'create', 'bg-success text-white': modalMode === 'edit'}">
+            <h5 class="modal-title">
+              <i [class]="modalMode === 'create' ? 'bi bi-person-plus-fill me-2' : 'bi bi-pencil-fill me-2'"></i>
+              {{ modalMode === 'create' ? 'Registrar Nuevo Estudiante' : 'Editar Estudiante' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              (click)="cerrarModal()"></button>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="estudianteForm">
+              <div class="row">
+                <!-- CI Estudiante -->
+                <div class="col-md-6 mb-3">
+                  <label for="ciEstudiante" class="form-label">CI Estudiante: <span class="text-danger">*</span></label>
+                  <input type="text" id="ciEstudiante" formControlName="ciEstudiante" class="form-control"
+                    [ngClass]="{'is-invalid': estudianteForm.get('ciEstudiante')?.touched && estudianteForm.get('ciEstudiante')?.invalid}" />
+                  <div class="invalid-feedback"
+                    *ngIf="estudianteForm.get('ciEstudiante')?.touched && estudianteForm.get('ciEstudiante')?.invalid">
+                    <span *ngIf="estudianteForm.get('ciEstudiante')?.errors?.['required']">El CI es requerido</span>
+                  </div>
+                </div>
+
+                <!-- Nombre -->
+                <div class="col-md-6 mb-3">
+                  <label for="nombre" class="form-label">Nombre: <span class="text-danger">*</span></label>
+                  <input type="text" id="nombre" formControlName="nombre" class="form-control"
+                    [ngClass]="{'is-invalid': estudianteForm.get('nombre')?.touched && estudianteForm.get('nombre')?.invalid}" />
+                  <div class="invalid-feedback"
+                    *ngIf="estudianteForm.get('nombre')?.touched && estudianteForm.get('nombre')?.invalid">
+                    <span *ngIf="estudianteForm.get('nombre')?.errors?.['required']">El nombre es requerido</span>
+                  </div>
+                </div>
+
+                <!-- Apellido Paterno -->
+                <div class="col-md-6 mb-3">
+                  <label for="apPaterno" class="form-label">Apellido Paterno: <span class="text-danger">*</span></label>
+                  <input type="text" id="apPaterno" formControlName="apPaterno" class="form-control"
+                    [ngClass]="{'is-invalid': estudianteForm.get('apPaterno')?.touched && estudianteForm.get('apPaterno')?.invalid}" />
+                  <div class="invalid-feedback"
+                    *ngIf="estudianteForm.get('apPaterno')?.touched && estudianteForm.get('apPaterno')?.invalid">
+                    <span *ngIf="estudianteForm.get('apPaterno')?.errors?.['required']">El apellido paterno es
+                      requerido</span>
+                  </div>
+                </div>
+
+                <!-- Apellido Materno -->
+                <div class="col-md-6 mb-3">
+                  <label for="apMaterno" class="form-label">Apellido Materno:</label>
+                  <input type="text" id="apMaterno" formControlName="apMaterno" class="form-control" />
+                </div>
+
+                <!-- Colegio -->
+                <div class="col-md-6 mb-3">
+                  <label for="colegio" class="form-label">Colegio: <span class="text-danger">*</span></label>
+                  <input type="text" id="colegio" formControlName="colegio" class="form-control"
+                    [ngClass]="{'is-invalid': estudianteForm.get('colegio')?.touched && estudianteForm.get('colegio')?.invalid}" />
+                  <div class="invalid-feedback"
+                    *ngIf="estudianteForm.get('colegio')?.touched && estudianteForm.get('colegio')?.invalid">
+                    <span *ngIf="estudianteForm.get('colegio')?.errors?.['required']">El colegio es requerido</span>
+                  </div>
+                </div>
+
+                <!-- Curso -->
+                <div class="col-md-6 mb-3">
+                  <label for="curso" class="form-label">Curso: <span class="text-danger">*</span></label>
+                  <input type="text" id="curso" formControlName="curso" class="form-control"
+                    [ngClass]="{'is-invalid': estudianteForm.get('curso')?.touched && estudianteForm.get('curso')?.invalid}" />
+                  <div class="invalid-feedback"
+                    *ngIf="estudianteForm.get('curso')?.touched && estudianteForm.get('curso')?.invalid">
+                    <span *ngIf="estudianteForm.get('curso')?.errors?.['required']">El curso es requerido</span>
+                  </div>
+                </div>
+
+                <!-- Edad -->
+                <div class="col-md-6 mb-3">
+                  <label for="edad" class="form-label">Edad: <span class="text-danger">*</span></label>
+                  <input type="number" id="edad" formControlName="edad" class="form-control"
+                    [ngClass]="{'is-invalid': estudianteForm.get('edad')?.touched && estudianteForm.get('edad')?.invalid}" />
+                  <div class="invalid-feedback"
+                    *ngIf="estudianteForm.get('edad')?.touched && estudianteForm.get('edad')?.invalid">
+                    <span *ngIf="estudianteForm.get('edad')?.errors?.['required']">La edad es requerida</span>
+                    <span *ngIf="estudianteForm.get('edad')?.errors?.['min']">La edad mínima es 10 años</span>
+                    <span *ngIf="estudianteForm.get('edad')?.errors?.['max']">La edad máxima es 30 años</span>
+                  </div>
+                </div>
+
+                <!-- Celular -->
+                <div class="col-md-6 mb-3">
+                  <label for="celular" class="form-label">Celular: <span class="text-danger">*</span></label>
+                  <input type="text" id="celular" formControlName="celular" class="form-control"
+                    [ngClass]="{'is-invalid': estudianteForm.get('celular')?.touched && estudianteForm.get('celular')?.invalid}" />
+                  <div class="invalid-feedback"
+                    *ngIf="estudianteForm.get('celular')?.touched && estudianteForm.get('celular')?.invalid">
+                    <span *ngIf="estudianteForm.get('celular')?.errors?.['required']">El número de celular es
+                      requerido</span>
+                  </div>
+                </div>
+
+                <!-- Provincia -->
+                <div class="col-md-6 mb-3">
+                  <label for="idProvincia" class="form-label">Provincia: <span class="text-danger">*</span></label>
+                  <select id="idProvincia" formControlName="idProvincia" class="form-select"
+                    [ngClass]="{'is-invalid': estudianteForm.get('idProvincia')?.touched && estudianteForm.get('idProvincia')?.invalid}">
+                    <option value="">Seleccione una provincia</option>
+                    <option *ngFor="let provincia of opcionesFiltros.provincias" [value]="provincia.idProvincia">
+                      {{ provincia.nombre }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback"
+                    *ngIf="estudianteForm.get('idProvincia')?.touched && estudianteForm.get('idProvincia')?.invalid">
+                    <span *ngIf="estudianteForm.get('idProvincia')?.errors?.['required']">La provincia es
+                      requerida</span>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
+            </button>
+            <button type="button" class="btn"
+              [ngClass]="{'btn-primary': modalMode === 'create', 'btn-success': modalMode === 'edit'}"
+              (click)="guardarEstudiante()">
+              <i class="bi"
+                [ngClass]="{'bi-save': modalMode === 'create', 'bi-check-circle': modalMode === 'edit'}"></i>
+              {{ modalMode === 'create' ? ' Registrar' : ' Actualizar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
