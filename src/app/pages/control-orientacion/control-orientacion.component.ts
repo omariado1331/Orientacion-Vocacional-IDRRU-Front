@@ -107,7 +107,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   get resultadosFormGroups(): FormArray<FormGroup> {
     return this.resultadosForm as FormArray<FormGroup>;
   }
-
+  
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private formBuilder: FormBuilder,
@@ -258,6 +258,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   cargarMunicipios(): void {
     this.municipioService.getAll().subscribe({
       next: (municipios: any[]) => {
@@ -278,11 +279,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   getMunicipioNombre(id: number): string {
     const municipio = this.municipios.find(m => m.idMunicipio === id);
     return municipio ? municipio.nombre : 'Desconocido';
   }
-
 
   cargarDatosParaResultados(): void {
     forkJoin({
