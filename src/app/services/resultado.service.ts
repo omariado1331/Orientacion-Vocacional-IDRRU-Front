@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ResultadoDto } from '../interfaces/resultado-interface';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ResultadoService {
-  private apiUrl = 'http://localhost:8080/resultado';
+  private apiUrl = `${environment.apiUrl}/resultado`;
 
   constructor(private http: HttpClient) { }
 

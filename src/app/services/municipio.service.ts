@@ -4,13 +4,14 @@ import { HttpClient} from '@angular/common/http';
 import { Municipio } from '../interfaces/municipio-interface';
 import { Municipioi } from '../interfaces/municipio-interface';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class MunicipioService {
-  private apiUrl = 'http://localhost:8080/municipio';
+  private apiUrl = `${environment.apiUrl}/municipio`;
 
   constructor(private http: HttpClient) { }
   getAll(): Observable<Municipioi[]> {

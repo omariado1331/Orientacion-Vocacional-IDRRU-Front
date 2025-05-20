@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 /**
  * Define la estructura de datos para una Facultad.
@@ -213,7 +214,7 @@ const FACULTADES_DATA: Facultad[] = [
   providedIn: 'root'
 })
 export class FacultadService {
-  private apiUrl = 'http://localhost:8080/facultad';
+  private apiUrl = `${environment.apiUrl}/facultad`;
   private useMockData = true; 
 
   constructor(private http: HttpClient) { }
