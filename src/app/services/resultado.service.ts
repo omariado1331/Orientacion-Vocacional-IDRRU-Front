@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ResultadoDto } from '../interfaces/resultado-interface';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ResultadoService {
-  private apiUrl = 'http://localhost:8080/resultado';
+  private apiUrl = `${environment.apiUrl}/resultado`;
 
   constructor(private http: HttpClient) { }
 
@@ -22,15 +24,15 @@ export class ResultadoService {
     return this.http.get<any>(`${this.apiUrl}/estudiante/${estudianteId}`);
   }
 
-  create(resultado: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/`, resultado);
+  create(resultado: ResultadoDto): Observable<ResultadoDto> {
+    return this.http.post<ResultadoDto>(this.apiUrl, resultado);
   }
 
-  update(id: number, resultado: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, resultado);
+  update(id: number, resultado: ResultadoDto): Observable<ResultadoDto> {
+    return this.http.put<ResultadoDto>(`${this.apiUrl}/${id}`, resultado);
   }
 
-  delete(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

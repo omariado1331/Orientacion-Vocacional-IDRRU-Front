@@ -8,6 +8,7 @@ import { ControlOrientacionComponent } from './pages/control-orientacion/control
 
 import { FormEstudianteComponent } from './pages/forms/form-estudiante/form-estudiante.component';
 import { ResultFormComponent } from './pages/forms/result-form/result-form.component';
+import { ControlOrientacionComponent } from './pages/control-orientacion/control-orientacion.component';
 
 export const routes: Routes = [
     {path: '', redirectTo: 'orientacion-vocacional', pathMatch: 'full'},
