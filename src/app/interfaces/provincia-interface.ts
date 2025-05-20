@@ -5,3 +5,8 @@ export class Provincia {
         public nombre: string
     ){}
 }
+
+export interface ProvinciaI {
+  id: number;
+  nombre: string;
+}

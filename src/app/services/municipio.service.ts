@@ -1,20 +1,17 @@
 import { Injectable } from '@angular/core';
-<<<<<<< HEAD
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+import { MunicipioI } from '../interfaces/municipio-interface';
+import { Municipio } from '../interfaces/municipio-interface';
 
-interface Municipio {
-    id: number;
-    nombre: string;
-    id_provincia: number;
-}
+
 
 @Injectable({
     providedIn: 'root'
 })
 export class MunicipioService {
 
-    private mockMunicipios: Municipio[] = [
+    private mockMunicipios: MunicipioI[] = [
         // ABEL ITURRALDE (id_provincia: 1)
         { id: 1, nombre: 'Ixiamas', id_provincia: 1 },
         { id: 2, nombre: 'San Buenaventura', id_provincia: 1 },
@@ -144,7 +141,7 @@ export class MunicipioService {
       ];
     constructor() { }
 
-    getMunicipios(provinciaId?: number): Observable<Municipio[]> {
+    getMunicipios(provinciaId?: number): Observable<MunicipioI[]> {
 
         let municipios = this.mockMunicipios;
 
@@ -154,16 +151,7 @@ export class MunicipioService {
 
         return of(municipios);
     }
-}
-=======
-import { Municipio } from '../interfaces/municipio-interface';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class MunicipioService {
-
-  constructor(){}
 
   municipios: Municipio[] = [
     new Municipio(1, 'Ixiamas', 'ABEL ITURRALDE'),
@@ -255,4 +243,3 @@ export class MunicipioService {
     new Municipio( 86, 'Yanacachi','SUDYUNGAS')
   ]
 }
->>>>>>> origin/omardev

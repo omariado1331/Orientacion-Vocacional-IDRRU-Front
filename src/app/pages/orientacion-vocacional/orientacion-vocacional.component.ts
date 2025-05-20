@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-orientacion-vocacional',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './orientacion-vocacional.component.html',
   styleUrl: './orientacion-vocacional.component.css'
 })

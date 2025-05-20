@@ -3,10 +3,11 @@ export interface Resultado{
     interes: number;
     aptitud: number;
     puntajeHolland: string;
-    createdAt: string;
-    updatedAt: string;
-    active: boolean;
-    
+    fecha: string;
+    idEstudiante: number;
+    idChaside: number;
+    idHolland: number;
+    idFacultad: number;
 }
 
 export interface ResultadoDto {
