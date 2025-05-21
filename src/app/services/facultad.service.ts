@@ -214,12 +214,8 @@ const FACULTADES_DATA: Facultad[] = [
   providedIn: 'root'
 })
 export class FacultadService {
-<<<<<<< HEAD
-  private apiUrl = 'http://localhost:8080/facultad';
-=======
   private apiUrl = `${environment.apiUrl}/facultad`;
   private useMockData = true; 
->>>>>>> origin/neil-eyner
 
   constructor(private http: HttpClient) { }
 

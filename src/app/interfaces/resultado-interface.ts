@@ -3,17 +3,9 @@ export interface Resultado{
     interes: number;
     aptitud: number;
     puntajeHolland: string;
-<<<<<<< HEAD
-    fecha: string;
-    idEstudiante: number;
-    idChaside: number;
-    idHolland: number;
-    idFacultad: number;
-=======
     createdAt: string;
     updatedAt: string;
     active: boolean;
->>>>>>> origin/neil-eyner
 }
 
 export interface ResultadoDto {
