@@ -1,272 +1,821 @@
-<div class="container mt-4">
-  <!-- Mostrar formulario de login si no está autenticado -->
-  <div class="row" *ngIf="!isAuthenticated">
-    <div class="col-md-6 offset-md-3 col-lg-4 offset-lg-4 mt-5">
-      <div class="card shadow-lg" style="border-radius: var(--card-border-radius); overflow: hidden; border: none;">
-        <!-- Encabezado con logo y título -->
-        <div class="card-header text-white text-center py-4"
-          style="background-color: var(--umsa-blue); border-bottom: 4px solid var(--umsa-accent); display: flex; align-items: center; justify-content: center;">
-          <div class="me-3">
-            <img src="{{ logoUrl }}" alt="UMSA Logo" height="80" *ngIf="logoUrl" onerror="this.style.display='none'">
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center" *ngIf="!isAuthenticated">
+  <div class="card shadow-lg border-0" style="max-width: 400px; width: 100%;">
+    <div class="card-body p-4 text-umsa">
+
+      <!-- Encabezado con logo a la izquierda y texto a la derecha -->
+      <div class="login-header d-flex align-items-center bg-umsa-blue-dark text-white rounded mb-4 px-3 py-2">
+        <img [src]="logoUrl" alt="Logo Universidad" class="img-fluid me-3" style="max-height: 110px;">
+        <div>
+          <h5 class="mb-1 fw-bold">Sistema de Orientación Vocacional</h5>
+          <small class="text-light">Inicie sesión para acceder al panel de control</small>
+        </div>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="username" class="form-label">Usuario</label>
+          <div class="input-group">
+            <span class="input-group-text bg-umsa-blue text-white"><i class="bi bi-person-fill"></i></span>
+            <input type="text" id="username" formControlName="username" class="form-control"
+              placeholder="Ingrese su usuario"
+              [ngClass]="{'is-invalid': loginForm.get('username')?.touched && loginForm.get('username')?.invalid}">
           </div>
-          <h2 class="mb-0" style="font-weight: 400;">Control de Orientación Vocacional</h2>
+          <div class="invalid-feedback"
+            *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.invalid">
+            Usuario requerido
+          </div>
         </div>
 
-        <div class="card-body p-4" style="background-color: var(--umsa-gray);">
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            <!-- Mensaje de error con icono -->
-            <div *ngIf="error" class="alert alert-danger d-flex align-items-center" role="alert">
-              <i class="bi bi-exclamation-triangle-fill me-2"></i>
-              <div>{{ error }}</div>
-            </div>
-
-            <!-- Campo de usuario -->
-            <div class="mb-4">
-              <label for="username" class="form-label fw-medium" style="color: var(--umsa-text);">
-                <i class="bi bi-person-fill me-1"></i> Usuario:
-              </label>
-              <div class="input-group">
-                <span class="input-group-text" style="background-color: var(--umsa-blue-light); color: white;">
-                  <i class="bi bi-person"></i>
-                </span>
-                <input type="text" id="username" formControlName="username" class="form-control"
-                  placeholder="Ingrese su nombre de usuario"
-                  [ngClass]="{'is-invalid': loginForm.controls['username'].touched && loginForm.controls['username'].invalid}"
-                  style="transition: all var(--transition-speed);" />
-              </div>
-              <div *ngIf="loginForm.controls['username'].touched && loginForm.controls['username'].invalid"
-                class="invalid-feedback">
-                <div *ngIf="loginForm.controls['username'].errors?.['required']">
-                  <i class="bi bi-info-circle me-1"></i> El usuario es requerido
-                </div>
-                <div *ngIf="loginForm.controls['username'].errors?.['minlength']">
-                  <i class="bi bi-info-circle me-1"></i> El usuario debe tener al menos 3 caracteres
-                </div>
-              </div>
-            </div>
-
-            <!-- Campo de contraseña -->
-            <div class="mb-4">
-              <label for="password" class="form-label fw-medium" style="color: var(--umsa-text);">
-                <i class="bi bi-lock-fill me-1"></i> Contraseña:
-              </label>
-              <div class="input-group">
-                <span class="input-group-text" style="background-color: var(--umsa-blue-light); color: white;">
-                  <i class="bi bi-lock"></i>
-                </span>
-                <input type="password" id="password" formControlName="password" class="form-control"
-                  placeholder="Ingrese su contraseña"
-                  [ngClass]="{'is-invalid': loginForm.controls['password'].touched && loginForm.controls['password'].invalid}"
-                  style="transition: all var(--transition-speed);" />
-              </div>
-              <div *ngIf="loginForm.controls['password'].touched && loginForm.controls['password'].invalid"
-                class="invalid-feedback">
-                <div *ngIf="loginForm.controls['password'].errors?.['required']">
-                  <i class="bi bi-info-circle me-1"></i> La contraseña es requerida
-                </div>
-                <div *ngIf="loginForm.controls['password'].errors?.['minlength']">
-                  <i class="bi bi-info-circle me-1"></i> La contraseña debe tener al menos 6 caracteres
-                </div>
-              </div>
-            </div>
-
-            <!-- Botón de envío -->
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn py-3" [disabled]="loginForm.invalid || loading"
-                style="background-color: var(--umsa-blue); color: white; font-weight: 600; border: none; transition: all var(--transition-speed);"
-                onmouseover="this.style.backgroundColor='var(--umsa-blue-dark)'"
-                onmouseout="this.style.backgroundColor='var(--umsa-blue)'">
-                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-                <i class="bi bi-box-arrow-in-right me-2"></i>
-                Iniciar Sesión
-              </button>
-            </div>
-          </form>
+        <div class="mb-4">
+          <label for="password" class="form-label">Contraseña</label>
+          <div class="input-group">
+            <span class="input-group-text bg-umsa-blue text-white"><i class="bi bi-lock-fill"></i></span>
+            <input type="password" id="password" formControlName="password" class="form-control"
+              placeholder="Ingrese su contraseña"
+              [ngClass]="{'is-invalid': loginForm.get('password')?.touched && loginForm.get('password')?.invalid}">
+          </div>
+          <div class="invalid-feedback"
+            *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+            Contraseña requerida
+          </div>
         </div>
 
-        <!-- Footer del formulario -->
-        <div class="card-footer py-3 text-center" style="background-color: var(--umsa-blue-dark); color: white;">
-          <small>Sistema de Orientación Vocacional IDRRU © 2025</small>
+        <div class="alert alert-danger" *ngIf="error">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ error }}
         </div>
+
+        <button type="submit" class="btn btn-umsa w-100 py-2" [disabled]="loginForm.invalid || loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          <i *ngIf="!loading" class="bi bi-box-arrow-in-right me-2"></i>
+          Iniciar Sesión
+        </button>
+      </form>
+
+      <div class="text-center mt-4">
+        <small class="text-muted">© {{ 2025 }} UMSA - Sistema de Orientación Vocacional</small>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Mostrar panel de control si está autenticado -->
-  <div *ngIf="isAuthenticated">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1>Panel de Control - Orientación Vocacional</h1>
-      <div>
-        <!-- <button class="btn btn-success me-2" (click)="abrirModalCrear()">
-          <i class="bi bi-person-plus-fill me-2"></i>Registrar Estudiante
-        </button> -->
-        <button class="btn btn-outline-danger" (click)="logout()">
-          <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-        </button>
-      </div>
-    </div>
 
-    <div class="row">
-      <!-- Tarjeta de estadísticas: Estudiantes -->
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow">
-          <div class="card-body text-center">
-            <h5 class="card-title">Estudiantes Registrados</h5>
-            <div class="display-2 fw-bold text-primary">{{ datosControl.totalEstudiantes }}</div>
-            <p class="card-text">Total de estudiantes que han ingresado al sistema</p>
-          </div>
+<!-- Panel de control cuando está autenticado -->
+<div *ngIf="isAuthenticated">
+  <!-- Header con logo y título -->
+  <header class="bg-umsa-blue-dark shadow-sm mb-4">
+    <div class="container-fluid py-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <img [src]="logoUrl" alt="Logo Universidad" class="me-3" style="height: 50px;">
+          <h1 class="h3 mb-0 text-light">Sistema de Orientación Vocacional</h1>
         </div>
-      </div>
-
-      <!-- Tarjeta de estadísticas: Facultades -->
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow">
-          <div class="card-body text-center">
-            <h5 class="card-title">Facultades Activas</h5>
-            <div class="display-2 fw-bold text-success">{{ datosControl.facultadesActivas }}</div>
-            <p class="card-text">Número de facultades participantes</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tarjeta de estadísticas: Orientaciones -->
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow">
-          <div class="card-body text-center">
-            <h5 class="card-title">Orientaciones Completadas</h5>
-            <div class="display-2 fw-bold text-info">{{ datosControl.orientacionesCompletadas }}</div>
-            <p class="card-text">Procesos de orientación finalizados</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sección de filtros -->
-    <div class="card shadow mb-4">
-      <div class="card-header bg-light">
-        <h4 class="mb-0"><i class="bi bi-funnel-fill me-2"></i>Filtros de Búsqueda</h4>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <!-- Filtro por provincia -->
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Provincia:</label>
-            <div class="input-group">
-              <select class="form-select" [(ngModel)]="filtros.provincia"
-                (change)="aplicarFiltro('provincia', filtros.provincia)">
-                <option value="">Todas las provincias</option>
-                <option *ngFor="let provincia of opcionesFiltros.provincias" [value]="provincia.nombre">
-                  {{ provincia.nombre }}
-                </option>
-              </select>
-              <button class="btn btn-outline-secondary" type="button" *ngIf="filtros.provincia"
-                (click)="limpiarFiltro('provincia')">
-                <i class="bi bi-x"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Filtro por colegio -->
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Colegio:</label>
-            <div class="input-group">
-              <select class="form-select" [(ngModel)]="filtros.colegio"
-                (change)="aplicarFiltro('colegio', filtros.colegio)">
-                <option value="">Todos los colegios</option>
-                <option *ngFor="let colegio of opcionesFiltros.colegios" [value]="colegio">
-                  {{ colegio }}
-                </option>
-              </select>
-              <button class="btn btn-outline-secondary" type="button" *ngIf="filtros.colegio"
-                (click)="limpiarFiltro('colegio')">
-                <i class="bi bi-x"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Filtro por curso -->
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Curso:</label>
-            <div class="input-group">
-              <select class="form-select" [(ngModel)]="filtros.curso" (change)="aplicarFiltro('curso', filtros.curso)">
-                <option value="">Todos los cursos</option>
-                <option *ngFor="let curso of opcionesFiltros.cursos" [value]="curso">
-                  {{ curso }}
-                </option>
-              </select>
-              <button class="btn btn-outline-secondary" type="button" *ngIf="filtros.curso"
-                (click)="limpiarFiltro('curso')">
-                <i class="bi bi-x"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Filtro por fecha -->
-          <div class="col-md-3 mb-3">
-            <label class="form-label">Fecha de Registro:</label>
-            <div class="input-group">
-              <select class="form-select" [(ngModel)]="filtros.fecha" (change)="aplicarFiltro('fecha', filtros.fecha)">
-                <option value="">Todas las fechas</option>
-                <option *ngFor="let fecha of opcionesFiltros.fechasRegistro" [value]="fecha">
-                  {{ fecha }}
-                </option>
-              </select>
-              <button class="btn btn-outline-secondary" type="button" *ngIf="filtros.fecha"
-                (click)="limpiarFiltro('fecha')">
-                <i class="bi bi-x"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Botón para limpiar todos los filtros -->
-        <div class="text-end">
-          <button class="btn btn-outline-primary" (click)="limpiarTodosFiltros()">
-            <i class="bi bi-arrow-counterclockwise me-2"></i>Limpiar Filtros
+        <div>
+          <button class="btn btn-outline-danger" (click)="logout()">
+            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
           </button>
         </div>
       </div>
     </div>
+  </header>
 
-    <!-- Tabla de estudiantes -->
-    <div class="card shadow">
-      <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Lista de Estudiantes</h4>
-        <span class="badge bg-primary">{{ estudiantesFiltrados.length }} estudiantes</span>
+  <div class="container-fluid px-4">
+    <!-- Sección de título y estadísticas -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2><i class="bi bi-speedometer2 me-2"></i>Panel de Control</h2>
+      <div>
+        <div class="btn-group" role="group">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportarDropdown"
+            data-bs-toggle="dropdown" aria-expanded="false"
+            [disabled]="exportando || estudiantesFiltrados.length === 0">
+            <i class="bi bi-download me-2"></i>Exportar
+            <span *ngIf="exportando" class="spinner-border spinner-border-sm ms-2" role="status"
+              aria-hidden="true"></span>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="exportarDropdown">
+            <li><a class="dropdown-item" (click)="exportarEstudiantes('excel')"><i
+                  class="bi bi-file-earmark-excel me-2"></i>Excel</a></li>
+            <li><a class="dropdown-item" (click)="exportarEstudiantes('pdf')"><i
+                  class="bi bi-file-earmark-pdf me-2"></i>PDF</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="card-body p-0">
+    </div>
+    <!-- Sección de búsqueda y filtros -->
+    <div class="card shadow mb-4">
+      <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary"><i class="bi bi-funnel-fill me-2"></i>Filtros y Búsqueda</h5>
+        <button class="btn btn-sm btn-outline-secondary" (click)="limpiarTodosFiltros()">
+          <i class="bi bi-x-circle me-1"></i>Limpiar Filtros
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <!-- Búsqueda global -->
+          <div class="col-md-12">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" placeholder="Buscar por nombre, apellido, CI o colegio..."
+                [value]="searchQuery" (input)="buscarGlobal($event)">
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="col-md-3">
+            <label class="form-label">Provincia</label>
+            <select class="form-select" [(ngModel)]="filtros.provincia" (change)="onProvinciaChange(filtros.provincia)">
+              <option value="">Todas las provincias</option>
+              <option *ngFor="let provincia of opcionesFiltros.provincias" [value]="provincia.idProvincia">
+                {{ provincia.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Municipio</label>
+            <select class="form-select" [(ngModel)]="filtros.municipio"
+              (change)="aplicarFiltro('municipio', filtros.municipio)">
+              <option value="">Todos los municipios</option>
+              <option *ngFor="let municipio of opcionesFiltros.municipios" [value]="municipio.idMunicipio">
+                {{ municipio.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Colegio</label>
+            <select class="form-select" [(ngModel)]="filtros.colegio"
+              (change)="aplicarFiltro('colegio', filtros.colegio)">
+              <option value="">Todos los colegios</option>
+              <option *ngFor="let colegio of opcionesFiltros.colegios" [value]="colegio">
+                {{ colegio }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Curso</label>
+            <select class="form-select" [(ngModel)]="filtros.curso" (change)="aplicarFiltro('curso', filtros.curso)">
+              <option value="">Todos los cursos</option>
+              <option *ngFor="let curso of opcionesFiltros.cursos" [value]="curso">
+                {{ curso }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Filtrado por rango de fechas -->
+          <div class="col-md-6">
+            <label class="form-label">Rango de Fechas</label>
+            <div class="d-flex">
+              <div class="input-group me-2">
+                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                <input type="date" class="form-control" [(ngModel)]="filtros.fechaInicio" placeholder="Fecha inicio">
+              </div>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                <input type="date" class="form-control" [(ngModel)]="filtros.fechaFin" placeholder="Fecha fin">
+              </div>
+              <button class="btn btn-outline-primary ms-2" (click)="aplicarFiltroFecha()">
+                <i class="bi bi-funnel"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Fecha específica</label>
+            <select class="form-select" [(ngModel)]="filtros.fecha" (change)="aplicarFiltro('fecha', filtros.fecha)">
+              <option value="">Todas las fechas</option>
+              <option *ngFor="let fecha of opcionesFiltros.fechasRegistro" [value]="fecha">
+                {{ fecha }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal para Ver Perfil de Estudiante -->
+    <div class="modal fade" [ngClass]="{'show d-block': modalPerfilVisible}" tabindex="-1"
+      [ngStyle]="{'display': modalPerfilVisible ? 'block' : 'none'}" aria-labelledby="perfilEstudianteModalLabel"
+      [attr.aria-hidden]="!modalPerfilVisible">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="perfilEstudianteModalLabel">
+              <i class="bi bi-person-badge me-2"></i>
+              Perfil del Estudiante
+            </h5>
+            <button type="button" class="btn-close btn-close-white" (click)="cerrarModalPerfil()"></button>
+          </div>
+          <div class="modal-body p-0">
+            <!-- Spinner de carga -->
+            <div *ngIf="loading" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              <p class="mt-2 text-muted">Cargando información del estudiante...</p>
+            </div>
+
+            <!-- Contenido del perfil -->
+            <div *ngIf="!loading && estudianteSeleccionado" class="perfil-container">
+              <!-- Banner y datos principales -->
+              <div class="bg-light p-4 mb-3 border-bottom position-relative">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <div
+                      class="bg-primary text-white d-flex align-items-center justify-content-center px-3 py-2 rounded-circle">
+                      <span class="fs-1">{{ estudianteSeleccionado.nombre.charAt(0) }}{{
+                        estudianteSeleccionado.apPaterno.charAt(0) }}</span>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <h4 class="mb-1">{{ estudianteSeleccionado.nombre }} {{ estudianteSeleccionado.apPaterno }} {{
+                      estudianteSeleccionado.apMaterno }}</h4>
+                    <div class="d-flex flex-wrap gap-3 text-muted">
+                      <div><i class="bi bi-credit-card me-1"></i> {{ estudianteSeleccionado.ciEstudiante }}</div>
+                      <div><i class="bi bi-mortarboard me-1"></i> {{ estudianteSeleccionado.curso }}</div>
+                      <div><i class="bi bi-building me-1"></i> {{ estudianteSeleccionado.colegio }}</div>
+                      <div><i class="bi bi-pin-map me-1"></i> {{ getMunicipioNombre(estudianteSeleccionado.id_municipio)
+                        }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="px-4">
+                <!-- Información personal -->
+                <div class="card mb-4 border-0 shadow-sm">
+                  <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                      <i class="bi bi-person-lines-fill me-2 text-primary"></i>
+                      Datos Personales
+                    </h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">CI:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.ciEstudiante }}</p>
+                        </div>
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Nombre Completo:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.nombre }} {{ estudianteSeleccionado.apPaterno
+                            }} {{ estudianteSeleccionado.apMaterno }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Edad:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.edad }} años</p>
+                        </div>
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Celular:</label>
+                          <p class="mb-0 fs-5">
+                            <span *ngIf="estudianteSeleccionado.celular">
+                              <i class="bi bi-telephone me-1"></i>{{ estudianteSeleccionado.celular }}
+                            </span>
+                            <span *ngIf="!estudianteSeleccionado.celular" class="text-muted fst-italic">No
+                              especificado</span>
+                          </p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Colegio:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.colegio }}</p>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="info-item mb-3">
+                          <label class="d-block text-uppercase small text-muted mb-1">Curso:</label>
+                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.curso }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Resultados de Orientación -->
+                <div *ngIf="resultadoEstudiante && resultadoEstudiante.length > 0">
+                  <h5 class="mb-3 d-flex align-items-center">
+                    <span class="badge bg-primary rounded-pill me-2">{{ resultadoEstudiante.length }}</span>
+                    <i class="bi bi-graph-up me-2 text-primary"></i>
+                    Resultados de Orientación Vocacional
+                  </h5>
+
+                  <!-- Tabs para múltiples resultados -->
+                  <ul class="nav nav-tabs mb-3" *ngIf="resultadoEstudiante.length > 1">
+                    <li class="nav-item" *ngFor="let resultado of resultadoEstudiante; let i = index">
+                      <button class="nav-link" [ngClass]="{'active': i === 0}" data-bs-toggle="tab"
+                        [attr.data-bs-target]="'#resultado-' + i">
+                        Resultado {{ i + 1 }}
+                        <small class="ms-2 text-muted">{{ resultado.fecha | date:'dd/MM/yyyy' }}</small>
+                      </button>
+                    </li>
+                  </ul>
+
+                  <div class="tab-content">
+                    <div class="tab-pane fade show" [ngClass]="{'active': i === 0}"
+                      *ngFor="let resultado of resultadoEstudiante; let i = index" [attr.id]="'resultado-' + i">
+                      <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                          <h6 class="mb-0 d-flex align-items-center">
+                            <i class="bi bi-calendar-check me-2 text-primary"></i>
+                            Evaluación del {{ resultado.fecha | date:'dd/MM/yyyy HH:mm' }}
+                          </h6>
+                          <span class="badge bg-success">Completado</span>
+                        </div>
+                        <div class="card-body">
+                          <div class="row mb-4">
+                            <div class="col-md-6">
+                              <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                  <h6 class="card-title text-primary">
+                                    <i class="bi bi-star me-2"></i>Interés y Aptitud
+                                  </h6>
+                                  <div class="mb-3">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Interés:</label>
+                                    <div class="d-flex align-items-center">
+                                      <span class="fs-5 me-2">{{ resultado.interes }}</span>
+                                    </div>
+                                  </div>
+                                  <div class="mb-0">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Aptitud:</label>
+                                    <div class="d-flex align-items-center">
+                                      <span class="fs-5 me-2">{{ resultado.aptitud }}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                  <h6 class="card-title text-primary">
+                                    <i class="bi bi-award me-2"></i>Evaluación Holland
+                                  </h6>
+                                  <div class="mb-3">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Puntaje Holland:</label>
+                                    <p class="mb-0 fs-5">{{ resultado.puntajeHolland }}</p>
+                                  </div>
+                                  <div *ngIf="resultado.facultad?.nombre">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Facultad
+                                      recomendada:</label>
+                                    <p class="mb-0 fs-5">
+                                      <span class="badge bg-primary me-2">
+                                        <i class="bi bi-building me-1"></i>
+                                      </span>
+                                      {{ resultado.facultad.nombre }}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Resultados detallados -->
+                          <div class="row mb-3">
+                            <!-- Datos CHASIDE específicos -->
+                            <div class="col-md-6 mb-3" *ngIf="resultado.chaside">
+                              <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                  <h6 class="card-title text-primary d-flex align-items-center">
+                                    <i class="bi bi-clipboard-data me-2"></i>
+                                    Test CHASIDE
+                                  </h6>
+                                  <div class="mb-0">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Código CHASIDE:</label>
+                                    <div class="chaside-code">
+                                      <span class="text-uppercase fw-bold me-1">
+                                        {{ resultado.chaside.codigo }}
+
+                                      </span>
+                                    </div>
+                                    <p class="mt-2 small text-muted mb-0">
+                                      C: Administrativas y Contables, H: Humanísticas, A: Artísticas, S: Medicina y Cs.
+                                      de la Salud,
+                                      I: Ingeniería, D: Defensa y Seguridad, E: Ciencias Exactas
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Datos Holland específicos -->
+                            <div class="col-md-6 mb-3" *ngIf="resultado.holland">
+                              <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                  <h6 class="card-title text-primary d-flex align-items-center">
+                                    <i class="bi bi-person-bounding-box me-2"></i>
+                                    Test Holland
+                                  </h6>
+                                  <div class="mb-0">
+                                    <label class="d-block text-uppercase small text-muted mb-1">Tipo de
+                                      personalidad:</label>
+                                    <p class="mb-0 fs-5">{{ resultado.holland.personalidad }}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Recomendaciones específicas -->
+                          <div class="card border-0 bg-primary bg-opacity-10 mb-0">
+                            <div class="card-body">
+                              <h6 class="card-title text-primary">
+                                <i class="bi bi-lightbulb me-2"></i>
+                                Recomendaciones
+                              </h6>
+                              <p class="mb-0">
+                                Basado en los resultados de los tests, se recomienda explorar carreras relacionadas con
+                                <strong>{{ resultado.facultad?.nombre || 'las áreas de mayor puntaje' }}</strong>.
+                                Es importante complementar estos resultados con una orientación personalizada.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="alert alert-info d-flex align-items-center" *ngIf="!resultadoEstudiante?.length">
+                  <i class="bi bi-info-circle fs-4 me-3"></i>
+                  <div>
+                    <h6 class="mb-1">Sin resultados disponibles</h6>
+                    <p class="mb-0">Este estudiante aún no tiene resultados de orientación vocacional registrados.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalPerfil()">
+              <i class="bi bi-x-circle me-2"></i>
+              Cerrar
+            </button>
+            <button type="button" class="btn btn-primary" *ngIf="estudianteSeleccionado" (click)="exportarPerfilPDF()">
+              <i class="bi bi-file-earmark-pdf me-2"></i>
+              Exportar PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal para Editar Estudiante y Resultados -->
+    <div class="modal fade" [ngClass]="{'show d-block': modalEditarVisible}" tabindex="-1"
+      [ngStyle]="{'display': modalEditarVisible ? 'block' : 'none'}" aria-labelledby="editarEstudianteModalLabel"
+      [attr.aria-hidden]="!modalEditarVisible">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="editarEstudianteModalLabel">
+              <i class="bi bi-pencil-square me-2"></i>
+              Editar Estudiante y Resultados de Orientación
+            </h5>
+            <button type="button" class="btn-close btn-close-white" (click)="cerrarModalEditar()"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Sección de Información Personal -->
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h6 class="mb-0 d-flex align-items-center">
+                  <i class="bi bi-person-lines-fill me-2 text-primary"></i>
+                  Datos Personales
+                </h6>
+              </div>
+              <div class="card-body">
+                <form *ngIf="editarForm" [formGroup]="editarForm">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="ciEstudiante" formControlName="ciEstudiante"
+                          placeholder="CI"
+                          [ngClass]="{'is-invalid': editarForm.controls['ciEstudiante'].invalid && editarForm.controls['ciEstudiante'].touched}">
+                        <label for="ciEstudiante">CI *</label>
+                        <div class="invalid-feedback"
+                          *ngIf="editarForm.controls['ciEstudiante'].invalid && editarForm.controls['ciEstudiante'].touched">
+                          El CI es requerido y debe ser único
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="nombre" formControlName="nombre"
+                          placeholder="Nombre"
+                          [ngClass]="{'is-invalid': editarForm.controls['nombre'].invalid && editarForm.controls['nombre'].touched}">
+                        <label for="nombre">Nombre *</label>
+                        <div class="invalid-feedback"
+                          *ngIf="editarForm.controls['nombre'].invalid && editarForm.controls['nombre'].touched">
+                          El nombre es requerido
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="apPaterno" formControlName="apPaterno"
+                          placeholder="Apellido Paterno"
+                          [ngClass]="{'is-invalid': editarForm.controls['apPaterno'].invalid && editarForm.controls['apPaterno'].touched}">
+                        <label for="apPaterno">Apellido Paterno *</label>
+                        <div class="invalid-feedback"
+                          *ngIf="editarForm.controls['apPaterno'].invalid && editarForm.controls['apPaterno'].touched">
+                          El apellido paterno es requerido
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="apMaterno" formControlName="apMaterno"
+                          placeholder="Apellido Materno">
+                        <label for="apMaterno">Apellido Materno</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="colegio" formControlName="colegio"
+                          placeholder="Colegio"
+                          [ngClass]="{'is-invalid': editarForm.controls['colegio'].invalid && editarForm.controls['colegio'].touched}">
+                        <label for="colegio">Colegio *</label>
+                        <div class="invalid-feedback"
+                          *ngIf="editarForm.controls['colegio'].invalid && editarForm.controls['colegio'].touched">
+                          El colegio es requerido
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="curso" formControlName="curso" placeholder="Curso"
+                          [ngClass]="{'is-invalid': editarForm.controls['curso'].invalid && editarForm.controls['curso'].touched}">
+                        <label for="curso">Curso *</label>
+                        <div class="invalid-feedback"
+                          *ngIf="editarForm.controls['curso'].invalid && editarForm.controls['curso'].touched">
+                          El curso es requerido
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <input type="number" class="form-control" id="edad" formControlName="edad" placeholder="Edad"
+                          [ngClass]="{'is-invalid': editarForm.controls['edad'].invalid && editarForm.controls['edad'].touched}">
+                        <label for="edad">Edad *</label>
+                        <div class="invalid-feedback"
+                          *ngIf="editarForm.controls['edad'].invalid && editarForm.controls['edad'].touched">
+                          La edad debe ser entre 10 y 30 años
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="celular" formControlName="celular"
+                          placeholder="Celular"
+                          [ngClass]="{'is-invalid': editarForm.controls['celular'].invalid && editarForm.controls['celular'].touched}">
+                        <label for="celular">Celular</label>
+                        <div class="invalid-feedback"
+                          *ngIf="editarForm.controls['celular'].invalid && editarForm.controls['celular'].touched">
+                          El celular debe contener solo números
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-12">
+                      <div class="form-floating mb-3">
+                        <select class="form-select" id="id_municipio" formControlName="id_municipio"
+                          [ngClass]="{'is-invalid': editarForm.controls['id_municipio'].invalid && editarForm.controls['id_municipio'].touched}">
+                          <option [value]="null">Seleccione un municipio</option>
+                          <option *ngFor="let municipio of municipios" [value]="municipio.idMunicipio">
+                            {{ municipio.nombre }}
+                          </option>
+                        </select>
+                        <label for="id_municipio">Municipio *</label>
+                        <div class="invalid-feedback"
+                          *ngIf="editarForm.controls['id_municipio'].invalid && editarForm.controls['id_municipio'].touched">
+                          Seleccione un municipio
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Sección de Resultados de Orientación -->
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-graph-up me-2 text-primary"></i>
+                    Resultados de Orientación Vocacional
+                  </h6>
+                  <!-- <button class="btn btn-sm btn-outline-primary" (click)="agregarNuevoResultado()">
+                    <i class="bi bi-plus-circle me-1"></i> Agregar Resultado
+                  </button> -->
+                </div>
+              </div>
+              <div class="card-body">
+                <div *ngIf="resultadosForm.length === 0" class="alert alert-info text-center">
+                  No hay resultados de orientación registrados
+                </div>
+
+                <div *ngFor="let resultadoForm of resultadosFormGroups.controls; let i = index"
+                  class="card mb-3 border">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Resultado {{ i + 1 }}</h6>
+                    <!-- <button class="btn btn-sm btn-outline-danger" (click)="eliminarResultado(i)"
+                      *ngIf="resultadosForm.length > 1">
+                      <i class="bi bi-trash me-1"></i> Eliminar
+                    </button> -->
+                  </div>
+                  <div class="card-body">
+                    <div [formGroup]="$any(resultadoForm)" class="row g-3">
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="number" class="form-control" formControlName="interes" placeholder="Interés"
+                            [ngClass]="{'is-invalid': resultadoForm.get('interes')?.invalid && resultadoForm.get('interes')?.touched}">
+                          <label>Interés *</label>
+                          <div class="invalid-feedback"
+                            *ngIf="resultadoForm.get('interes')?.invalid && resultadoForm.get('interes')?.touched">
+                            Ingrese un valor de interés válido
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="number" class="form-control" formControlName="aptitud" placeholder="Aptitud"
+                            [ngClass]="{'is-invalid': resultadoForm.get('aptitud')?.invalid && resultadoForm.get('aptitud')?.touched}">
+                          <label>Aptitud *</label>
+                          <div class="invalid-feedback"
+                            *ngIf="resultadoForm.get('aptitud')?.invalid && resultadoForm.get('aptitud')?.touched">
+                            Ingrese un valor de aptitud válido
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                          <select class="form-select" formControlName="idChaside"
+                            [ngClass]="{'is-invalid': resultadoForm.get('idChaside')?.invalid && resultadoForm.get('idChaside')?.touched}">
+                            <option [value]="null">Seleccione CHASIDE</option>
+                            <option *ngFor="let chaside of chasideOpciones" [value]="chaside.idChaside">
+                              {{ chaside.codigo }}
+                            </option>
+                          </select>
+                          <label>Test CHASIDE</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                          <select class="form-select" formControlName="idHolland"
+                            [ngClass]="{'is-invalid': resultadoForm.get('idHolland')?.invalid && resultadoForm.get('idHolland')?.touched}">
+                            <option [value]="null">Seleccione Holland</option>
+                            <option *ngFor="let holland of hollandOpciones" [value]="holland.idHolland">
+                              {{ holland.personalidad }}
+                            </option>
+                          </select>
+                          <label>Test Holland</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                          <select class="form-select" formControlName="idFacultad"
+                            [ngClass]="{'is-invalid': resultadoForm.get('idFacultad')?.invalid && resultadoForm.get('idFacultad')?.touched}">
+                            <option [value]="null">Seleccione Facultad</option>
+                            <option *ngFor="let facultad of facultadOpciones" [value]="facultad.id">
+                              {{ facultad.nombre }}
+                            </option>
+                          </select>
+                          <label>Facultad Recomendada</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="text" class="form-control" formControlName="puntajeHolland"
+                            placeholder="Puntaje Holland"
+                            [ngClass]="{'is-invalid': resultadoForm.get('puntajeHolland')?.invalid && resultadoForm.get('puntajeHolland')?.touched}">
+                          <label>Puntaje Holland</label>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                          <input type="datetime-local" class="form-control" formControlName="fecha"
+                            placeholder="Fecha de Evaluación"
+                            [ngClass]="{'is-invalid': resultadoForm.get('fecha')?.invalid && resultadoForm.get('fecha')?.touched}">
+                          <label>Fecha de Evaluación</label>
+                          <div class="invalid-feedback"
+                            *ngIf="resultadoForm.get('fecha')?.invalid && resultadoForm.get('fecha')?.touched">
+                            Fecha inválida
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalEditar()">
+              <i class="bi bi-x-circle me-2"></i>
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" [disabled]="!esFormularioValido()"
+              (click)="guardarEdicionCompletaEstudiante()">
+              <i class="bi bi-save me-2"></i>
+              Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Tabla de estudiantes -->
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h5 class="mb-0 text-primary"><i class="bi bi-table me-2"></i>Listado de Estudiantes</h5>
+      </div>
+      <div class="card-body">
+        <!-- Selector de items por página -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="d-flex align-items-center">
+              <span class="me-2">Mostrar</span>
+              <select class="form-select form-select-sm" style="width: auto" [(ngModel)]="paginacion.itemsPorPagina"
+                (change)="cambiarItemsPorPagina(paginacion.itemsPorPagina)">
+                <option [value]="10">10</option>
+                <option [value]="25">25</option>
+                <option [value]="50">50</option>
+                <option [value]="100">100</option>
+              </select>
+              <span class="ms-2">registros</span>
+            </div>
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="text-muted">
+              Mostrando {{ estudiantesFiltrados.length > 0 ? (paginacion.paginaActual - 1) * paginacion.itemsPorPagina +
+              1 : 0 }}
+              a {{ Math.min(paginacion.paginaActual * paginacion.itemsPorPagina, estudiantesFiltrados.length) }}
+              de {{ estudiantesFiltrados.length }} estudiantes
+            </span>
+          </div>
+        </div>
+
         <div class="table-responsive">
-          <table class="table table-striped table-hover mb-0">
-            <thead class="table-dark">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
               <tr>
-                <th>CI</th>
-                <th>Nombre</th>
-                <th>Apellidos</th>
-                <th>Colegio</th>
-                <th>Curso</th>
-                <th>Edad</th>
-                <th>Provincia</th>
-                <th>Celular</th>
-                <th>Acciones</th>
+                <th class="cursor-pointer" (click)="ordenarPor('ciEstudiante')">
+                  CI
+                  <i *ngIf="ordenamiento.columna === 'ciEstudiante'"
+                    [ngClass]="ordenamiento.direccion === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down'"></i>
+                </th>
+                <th class="cursor-pointer" (click)="ordenarPor('nombre')">
+                  Nombre
+                  <i *ngIf="ordenamiento.columna === 'nombre'"
+                    [ngClass]="ordenamiento.direccion === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down'"></i>
+                </th>
+                <th class="cursor-pointer" (click)="ordenarPor('apellidos')">
+                  Apellidos
+                  <i *ngIf="ordenamiento.columna === 'apellidos'"
+                    [ngClass]="ordenamiento.direccion === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down'"></i>
+                </th>
+                <th class="cursor-pointer" (click)="ordenarPor('colegio')">
+                  Colegio
+                  <i *ngIf="ordenamiento.columna === 'colegio'"
+                    [ngClass]="ordenamiento.direccion === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down'"></i>
+                </th>
+                <th class="cursor-pointer"> Celular </th>
+                <th class="cursor-pointer"> Municipio </th>
+                <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let estudiante of estudiantesFiltrados">
+              <tr *ngIf="estudiantesPaginados.length === 0">
+                <td colspan="7" class="text-center py-4">
+                  <i class="bi bi-exclamation-circle text-muted me-2"></i>
+                  No se encontraron registros que coincidan con los criterios de búsqueda
+                </td>
+              </tr>
+              <tr *ngFor="let estudiante of estudiantesPaginados; let i = index">
                 <td>{{ estudiante.ciEstudiante }}</td>
                 <td>{{ estudiante.nombre }}</td>
                 <td>{{ estudiante.apPaterno }} {{ estudiante.apMaterno }}</td>
                 <td>{{ estudiante.colegio }}</td>
-                <td>{{ estudiante.curso }}</td>
-                <td>{{ estudiante.edad }}</td>
-                <td>{{ estudiante.provincia.nombre }}</td>
                 <td>{{ estudiante.celular }}</td>
-                <td>
-                  <div class="btn-group">
-                    <button class="btn btn-sm btn-outline-primary" (click)="abrirModalEditar(estudiante)">
-                      <i class="bi bi-pencil-fill"></i>
+                <td>{{ getMunicipioNombre(estudiante.id_municipio) }}</td>
+
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button class="btn btn-outline-primary" title="Ver Perfil"
+                      (click)="verPerfilEstudiante(estudiante.idEstudiante)">
+                      <i class="bi bi-person-badge"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" (click)="eliminarEstudiante(estudiante.idEstudiante)">
-                      <i class="bi bi-trash-fill"></i>
+                    <button class="btn btn-outline-secondary" title="Editar" (click)="abrirModalEditar(estudiante)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" title="Eliminar"
+                      (click)="eliminarEstudiante(estudiante.idEstudiante)">
+                      <i class="bi bi-trash"></i>
                     </button>
                   </div>
                 </td>
@@ -274,151 +823,53 @@
             </tbody>
           </table>
         </div>
+        <!-- Paginación -->
+        <div class="d-flex justify-content-center mt-3" *ngIf="paginacion.totalPaginas > 1">
+          <nav>
+            <ul class="pagination">
+              <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === 1}">
+                <a class="page-link" (click)="cambiarPagina(1)" aria-label="Primera">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === 1}">
+                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual - 1)" aria-label="Anterior">
+                  <span aria-hidden="true">&lt;</span>
+                </a>
+              </li>
 
-        <!-- Mensaje cuando no hay datos -->
-        <div *ngIf="estudiantesFiltrados.length === 0" class="text-center py-5">
-          <i class="bi bi-search display-1 text-muted"></i>
-          <p class="mt-3 text-muted">No se encontraron estudiantes con los filtros seleccionados</p>
-        </div>
-      </div>
-    </div>
+              <ng-container *ngFor="let pagina of [].constructor(paginacion.totalPaginas); let i = index">
+                <li class="page-item" *ngIf="(i + 1) === 1 || 
+                                            (i + 1) === paginacion.totalPaginas || 
+                                            (i + 1) >= paginacion.paginaActual - 1 && 
+                                            (i + 1) <= paginacion.paginaActual + 1"
+                  [ngClass]="{'active': i + 1 === paginacion.paginaActual}">
+                  <a class="page-link" (click)="cambiarPagina(i + 1)">{{ i + 1 }}</a>
+                </li>
+                <li class="page-item disabled" *ngIf="(i + 1) === 2 && paginacion.paginaActual > 3">
+                  <a class="page-link">...</a>
+                </li>
+                <li class="page-item disabled"
+                  *ngIf="(i + 1) === paginacion.totalPaginas - 1 && paginacion.paginaActual < paginacion.totalPaginas - 2">
+                  <a class="page-link">...</a>
+                </li>
+              </ng-container>
 
-    <!-- Modal para crear/editar estudiante -->
-    <div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header"
-            [ngClass]="{'bg-primary text-white': modalMode === 'create', 'bg-success text-white': modalMode === 'edit'}">
-            <h5 class="modal-title">
-              <i [class]="modalMode === 'create' ? 'bi bi-person-plus-fill me-2' : 'bi bi-pencil-fill me-2'"></i>
-              {{ modalMode === 'create' ? 'Registrar Nuevo Estudiante' : 'Editar Estudiante' }}
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-              (click)="cerrarModal()"></button>
-          </div>
-          <div class="modal-body">
-            <form [formGroup]="estudianteForm">
-              <div class="row">
-                <!-- CI Estudiante -->
-                <div class="col-md-6 mb-3">
-                  <label for="ciEstudiante" class="form-label">CI Estudiante: <span class="text-danger">*</span></label>
-                  <input type="text" id="ciEstudiante" formControlName="ciEstudiante" class="form-control"
-                    [ngClass]="{'is-invalid': estudianteForm.get('ciEstudiante')?.touched && estudianteForm.get('ciEstudiante')?.invalid}" />
-                  <div class="invalid-feedback"
-                    *ngIf="estudianteForm.get('ciEstudiante')?.touched && estudianteForm.get('ciEstudiante')?.invalid">
-                    <span *ngIf="estudianteForm.get('ciEstudiante')?.errors?.['required']">El CI es requerido</span>
-                  </div>
-                </div>
-
-                <!-- Nombre -->
-                <div class="col-md-6 mb-3">
-                  <label for="nombre" class="form-label">Nombre: <span class="text-danger">*</span></label>
-                  <input type="text" id="nombre" formControlName="nombre" class="form-control"
-                    [ngClass]="{'is-invalid': estudianteForm.get('nombre')?.touched && estudianteForm.get('nombre')?.invalid}" />
-                  <div class="invalid-feedback"
-                    *ngIf="estudianteForm.get('nombre')?.touched && estudianteForm.get('nombre')?.invalid">
-                    <span *ngIf="estudianteForm.get('nombre')?.errors?.['required']">El nombre es requerido</span>
-                  </div>
-                </div>
-
-                <!-- Apellido Paterno -->
-                <div class="col-md-6 mb-3">
-                  <label for="apPaterno" class="form-label">Apellido Paterno: <span class="text-danger">*</span></label>
-                  <input type="text" id="apPaterno" formControlName="apPaterno" class="form-control"
-                    [ngClass]="{'is-invalid': estudianteForm.get('apPaterno')?.touched && estudianteForm.get('apPaterno')?.invalid}" />
-                  <div class="invalid-feedback"
-                    *ngIf="estudianteForm.get('apPaterno')?.touched && estudianteForm.get('apPaterno')?.invalid">
-                    <span *ngIf="estudianteForm.get('apPaterno')?.errors?.['required']">El apellido paterno es
-                      requerido</span>
-                  </div>
-                </div>
-
-                <!-- Apellido Materno -->
-                <div class="col-md-6 mb-3">
-                  <label for="apMaterno" class="form-label">Apellido Materno:</label>
-                  <input type="text" id="apMaterno" formControlName="apMaterno" class="form-control" />
-                </div>
-
-                <!-- Colegio -->
-                <div class="col-md-6 mb-3">
-                  <label for="colegio" class="form-label">Colegio: <span class="text-danger">*</span></label>
-                  <input type="text" id="colegio" formControlName="colegio" class="form-control"
-                    [ngClass]="{'is-invalid': estudianteForm.get('colegio')?.touched && estudianteForm.get('colegio')?.invalid}" />
-                  <div class="invalid-feedback"
-                    *ngIf="estudianteForm.get('colegio')?.touched && estudianteForm.get('colegio')?.invalid">
-                    <span *ngIf="estudianteForm.get('colegio')?.errors?.['required']">El colegio es requerido</span>
-                  </div>
-                </div>
-
-                <!-- Curso -->
-                <div class="col-md-6 mb-3">
-                  <label for="curso" class="form-label">Curso: <span class="text-danger">*</span></label>
-                  <input type="text" id="curso" formControlName="curso" class="form-control"
-                    [ngClass]="{'is-invalid': estudianteForm.get('curso')?.touched && estudianteForm.get('curso')?.invalid}" />
-                  <div class="invalid-feedback"
-                    *ngIf="estudianteForm.get('curso')?.touched && estudianteForm.get('curso')?.invalid">
-                    <span *ngIf="estudianteForm.get('curso')?.errors?.['required']">El curso es requerido</span>
-                  </div>
-                </div>
-
-                <!-- Edad -->
-                <div class="col-md-6 mb-3">
-                  <label for="edad" class="form-label">Edad: <span class="text-danger">*</span></label>
-                  <input type="number" id="edad" formControlName="edad" class="form-control"
-                    [ngClass]="{'is-invalid': estudianteForm.get('edad')?.touched && estudianteForm.get('edad')?.invalid}" />
-                  <div class="invalid-feedback"
-                    *ngIf="estudianteForm.get('edad')?.touched && estudianteForm.get('edad')?.invalid">
-                    <span *ngIf="estudianteForm.get('edad')?.errors?.['required']">La edad es requerida</span>
-                    <span *ngIf="estudianteForm.get('edad')?.errors?.['min']">La edad mínima es 10 años</span>
-                    <span *ngIf="estudianteForm.get('edad')?.errors?.['max']">La edad máxima es 30 años</span>
-                  </div>
-                </div>
-
-                <!-- Celular -->
-                <div class="col-md-6 mb-3">
-                  <label for="celular" class="form-label">Celular: <span class="text-danger">*</span></label>
-                  <input type="text" id="celular" formControlName="celular" class="form-control"
-                    [ngClass]="{'is-invalid': estudianteForm.get('celular')?.touched && estudianteForm.get('celular')?.invalid}" />
-                  <div class="invalid-feedback"
-                    *ngIf="estudianteForm.get('celular')?.touched && estudianteForm.get('celular')?.invalid">
-                    <span *ngIf="estudianteForm.get('celular')?.errors?.['required']">El número de celular es
-                      requerido</span>
-                  </div>
-                </div>
-
-                <!-- Provincia -->
-                <div class="col-md-6 mb-3">
-                  <label for="idProvincia" class="form-label">Provincia: <span class="text-danger">*</span></label>
-                  <select id="idProvincia" formControlName="idProvincia" class="form-select"
-                    [ngClass]="{'is-invalid': estudianteForm.get('idProvincia')?.touched && estudianteForm.get('idProvincia')?.invalid}">
-                    <option value="">Seleccione una provincia</option>
-                    <option *ngFor="let provincia of opcionesFiltros.provincias" [value]="provincia.idProvincia">
-                      {{ provincia.nombre }}
-                    </option>
-                  </select>
-                  <div class="invalid-feedback"
-                    *ngIf="estudianteForm.get('idProvincia')?.touched && estudianteForm.get('idProvincia')?.invalid">
-                    <span *ngIf="estudianteForm.get('idProvincia')?.errors?.['required']">La provincia es
-                      requerida</span>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
-              <i class="bi bi-x-circle me-2"></i>Cancelar
-            </button>
-            <button type="button" class="btn"
-              [ngClass]="{'btn-primary': modalMode === 'create', 'btn-success': modalMode === 'edit'}"
-              (click)="guardarEstudiante()">
-              <i class="bi"
-                [ngClass]="{'bi-save': modalMode === 'create', 'bi-check-circle': modalMode === 'edit'}"></i>
-              {{ modalMode === 'create' ? ' Registrar' : ' Actualizar' }}
-            </button>
-          </div>
+              <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === paginacion.totalPaginas}">
+                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual + 1)" aria-label="Siguiente">
+                  <span aria-hidden="true">&gt;</span>
+                </a>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === paginacion.totalPaginas}">
+                <a class="page-link" (click)="cambiarPagina(paginacion.totalPaginas)" aria-label="Última">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </div>
   </div>
 </div>
+<div class="modal-backdrop fade show" *ngIf="modalEditarVisible || modalPerfilVisible"></div>

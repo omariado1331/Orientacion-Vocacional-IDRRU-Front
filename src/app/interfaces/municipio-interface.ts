@@ -5,3 +5,8 @@ export class Municipio{
         public idProvincia: string
     ){}
 }
+export interface Municipioi {
+    id_municipio: number;
+    nombre: string;
+    id_provincia: number;
+}

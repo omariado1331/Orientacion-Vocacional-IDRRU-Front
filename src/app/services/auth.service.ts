@@ -5,6 +5,7 @@ import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { LoginRequest, LoginResponse } from '../interfaces/auth.interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio para manejar la autenticacion, compatible con SSR.
@@ -14,7 +15,7 @@ import { LoginRequest, LoginResponse } from '../interfaces/auth.interface';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:8080/auth';
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_DATA = 'user_data';
   private isBrowser: boolean;
@@ -58,13 +59,15 @@ export class AuthService {
   }
 
   /**
-   * Cierra la sesion eliminando datos de localStorage (solo en navegador).
+   * Cierra la sesion eliminando datos de localStorage.
    */
-  logout(): void {
+
+  logout(): Observable<any> { 
     if (this.isBrowser) {
       localStorage.removeItem(this.TOKEN_KEY);
       localStorage.removeItem(this.USER_DATA);
     }
+    return this.http.post<any>(`${this.apiUrl}/logout`, {}); 
   }
 
   /**

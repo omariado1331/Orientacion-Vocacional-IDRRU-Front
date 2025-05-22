@@ -5,6 +5,7 @@ import { InfoOrientacionComponent } from './pages/info-orientacion/info-orientac
 import { ReportOrientacionComponent } from './pages/report-orientacion/report-orientacion.component';
 import { FormEstudianteComponent } from './pages/forms/form-estudiante/form-estudiante.component';
 import { ResultFormComponent } from './pages/forms/result-form/result-form.component';
+import { ControlOrientacionComponent } from './pages/control-orientacion/control-orientacion.component';
 import { unsavedChangesGuard } from './guards/unsaved-changes.guard';
 
 export const routes: Routes = [
@@ -12,6 +13,7 @@ export const routes: Routes = [
     {path:'orientacion-vocacional', component: OrientacionVocacionalComponent},
     {path:'info-orientacion', component: InfoOrientacionComponent },
     {path:'report-orientacion', component: ReportOrientacionComponent},
+    {path: 'control-orientacion', component: ControlOrientacionComponent},
     {path: 'formulario', children:[
         {path: 'estudiante', component: FormEstudianteComponent, canDeactivate: [unsavedChangesGuard]},
         {path: 'resultado', component: ResultFormComponent}
