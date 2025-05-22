@@ -1,5 +1,5 @@
 export interface Resultado{
-    idResultado: number;
+    idResultado: number | null;
     interes: number;
     aptitud: number;
     puntajeHolland: string;
@@ -7,7 +7,6 @@ export interface Resultado{
     idEstudiante: number;
     idChaside: number;
     idHolland: number;
-    idFacultad: number;
 }
 
 
