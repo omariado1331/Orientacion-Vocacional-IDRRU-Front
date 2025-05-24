@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ResultadoDto } from '../interfaces/resultado-interface';
+import { Resultado, ResultadoDto } from '../interfaces/resultado-interface';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -25,7 +25,10 @@ export class ResultadoService {
   }
 
   create(resultado: ResultadoDto): Observable<ResultadoDto> {
-    return this.http.post<ResultadoDto>(this.apiUrl, resultado);
+    return this.http.post<ResultadoDto>(`${this.apiUrl}/`, resultado);
+  }
+  createR(resultado: Resultado): Observable<Resultado> {
+    return this.http.post<Resultado>(`${this.apiUrl}/`, resultado);
   }
 
   update(id: number, resultado: ResultadoDto): Observable<ResultadoDto> {
