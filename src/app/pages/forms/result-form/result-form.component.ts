@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './result-form.component.css'
 })
 export class ResultFormComponent {
-
+  title = "Resultados";
 }

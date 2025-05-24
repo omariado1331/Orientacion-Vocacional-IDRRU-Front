@@ -207,6 +207,54 @@ const FACULTADES_DATA: Facultad[] = [
       "Programa Tecnologia de Alimentos",
       "Programa Tec. Sup. Procesos Quimicos"
     ],
+  },
+  {
+    id: 14,
+    nombre: "Academia Nacional de Policías (ANAPOL)",
+    codigo: "ANAPOL",
+    url: "http://www.unipol.edu.bo/?page_id=223",
+    imgLogo: "",
+    carreras: ["Oficial de Policía"],
+  },
+  {
+    id: 15,
+    nombre: "Facultad Técnica Superior en Ciencias Policiales (FATESCIPOL)",
+    codigo: "FATESCIPOL",
+    url: "http://www.unipol.edu.bo/?page_id=258",
+    imgLogo: "",
+    carreras: ["Técnico Superior en Ciencias Policiales"],
+  },
+  {
+    id: 16,
+    nombre: "Colegio Militar del Ejército - Cnl. Gualberto Villarroel",
+    codigo: "COLMIL",
+    url: "https://www.colmil.mil.bo/",
+    imgLogo: "",
+    carreras: ["Oficial del Ejército"],
+  },
+  {
+    id: 17,
+    nombre: "Colegio Militar de Aviación (COLMILAV)",
+    codigo: "COLMILAV",
+    url: "https://fab.bo/colmilav/",
+    imgLogo: "",
+    carreras: ["Oficial de la Fuerza Aérea"],
+  },
+  {
+    id: 18,
+    nombre: "Escuela Naval Militar - Eduardo Abaroa Hidalgo",
+    codigo: "ESCUELANAVAL",
+    url: "https://www.armada.mil.bo/",
+    imgLogo: "",
+    carreras: ["Oficial de la Armada"],
+  },
+  {
+    id: 19,
+    nombre: "Escuela Militar de Sargentos del Ejército",
+    codigo: "EMSGT",
+    url: "https://ejercito.mil.bo/",
+    imgLogo: "",
+    carreras: ["Sargento del Ejército"],
   }
 ];
 
@@ -215,7 +263,7 @@ const FACULTADES_DATA: Facultad[] = [
 })
 export class FacultadService {
   private apiUrl = `${environment.apiUrl}/facultad`;
-  private useMockData = true; 
+  private useMockData = true;
 
   constructor(private http: HttpClient) { }
 
