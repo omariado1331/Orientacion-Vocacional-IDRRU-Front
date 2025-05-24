@@ -1,7 +1,7 @@
-import { Component, computed, signal } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import { Estudiante } from '../../../interfaces/estudiante-interface';
+import { Component, PLATFORM_ID, Inject, computed, signal } from '@angular/core';
+import { NavigationExtras, RouterModule } from '@angular/router';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators, FormBuilder} from '@angular/forms';
+import { Estudiante, EstudianteI } from '../../../interfaces/estudiante-interface';
 import { ProvinciaService } from '../../../services/provincia.service';
 import { Provincia } from '../../../interfaces/provincia-interface';
 import { MunicipioService } from '../../../services/municipio.service';
@@ -16,6 +16,8 @@ import { HollandThirdService } from '../../../services/holland-third.service';
 import { HollandAutoevService } from '../../../services/holland-autoev.service';
 import { hollandPregunta } from '../../../interfaces/holland-pregunta-intf';
 import { Resultado } from '../../../interfaces/resultado-interface';
+import { EstudianteService } from '../../../services/estudiante.service';
+import { ResultadoService } from '../../../services/resultado.service';
 
 
 @Component({
@@ -26,12 +28,12 @@ import { Resultado } from '../../../interfaces/resultado-interface';
   styleUrl: './form-estudiante.component.css'
 })
 export class FormEstudianteComponent {
+  submitted = false;
   carnet: string = '';
   idMunicipio: number = 0;
   areaChaside:string[] = [];
   puntajeAptitud: number = 0;
   puntajeInteres: number = 0;
-  resultado!: Resultado;
   //arreglos para cargar en el DOM de preguntas chasides y holland, de municipio y provincias
   provincias: Provincia[] = [];
   municipios: Municipio[] = [];
@@ -46,7 +48,19 @@ export class FormEstudianteComponent {
   //resultadoChaside = signal<Record<string, number>>({ C: 0, H: 0, A: 0, S: 0, I: 0, D: 0, E: 0 });
   //resultados del test de holland
   resultadoHolland = signal<Record<string, number>>({ R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 });
-
+  estudianteGuardados!: EstudianteI;
+  estudianteI: EstudianteI={
+    id_municipio: 0,
+    idEstudiante: null,
+    ciEstudiante: '',
+    nombre: '',
+    apPaterno: '',
+    apMaterno: '',
+    colegio: '',
+    curso: '',
+    edad: 0,
+    celular: '',
+  };
   perfil = computed(() => {
     const res = this.resultadoHolland();
     return Object.entries(res)
@@ -54,6 +68,7 @@ export class FormEstudianteComponent {
       .slice(0, 3)
       .map(([key]) => key);
   });
+  chasidePtj:string = '';
 
   //condicionales para mostrar los formularios
   formularioActived: boolean= false;
@@ -66,6 +81,19 @@ export class FormEstudianteComponent {
   enviadoCh = signal(false);
   enviadoHl = signal(false);
 
+  resultadoEnviar : Resultado = {
+    idResultado: null,
+    interes: 0,
+    aptitud: 0,
+    puntajeHolland: '',
+    fecha: '',
+    idEstudiante: 0,
+    idChaside: 0,
+    idHolland: 0
+  }
+  resultIdChaside = ['C','H','A','S','I','D','E'];
+  resultIdHolland = ['R','I','A','S','E','C'];
+
   constructor(
     private provinciaService: ProvinciaService, 
     private municipioService: MunicipioService,
@@ -76,7 +104,9 @@ export class FormEstudianteComponent {
     private hollandSecondService: HollandSecondService,
     private hollandThirdService: HollandThirdService,
     private hollandAutoevService: HollandAutoevService,
-    private formBuilder: FormBuilder) 
+    private formBuilder: FormBuilder,
+    private estudianteService: EstudianteService,
+    private resultadoService: ResultadoService) 
     { 
       this.pregChasideInteres = this.chasideInteresPService.preguntasInteresChasides;
       this.pregChasideAptitud = this.chasideAptitudPService.preguntasAptitudChaside;
@@ -86,15 +116,15 @@ export class FormEstudianteComponent {
       this.pregHollandAutoev = this.hollandAutoevService.preguntasHollandAutoev;
 
       this.form = this.formBuilder.group({
-        carnetNum: new FormControl(1234, Validators.required),
+        carnetNum: new FormControl(123, Validators.required),
         carnetExt: new FormControl('', Validators.required),
         nombre: new FormControl('OMAR', Validators.required),
         apPaterno: new FormControl('CALLE', Validators.required),
         apMaterno: new FormControl('GUACHALLA', Validators.required),
         colegio: new FormControl('SIMON BOLIVAR', Validators.required),
         curso: new FormControl('6TO SECUNDARIA', Validators.required),
-        edad: new FormControl(18, Validators.required),
-        celular: new FormControl('321321', Validators.required),
+        edad: new FormControl(21, Validators.required),
+        celular: new FormControl('3215', Validators.required),
         provincia: new FormControl('', Validators.required),
         municipio: new FormControl('', Validators.required),
         respuestasChI : this.formBuilder.array(this.pregChasideInteres.map(
@@ -170,29 +200,56 @@ export class FormEstudianteComponent {
       return this.form.get('respuestasHA') as FormArray
     }
 
+  //verifica si sale del formulario y pide confirmacion para continuar
+  canDeactivate(): boolean{
+    if(!this.submitted && this.form.dirty){
+      return confirm('Tienes cambios sin guardar. ¿Seguro que quieres salir del formulario?')
+    }
+    return true;
+  }
 
-  ngOnInit(){
+  ngOnInit(): void{
     this.provincias = this.provinciaService.provincias;
     this.municipios = this.municipioService.municipios;
+    //instanciar el evento cerrar ventana
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', this.beforeUnloadHandler);
+    }
   }
+
+  ngOnDestroy(): void {
+    //eliminar el evento cerrar ventana
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+    }
+  }
+
+  //verifica el evento si se cierra la ventana
+  beforeUnloadHandler = (event: BeforeUnloadEvent) => {
+    if (this.form.dirty && !this.submitted) {
+      event.preventDefault();
+      event.returnValue = ''; // necesario para activar la alerta
+    }
+  };
 
   mostrarRegistroEstudiante(){
     this.formularioActived = false;
     this.chasideActivated = true;
     this.hollandActivated = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
   mostrarChaside(){
     this.formularioActived = true;
     this.chasideActivated = false;
     this.hollandActivated = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   mostrarHolland(){
     this.formularioActived = true;
     this.chasideActivated = true;
     this.hollandActivated = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
 
   guardarResultado(){
     this.enviadoEst.set(true);
@@ -212,8 +269,21 @@ export class FormEstudianteComponent {
     //crear el objeto estudiante con los datos ingresados en el formulario
      const estudiante = new Estudiante(null, this.carnet, this.nombre?.value, this.apPaterno?.value, 
        this.apMaterno?.value, this.colegio?.value, this.curso?.value, this.edad?.value, 
-       this.celular?.value, this.idMunicipio);
-      
+       this.celular?.value, 12);
+    
+    this.estudianteI.ciEstudiante = this.carnet;
+    this.estudianteI.nombre = this.nombre?.value;
+    this.estudianteI.apPaterno = this.apPaterno?.value;
+    this.estudianteI.apMaterno = this.apMaterno?.value;
+    this.estudianteI.colegio = this.colegio?.value;
+    this.estudianteI.curso = this.curso?.value;
+    this.estudianteI.edad = this.edad?.value;
+    this.estudianteI.celular = this.celular?.value;
+    this.estudianteI.id_municipio = this.idMunicipio;
+    
+    //console.log(this.estudianteGuardado.idEstudiante);
+
+
       //resultado general chaside
       const resultadoChaside = { C: 0, H: 0, A: 0, S: 0, I: 0, D: 0, E: 0 };
 
@@ -234,12 +304,12 @@ export class FormEstudianteComponent {
         resultadoChaside[area] += Number(control.value);
       })
 
-      const claveMayorCh = Object.entries(resultadoChaside).reduce((a, b) => {
+      this.chasidePtj = Object.entries(resultadoChaside).reduce((a, b) => {
         return b[1] > a[1] ? b : a;
       })[0];
 
-      this.puntajeInteres = resultadoInteres[claveMayorCh as keyof typeof resultadoInteres];
-      this.puntajeAptitud = resultadoAptitud[claveMayorCh as keyof typeof resultadoAptitud];
+      this.puntajeInteres = resultadoInteres[this.chasidePtj as keyof typeof resultadoInteres];
+      this.puntajeAptitud = resultadoAptitud[this.chasidePtj as keyof typeof resultadoAptitud];
 
 
       //resultado general de test de holland
@@ -267,15 +337,60 @@ export class FormEstudianteComponent {
 
     const fecha = new Date();
     const fechaStr = fecha.toLocaleDateString(); 
-    const prefilStr = this.perfil().join('');
+    const perfilStr = this.perfil().join('');
 
-    //campos de tabla resultado para guardarlo
-    console.log('Tabla chaside: ',claveMayorCh)
-    console.log('puntajeInteres: ',this.puntajeInteres);
-    console.log('puntajeAptitud: ',this.puntajeAptitud);
-    console.log('puntajeHolland: ', prefilStr);
-    console.log('fecha: ',fechaStr);
+    this.resultadoEnviar.idResultado = null;
+    this.resultadoEnviar.interes = this.puntajeInteres;
+    this.resultadoEnviar.aptitud = this.puntajeAptitud;
+    this.resultadoEnviar.fecha = fechaStr;
+    this.resultadoEnviar.puntajeHolland = perfilStr;
     
-    console.log(estudiante);
+    const idChasideEnviar = this.resultIdChaside.indexOf(this.chasidePtj)+1;
+    this.resultadoEnviar.idChaside = idChasideEnviar;
+
+    const idHollandEnviar = this.resultIdHolland.indexOf(perfilStr[0])+1
+    this.resultadoEnviar.idHolland = idHollandEnviar;
+
+    let estudianteGuardado: EstudianteI;
+    //conecta con el back para guardar el estudiante y recibir los datos guardados
+    this.estudianteService.create(this.estudianteI).subscribe({
+      next: (datos) => 
+        {estudianteGuardado = datos;
+          this.resultadoEnviar.idEstudiante = estudianteGuardado.idEstudiante;
+          this.guardarResultadoForm(estudianteGuardado, this.resultadoEnviar);
+        },
+      error: (error:any) => 
+        {console.log('Error al guardar los datos', error)}
+    });
+    
   }
+
+  guardarResultadoForm(estudianteGuardado: EstudianteI, resultadoEnviar: Resultado){
+    console.log(estudianteGuardado);
+    console.log(estudianteGuardado.idEstudiante);
+    console.log(resultadoEnviar);
+    this.resultadoService.createR(resultadoEnviar).subscribe({
+      next: (datos)=> {
+        const resultadoGuardado = datos;
+        console.log(resultadoGuardado);
+        const perfilStr = this.perfil().join('');
+        const navigationExtras: NavigationExtras = {
+          state:{
+            nombre: [`${this.nombre?.value} ${this.apPaterno?.value} ${this.apMaterno?.value}`],
+            colegio: this.colegio?.value,
+            carnet: this.carnet,
+            interes: this.puntajeInteres,
+            aptitud: this.puntajeAptitud,
+            holland: perfilStr,
+            chaside: this.chasidePtj
+          }
+        }
+        this.router.navigate(['/formulario/resultado'], navigationExtras)
+      },
+      error:(error:any) =>{
+        console.log('Error al guardar los datos', error)
+      }
+    });
+  }
+
 }

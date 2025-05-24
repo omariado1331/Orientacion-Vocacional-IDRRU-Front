@@ -1,11 +1,12 @@
 export interface Resultado{
-    idResultado: number;
+    idResultado: number | null;
     interes: number;
     aptitud: number;
     puntajeHolland: string;
-    createdAt: string;
-    updatedAt: string;
-    active: boolean;
+    fecha: string;
+    idEstudiante: number | null;
+    idChaside: number;
+    idHolland: number;
 }
 
 export interface ResultadoDto {
@@ -22,3 +23,7 @@ export interface ResultadoDto {
     chaside?: any;
     holland?: any;
   }
+
+
+
+

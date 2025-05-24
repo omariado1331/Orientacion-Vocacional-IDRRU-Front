@@ -13,3 +13,16 @@ export class Estudiante{
         public idMunicipio: number
     ){}
 }
+
+export interface EstudianteI{
+    idEstudiante: number | null;
+    ciEstudiante: string;
+    nombre: string;
+    apPaterno: string;
+    apMaterno: string;
+    colegio: string;
+    curso: string;
+    edad: number;
+    celular: string;
+    id_municipio: number;
+}
