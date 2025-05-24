@@ -44,7 +44,7 @@ export class InfoOrientacionComponent implements OnInit {
     
     this.facultadService.getAll().subscribe({
       next: (data) => {
-        this.facultades = data;
+        this.facultades = data.slice(0, 13);
         this.cargando = false;
       },
       error: (error) => {
