@@ -1,0 +1,90 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="text-dark text-center mb-4">
+            <i class="fas fa-compass me-2"></i> Tus mejores opciones vocacionales son:
+        </h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-2"></div>
+@for (facultad of facultadesArray; track facultad; let i = $index) {
+    @if (facultad[0] == 'COLMIL') {
+            <!-- COLEGIO MILITAR -->
+            <div class="col-lg-4 mb-4">
+                <div class="card card-custom option-card">
+                    <div class="option-number">{{i+1}}</div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <img src="./assets/logos-facultades/COLMIL.jpeg" alt="Logo COLMIL" class="faculty-logo mb-2">
+                            <h5 class="text-primary mb-1">{{COLMIL.nombre}}</h5>
+                            <span class="badge bg-primary">{{COLMIL.codigo}}</span>
+                        </div>
+    
+    
+                        <div class="text-center mb-3">
+                            <h6 class="text-muted mb-2">Personalidades de test Holland que coinciden</h6>
+                            @for(personalidad of hollandCOLMILArray; track personalidad){
+                            <span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>
+                            }
+    
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
+                            <div class="career-list">
+                                @for( carrera of carrerasCOLMIL; track carrera){
+                                <div class="career-item">{{carrera}}</div>
+                                }
+                            </div>
+                        </div>
+    
+                        <div class="text-center">
+                            <a href="http://agro.umsa.bo/" target="_blank" class="btn btn-primary btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    }
+    @if (facultad[0]== 'ANAPOL') {
+            <!-- ACADEMIA NACIONAL DE POLICIAS -->
+            <div class="col-lg-4 mb-4">
+                <div class="card card-custom option-card">
+                    <div class="option-number">{{i+1}}</div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <img src="./assets/logos-facultades/ANAPOL.jpeg" alt="Logo ANAPOL" class="faculty-logo mb-2">
+                            <h5 class="text-primary mb-1">{{ANAPOL.nombre}}</h5>
+                            <span class="badge bg-primary">{{ANAPOL.codigo}}</span>
+                        </div>
+    
+    
+                        <div class="text-center mb-3">
+                            <h6 class="text-muted mb-2">Personalidades de test Holland que coinciden</h6>
+                            @for(personalidad of hollandANAPOLArray; track personalidad){
+                            <span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>
+                            }
+    
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
+                            <div class="career-list">
+                                @for( carrera of carrerasANAPOL; track carrera){
+                                <div class="career-item">{{carrera}}</div>
+                                }
+                            </div>
+                        </div>
+    
+                        <div class="text-center">
+                            <a href="http://agro.umsa.bo/" target="_blank" class="btn btn-primary btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    }
+}
+</div>

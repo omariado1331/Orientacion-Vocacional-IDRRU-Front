@@ -1,5 +1,5 @@
 .header-card {
-    background: linear-gradient(135deg, #5e74da 0%, #4a79c0 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -8,7 +8,7 @@
 .profile-avatar {
     width: 120px;
     height: 120px;
-    background: linear-gradient(135deg, #ff2929 0%, #ff4f67 100%);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -136,8 +136,8 @@
 }
 
 .faculty-logo {
-    width: 120px;
-    height: 120px;
+    width: 200px;
+    height: 200px;
     object-fit: contain;
     border-radius: 10px;
     background: #f8f9fa;
