@@ -55,7 +55,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   estudiantesFiltrados: any[] = [];
   estudianteSeleccionado: any = null;
   resultadoEstudiante: ResultadoDto[] = [];
-
+  resultados: any[] = [];
   // OPCIONES PARA SELECTORES
   chasideOpciones: any[] = [];
   hollandOpciones: any[] = [];
@@ -63,6 +63,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   provincias: any[] = [];
   municipiosPorProvincia: { [provinciaId: number]: any[] } = {};
   municipios: any[] = [];
+  municipiosFiltrados: any[] = [];
   // DATOS ADICIONALES PARA VISUALIZACIONES
   chasideData: any = null;
   hollandData: any = null;
@@ -107,7 +108,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   get resultadosFormGroups(): FormArray<FormGroup> {
     return this.resultadosForm as FormArray<FormGroup>;
   }
-  
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private formBuilder: FormBuilder,
@@ -143,6 +144,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       curso: ['', [Validators.required]],
       edad: [null, [Validators.required, Validators.min(10), Validators.max(30)]],
       celular: ['', [Validators.pattern('^[0-9]*$')]],
+      id_provincia: [null, [Validators.required]],
       id_municipio: [null, [Validators.required]]
     });
 
@@ -250,7 +252,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           nombre: p.nombre,
           idProvincia: p.id
         }));
-
       },
       error: (err) => {
         console.error('Error al cargar provincias', err);
@@ -284,7 +285,32 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     const municipio = this.municipios.find(m => m.idMunicipio === id);
     return municipio ? municipio.nombre : 'Desconocido';
   }
+  onProvinciaChangeEditar(event: any): void {
+    const provinciaId = event.target.value;
 
+    if (provinciaId && provinciaId !== 'null') {
+
+      this.municipiosFiltrados = this.municipiosPorProvincia[provinciaId] || [];
+
+      this.editarForm.patchValue({
+        id_municipio: null
+      });
+    } else {
+      this.municipiosFiltrados = [];
+      this.editarForm.patchValue({
+        id_municipio: null
+      });
+    }
+  }
+  getProvinciaByMunicipio(municipioId: number): any {
+    for (let provinciaId in this.municipiosPorProvincia) {
+      const municipio = this.municipiosPorProvincia[provinciaId].find(m => m.idMunicipio === municipioId);
+      if (municipio) {
+        return this.provincias.find(p => p.id == provinciaId);
+      }
+    }
+    return null;
+  }
   cargarDatosParaResultados(): void {
     forkJoin({
       chaside: this.chasideService.getAll(),
@@ -611,12 +637,14 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   abrirModalEditar(estudiante: any): void {
     this.estudianteSeleccionado = { ...estudiante };
-
+    this.loading = true;
     this.editarForm.reset();
-    this.resultadosForm = this.inicializarFormArrayResultados();
-
+    this.resultados = [];
     this.cargarDatosParaResultados();
-
+    let provinciaEstudiante = null;
+    if (estudiante.id_municipio) {
+      provinciaEstudiante = this.getProvinciaByMunicipio(estudiante.id_municipio);
+    }
     this.editarForm.patchValue({
       ciEstudiante: estudiante.ciEstudiante,
       nombre: estudiante.nombre,
@@ -626,25 +654,96 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       curso: estudiante.curso,
       edad: estudiante.edad,
       celular: estudiante.celular,
+      id_provincia: provinciaEstudiante ? provinciaEstudiante.id : null,
       id_municipio: estudiante.id_municipio
     });
-
+    if (provinciaEstudiante) {
+      this.municipiosFiltrados = this.municipiosPorProvincia[provinciaEstudiante.id] || [];
+    } else {
+      this.municipiosFiltrados = [];
+    }
     this.resultadoService.getByEstudianteId(estudiante.idEstudiante).subscribe({
       next: (resultados: ResultadoDto[]) => {
-        if (resultados.length > 0) {
-          resultados.forEach(resultado => {
-            this.resultadosForm.push(this.crearFormularioResultado(resultado));
-          });
-        } else {
-          this.agregarNuevoResultado();
+        if (resultados.length === 0) {
+          this.resultados = [];
+          this.modalEditarVisible = true;
+          this.loading = false;
+          return;
         }
-        this.modalEditarVisible = true;
+
+        const resultadosCompletos = resultados.map((resultado: ResultadoDto) => {
+          const resultadoPromesas = [];
+
+          if (resultado.idFacultad) {
+            resultadoPromesas.push(
+              this.facultadService.getById(resultado.idFacultad).toPromise()
+                .then(facultad => ({ tipo: 'facultad', data: facultad }))
+                .catch(() => ({ tipo: 'facultad', data: null }))
+            );
+          }
+
+          if (resultado.idChaside) {
+            resultadoPromesas.push(
+              this.chasideService.getById(resultado.idChaside).toPromise()
+                .then(chaside => ({ tipo: 'chaside', data: chaside }))
+                .catch(() => ({ tipo: 'chaside', data: null }))
+            );
+          }
+
+          if (resultado.idHolland) {
+            resultadoPromesas.push(
+              this.hollandService.getById(resultado.idHolland).toPromise()
+                .then(holland => ({ tipo: 'holland', data: holland }))
+                .catch(() => ({ tipo: 'holland', data: null }))
+            );
+          }
+
+          return Promise.all(resultadoPromesas).then(resultadosAdicionales => {
+            const resultadoCompleto = { ...resultado };
+            resultadosAdicionales.forEach(item => {
+              if (item.tipo === 'facultad') {
+                resultadoCompleto.facultad = item.data;
+              } else if (item.tipo === 'chaside') {
+                resultadoCompleto.chaside = item.data;
+              } else if (item.tipo === 'holland') {
+                resultadoCompleto.holland = item.data;
+              }
+            });
+            return resultadoCompleto;
+          });
+        });
+
+        Promise.all(resultadosCompletos)
+          .then(resultadosFinales => {
+            this.resultados = resultadosFinales;
+
+            const primerChaside = resultadosFinales.find(r => r.chaside);
+            if (primerChaside) {
+              this.chasideData = primerChaside.chaside;
+            }
+
+            const primerHolland = resultadosFinales.find(r => r.holland);
+            if (primerHolland) {
+              this.hollandData = primerHolland.holland;
+            }
+
+            this.modalEditarVisible = true;
+            this.loading = false;
+          })
+          .catch(err => {
+            console.error('Error al procesar los resultados', err);
+            this.mostrarNotificacion('Hubo un error al procesar los resultados', 'error');
+            this.resultados = resultados;
+            this.modalEditarVisible = true;
+            this.loading = false;
+          });
       },
       error: (err) => {
         console.error('Error al cargar resultados del estudiante', err);
         this.mostrarNotificacion('No se pudieron cargar los resultados de orientación', 'error');
-        this.agregarNuevoResultado();
+        this.resultados = [];
         this.modalEditarVisible = true;
+        this.loading = false;
       }
     });
   }

@@ -3,9 +3,9 @@ import { Routes } from '@angular/router';
 import { OrientacionVocacionalComponent } from './pages/orientacion-vocacional/orientacion-vocacional.component';
 import { InfoOrientacionComponent } from './pages/info-orientacion/info-orientacion.component';
 import { ReportOrientacionComponent } from './pages/report-orientacion/report-orientacion.component';
+import { ControlOrientacionComponent } from './pages/control-orientacion/control-orientacion.component';
 import { FormEstudianteComponent } from './pages/forms/form-estudiante/form-estudiante.component';
 import { ResultFormComponent } from './pages/forms/result-form/result-form.component';
-import { ControlOrientacionComponent } from './pages/control-orientacion/control-orientacion.component';
 import { unsavedChangesGuard } from './guards/unsaved-changes.guard';
 
 export const routes: Routes = [
