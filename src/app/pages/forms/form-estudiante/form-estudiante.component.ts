@@ -5,7 +5,7 @@ import { Estudiante, EstudianteI } from '../../../interfaces/estudiante-interfac
 import { ProvinciaService } from '../../../services/provincia.service';
 import { Provincia } from '../../../interfaces/provincia-interface';
 import { MunicipioService } from '../../../services/municipio.service';
-import { Municipio } from '../../../interfaces/municipio-interface';
+import { Municipio, MunicipioN } from '../../../interfaces/municipio-interface';
 import { Router } from '@angular/router';
 import { ChasideInteresPService } from '../../../services/chaside-interes-p.service';
 import { ChasideAptitudPService } from '../../../services/chaside-aptitud-p.service';
@@ -36,7 +36,7 @@ export class FormEstudianteComponent {
   puntajeInteres: number = 0;
   //arreglos para cargar en el DOM de preguntas chasides y holland, de municipio y provincias
   provincias: Provincia[] = [];
-  municipios: Municipio[] = [];
+  municipios: MunicipioN[] = [];
   pregChasideAptitud: chasidePregunta[] = [];
   pregChasideInteres: chasidePregunta[] = [];
   pregHollandFirst: hollandPregunta[] = [];
@@ -210,7 +210,7 @@ export class FormEstudianteComponent {
 
   ngOnInit(): void{
     this.provincias = this.provinciaService.provincias;
-    this.municipios = this.municipioService.municipios;
+    this.municipios = this.municipioService.municipiosN;
     //instanciar el evento cerrar ventana
     if (typeof window !== 'undefined') {
       window.addEventListener('beforeunload', this.beforeUnloadHandler);
@@ -239,10 +239,17 @@ export class FormEstudianteComponent {
     window.scrollTo({ top: 0.5, behavior: 'instant' });
   }
   mostrarChaside(){
-    this.formularioActived = true;
-    this.chasideActivated = false;
-    this.hollandActivated = true;
-    window.scrollTo({ top: 0.5, behavior: 'instant' });
+    if(this.carnetNum?.invalid || this.carnetExt?.invalid || this.nombre?.invalid || this.apMaterno?.invalid
+      || this.apMaterno?.invalid || this.colegio?.invalid || this.curso?.invalid || this.edad?.invalid || this.celular?.invalid
+      || this.municipio?.invalid || this.provincia?.invalid){
+        alert('Debes llenar todos los campos')
+        this.enviadoEst.set(true);
+    }else{
+      this.formularioActived = true;
+      this.chasideActivated = false;
+      this.hollandActivated = true;
+      window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
   }
   mostrarHolland(){
     this.formularioActived = true;
