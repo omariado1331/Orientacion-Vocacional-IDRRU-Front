@@ -25,5 +25,12 @@ export interface ResultadoDto {
   }
 
 
+export interface ResultadoDtoResponse {
+  provinciaNombre: string;
+  municipioNombre: string;
+  chasideCodigo: string;
+  fecha: string;
+  cantidadEstudiantes: number;
+}
 
 
