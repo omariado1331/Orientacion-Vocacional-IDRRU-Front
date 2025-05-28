@@ -43,14 +43,22 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .display-2 {
   font-size: 3rem;
   animation: fadeIn 1s ease-out;
 }
+
 .bg-umsa-blue-dark {
   background-color: var(--umsa-blue-dark);
 }
@@ -61,4 +69,8 @@
 
 .login-header img {
   filter: drop-shadow(0 0 2px #000);
+}
+
+.page-link {
+  cursor: pointer;
 }

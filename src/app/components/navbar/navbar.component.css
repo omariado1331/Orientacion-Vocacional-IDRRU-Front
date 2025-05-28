@@ -1,4 +1,62 @@
-a{
-    font-size: 20px;
-    font-weight: 450;
+.custom-navbar {
+    background: var(--umsa-blue) url('../../../assets/panel.png') no-repeat center;
+    background-size: cover;
+    width: 95%;
+    height: 125px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    border-radius: 0 0 20px 20px;
+    font: 1.2em sans-serif;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 0.5rem 0;
+    margin: 0 auto;
+}
+
+.navbar-brand {
+    display: none;
+}
+
+.nav-link {
+    color: white !important;
+    margin-bottom: 18px;
+
+}
+
+.nav-link:hover {
+    background-color: var(--umsa-blue-dark) !important;
+    border-radius: 5px;
+}
+
+@media (max-width: 991.98px) {
+    .custom-navbar {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0 0 20px 20px;
+        height: auto;
+        background-color: transparent;
+    }
+
+    .custom-navbar::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--umsa-blue) url('../../../assets/fondob.png') repeat;
+        background-size: 80px;
+        filter: blur(1px);
+        z-index: -1;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .navbar-brand {
+        display: block;
+    }
+
+    .navbar-toggler-icon {
+        filter: invert(1);
+    }
+
+    .nav-link {
+        padding-left: 20px;
+    }
+
 }

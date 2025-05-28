@@ -1403,6 +1403,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         orden: idx + 1,
         fechaCreacion: r.fecha
       }));
+
     if (todosChaside.length > 0) {
       verificarEspacioDisponible(70);
       crearTitulo('RESULTADOS TEST CHASIDE');
@@ -1510,7 +1511,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
         y += 8;
       });
-
       y += 5;
     }
     if (todasFacultades.length > 0) {

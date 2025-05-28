@@ -16,23 +16,26 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const parsedUrl = new URL(req.url);
   const path = parsedUrl.pathname;
+  const method = req.method.toUpperCase();
 
   const urlsProtegidas = [
-    '/auth/logout', 
-    //'/estudiante', 
-    //'/resultado',
-    '/facultad',
+    '/auth/logout',
     '/holland',
-    '/chaside',];
-  const necesitaToken = urlsProtegidas.some(url => path.startsWith(url));
-  
+    '/chaside',
+    '/estudiante',
+    '/resultado',
+  ];
+
+  const esPostLibre = method === 'POST' && (path.startsWith('/estudiante') || path.startsWith('/resultado'));
+  const necesitaToken = !esPostLibre && urlsProtegidas.some(url => path.startsWith(url));
+
   if (necesitaToken) {
     const token = authService.getToken();
     if (token) {
       const authReq = req.clone({
         setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       return next(authReq);
     } else {

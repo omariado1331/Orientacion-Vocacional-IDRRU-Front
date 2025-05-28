@@ -101,8 +101,8 @@
     <div class="card shadow mb-4">
       <div class="card-header py-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0 text-primary"><i class="bi bi-funnel-fill me-2"></i>Filtros y Búsqueda</h5>
-        <button class="btn btn-sm btn-outline-secondary" (click)="limpiarTodosFiltros()">
-          <i class="bi bi-x-circle me-1"></i>Limpiar Filtros
+        <button class="btn btn-sm btn-warning" (click)="limpiarTodosFiltros()">
+          <i class="bi bi-x-circle-fill me-1"></i> Limpiar Filtros
         </button>
       </div>
       <div class="card-body">
@@ -171,7 +171,7 @@
                 <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
                 <input type="date" class="form-control" [(ngModel)]="filtros.fechaFin" placeholder="Fecha fin">
               </div>
-              <button class="btn btn-outline-primary ms-2" (click)="aplicarFiltroFecha()">
+              <button class="btn btn-primary ms-2" (click)="aplicarFiltroFecha()">
                 <i class="bi bi-funnel"></i>
               </button>
             </div>
@@ -844,9 +844,8 @@
 
                 <td class="text-center">
                   <div class="btn-group btn-group-sm" role="group">
-                    <button class="btn btn-light px-3 py-2 rounded-start btn-outline-primary"
-                      title="Ver Perfil" (click)="verPerfilEstudiante(estudiante.idEstudiante)"
-                      style="transition: all 0.2s;">
+                    <button class="btn btn-light px-3 py-2 rounded-start btn-outline-primary" title="Ver Perfil"
+                      (click)="verPerfilEstudiante(estudiante.idEstudiante)" style="transition: all 0.2s;">
                       <i class="bi bi-person-badge fs-5"></i>
                     </button>
 
@@ -867,43 +866,45 @@
         </div>
         <!-- Paginación -->
         <div class="d-flex justify-content-center mt-3" *ngIf="paginacion.totalPaginas > 1">
-          <nav>
+          <nav aria-label="Paginación de resultados">
             <ul class="pagination">
               <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === 1}">
-                <a class="page-link" (click)="cambiarPagina(1)" aria-label="Primera">
+                <a class="page-link" (click)="cambiarPagina(1)" aria-label="Primera" tabindex="-1">
                   <span aria-hidden="true">&laquo;</span>
                 </a>
               </li>
               <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === 1}">
-                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual - 1)" aria-label="Anterior">
+                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual - 1)" aria-label="Anterior"
+                  tabindex="-1">
                   <span aria-hidden="true">&lt;</span>
                 </a>
               </li>
 
               <ng-container *ngFor="let pagina of [].constructor(paginacion.totalPaginas); let i = index">
-                <li class="page-item" *ngIf="(i + 1) === 1 || 
-                                            (i + 1) === paginacion.totalPaginas || 
-                                            (i + 1) >= paginacion.paginaActual - 1 && 
-                                            (i + 1) <= paginacion.paginaActual + 1"
+                <li class="page-item" *ngIf="(i + 1) === 1 ||
+                                      (i + 1) === paginacion.totalPaginas ||
+                                      (i + 1) >= paginacion.paginaActual - 1 &&
+                                      (i + 1) <= paginacion.paginaActual + 1"
                   [ngClass]="{'active': i + 1 === paginacion.paginaActual}">
-                  <a class="page-link" (click)="cambiarPagina(i + 1)">{{ i + 1 }}</a>
+                  <a class="page-link" (click)="cambiarPagina(i + 1)" tabindex="-1">{{ i + 1 }}</a>
                 </li>
                 <li class="page-item disabled" *ngIf="(i + 1) === 2 && paginacion.paginaActual > 3">
-                  <a class="page-link">...</a>
+                  <span class="page-link">...</span>
                 </li>
                 <li class="page-item disabled"
                   *ngIf="(i + 1) === paginacion.totalPaginas - 1 && paginacion.paginaActual < paginacion.totalPaginas - 2">
-                  <a class="page-link">...</a>
+                  <span class="page-link">...</span>
                 </li>
               </ng-container>
 
               <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === paginacion.totalPaginas}">
-                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual + 1)" aria-label="Siguiente">
+                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual + 1)" aria-label="Siguiente"
+                  tabindex="-1">
                   <span aria-hidden="true">&gt;</span>
                 </a>
               </li>
               <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === paginacion.totalPaginas}">
-                <a class="page-link" (click)="cambiarPagina(paginacion.totalPaginas)" aria-label="Última">
+                <a class="page-link" (click)="cambiarPagina(paginacion.totalPaginas)" aria-label="Última" tabindex="-1">
                   <span aria-hidden="true">&raquo;</span>
                 </a>
               </li>

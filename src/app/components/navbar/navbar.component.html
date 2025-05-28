@@ -1,28 +1,33 @@
-<nav class="navbar navbar-expand-lg n1 col-12">
-    <div class="container-fluid">
-      <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-        
-        <div class="collapse navbar-collapse" id="navbarText">
+<nav class="navbar navbar-expand-lg custom-navbar">
+  <div class="container">
 
-          <ul class="navbar-nav mx-auto mb-6 mt-3">
-            <li class="nav-item">
-              <a class="nav-link active text-decoration-none text-white link-danger" aria-current="page" [routerLink]="['/orientacion-vocacional']" routerLinkActive="active">Inicio</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-decoration-none text-white link-danger" [routerLink]="['/report-orientacion']" routerLinkActive="active">Estadísticas</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-decoration-none text-white link-danger" [routerLink]="['/control-orientacion']" routerLinkActive="active">Control</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-decoration-none text-white link-danger" href="#">IDR-DU</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-decoration-none text-white link-danger" [routerLink]="['/info-orientacion']" routerLinkActive="active">Información</a>
-            </li>
-          </ul>
-        </div>
+    <a class="navbar-brand" [routerLink]="['/orientacion-vocacional']">
+      <img src="../../../assets/escudo.png" alt="Logo" height="80">
+    </a>
+
+    <button class="navbar-toggler border-1 border-white rounded" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="bi bi-list text-white fs-2"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item mx-3">
+          <a class="nav-link" [routerLink]="['/orientacion-vocacional']" routerLinkActive="enlace_activo">Inicio</a>
+        </li>
+        <li class="nav-item mx-3">
+          <a class="nav-link" [routerLink]="['/report-orientacion']" routerLinkActive="enlace_activo">Estadísticas</a>
+        </li>
+        <li class="nav-item mx-3">
+          <a class="nav-link" [routerLink]="['/control-orientacion']" routerLinkActive="enlace_activo">Control</a>
+        </li>
+        <li class="nav-item mx-3">
+          <a class="nav-link" href="https://umsa.bo/web/idru-du" target="_blank">IDR-DU</a>
+        </li>
+        <li class="nav-item mx-3">
+          <a class="nav-link" [routerLink]="['/info-orientacion']" routerLinkActive="enlace_activo">Información</a>
+        </li>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>

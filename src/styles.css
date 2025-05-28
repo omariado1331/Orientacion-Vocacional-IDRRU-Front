@@ -1,6 +1,6 @@
 :root {
-    --umsa-blue: #004A98;
-    --umsa-blue-light: #0066CC;
+    --umsa-blue: #1756a3;
+    --umsa-blue-light: #4377b6;
     --umsa-blue-dark: #00366B;
     --umsa-accent: #FFCC00;
     --umsa-gray: #F5F7FA;
@@ -10,12 +10,20 @@
     --transition-speed: 0.3s;
 }
 
+.enlace_activo {
+    background-color: var(--umsa-blue-dark) !important;
+    color: var(--umsa-gray) !important;
+    border-radius: 5px;
+}
+
+
 body {
     background-image: url(../src/assets/fondo.png);
     background-repeat: initial;
     background-position: left;
-    background-size: 8%;
+    background-size: 6%;
 }
+
 
 footer {
     height: 250px;
