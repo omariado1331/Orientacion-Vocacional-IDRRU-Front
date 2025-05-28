@@ -35,31 +35,38 @@
                         </div>
                     
                         <div class="mb-2 col-md-6">
-                            <label class="form-label">Apellido Paterno*</label>
+                            <label class="form-label" [class.error]="enviadoEst() && apPaterno?.invalid">Apellido Paterno*</label>
                             <input type="text" class="form-control" formControlName="apPaterno" placeholder="INGRESA APELLIDO PATERNO">
                         </div>    
                         <div class="mb-2 col-md-6">
-                            <label class="form-label">Apellido Materno*</label>
+                            <label class="form-label" [class.error]="enviadoEst() && apMaterno?.invalid">Apellido Materno*</label>
                             <input type="text" class="form-control"formControlName="apMaterno" placeholder="INGRESA APELLIDO MATERNO">
                         </div>
                         <div class="mb-2 col-md-8">
-                            <label class="form-label">Colegio*</label>
+                            <label class="form-label" [class.error]="enviadoEst() && colegio?.invalid">Colegio*</label>
                             <input type="text" class="form-control" formControlName="colegio" placeholder="INGRESA COLEGIO">
                         </div>
                         <div class="mb-2 col-md-4">
-                            <label for="curso" class="form-label">Curso*</label>
-                            <input type="text" class="form-control" formControlName="curso">
+                            <label class="form-label" [class.error]="enviadoEst() && curso?.invalid">Curso*</label>
+                            <select class="form-control" formControlName="curso">
+                                <option value="1ro SECUNDARIA">1ro SECUNDARIA</option>
+                                <option value="2do SECUNDARIA">2do SECUNDARIA</option>
+                                <option value="3ro SECUNDARIA">3ro SECUNDARIA</option>
+                                <option value="4to SECUNDARIA">4to SECUNDARIA</option>
+                                <option value="5to SECUNDARIA">5to SECUNDARIA</option>
+                                <option value="6to SECUNDARIA">6to SECUNDARIA</option>
+                            </select>
                         </div>   
                         <div class="mb-2 col-md-6">
-                            <label for="edad" class="form-label">Edad*</label>
+                            <label class="form-label" [class.error]="enviadoEst() && edad?.invalid">Edad*</label>
                             <input type="number" class="form-control" formControlName="edad" placeholder="INGRESA EDAD">
                         </div>
                         <div class="mb-2 col-md-6">
-                            <label for="celular" class="form-label">Celular*</label>
+                            <label class="form-label" [class.error]="enviadoEst() && celular?.invalid">Celular*</label>
                             <input type="text" class="form-control" formControlName="celular" placeholder="77265981">
                         </div>
                         <div class="mb-2 col-md-6">
-                            <label class="form-label">Provincia</label>
+                            <label class="form-label" [class.error]="enviadoEst() && provincia?.invalid">Provincia</label>
                             <select class="form-control" formControlName="provincia">
                                 @for (provincia of provincias; track provincia) {
                                     <option value="{{provincia.nombre}}">{{provincia.nombre}}</option>
@@ -67,7 +74,7 @@
                             </select>
                         </div>
                         <div class="mb-2 col-md-6">
-                            <label class="form-label">Municipio</label>
+                            <label class="form-label" [class.error]="enviadoEst() && municipio?.invalid">Municipio</label>
                             <select class="form-control" formControlName="municipio">
                                 @if (provincia?.value != "") {
                                     @for (municipio of municipios; track municipio) {
@@ -217,7 +224,7 @@
             </div>
             <br>
         <div class="card align-items-center">
-            <button type="submit" class="btn btn-primary mt-3 mb-3">Completar Registro</button>
+            <button type="submit" class="btn btn-primary mt-3 mb-3" [disabled]="form.invalid">Completar Registro</button>
         </div> 
     </form>
 </div>

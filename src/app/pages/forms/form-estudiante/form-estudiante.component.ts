@@ -236,19 +236,19 @@ export class FormEstudianteComponent {
     this.formularioActived = false;
     this.chasideActivated = true;
     this.hollandActivated = true;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
   }
   mostrarChaside(){
     this.formularioActived = true;
     this.chasideActivated = false;
     this.hollandActivated = true;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
   }
   mostrarHolland(){
     this.formularioActived = true;
     this.chasideActivated = true;
     this.hollandActivated = false;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
   }
 
   guardarResultado(){
@@ -257,6 +257,8 @@ export class FormEstudianteComponent {
     this.enviadoHl.set(true);
     if(this.form.invalid){
       return;
+    }else{
+      this.submitted = true;
     }
     //unir numero de carnet con la extension
     this.carnet = this.carnetNum?.value+this.carnetExt?.value;
@@ -266,11 +268,6 @@ export class FormEstudianteComponent {
           this.idMunicipio = municipiod.id;
         }
     }
-    //crear el objeto estudiante con los datos ingresados en el formulario
-     const estudiante = new Estudiante(null, this.carnet, this.nombre?.value, this.apPaterno?.value, 
-       this.apMaterno?.value, this.colegio?.value, this.curso?.value, this.edad?.value, 
-       this.celular?.value, 12);
-    
     this.estudianteI.ciEstudiante = this.carnet;
     this.estudianteI.nombre = this.nombre?.value;
     this.estudianteI.apPaterno = this.apPaterno?.value;
@@ -280,9 +277,6 @@ export class FormEstudianteComponent {
     this.estudianteI.edad = this.edad?.value;
     this.estudianteI.celular = this.celular?.value;
     this.estudianteI.id_municipio = this.idMunicipio;
-    
-    //console.log(this.estudianteGuardado.idEstudiante);
-
 
       //resultado general chaside
       const resultadoChaside = { C: 0, H: 0, A: 0, S: 0, I: 0, D: 0, E: 0 };
@@ -359,30 +353,50 @@ export class FormEstudianteComponent {
           this.resultadoEnviar.idEstudiante = estudianteGuardado.idEstudiante;
           this.guardarResultadoForm(estudianteGuardado, this.resultadoEnviar);
         },
-      error: (error:any) => 
-        {console.log('Error al guardar los datos', error)}
-    });
-    
-  }
-
-  guardarResultadoForm(estudianteGuardado: EstudianteI, resultadoEnviar: Resultado){
-    console.log(estudianteGuardado);
-    console.log(estudianteGuardado.idEstudiante);
-    console.log(resultadoEnviar);
-    this.resultadoService.createR(resultadoEnviar).subscribe({
-      next: (datos)=> {
-        const resultadoGuardado = datos;
-        console.log(resultadoGuardado);
-        const perfilStr = this.perfil().join('');
+      error: (error:any) => {     
+        console.log('Error al guardar los datos', error)
         const navigationExtras: NavigationExtras = {
           state:{
+            bdform: false,
             nombre: [`${this.nombre?.value} ${this.apPaterno?.value} ${this.apMaterno?.value}`],
             colegio: this.colegio?.value,
             carnet: this.carnet,
             interes: this.puntajeInteres,
             aptitud: this.puntajeAptitud,
-            holland: perfilStr,
-            chaside: this.chasidePtj
+            holland: this.perfil().join(''),
+            chaside: this.chasidePtj,
+            celular: this.celular?.value,
+            curso: this.curso?.value,
+            edad: this.edad?.value,
+          }
+        }
+        this.router.navigate(['/formulario/resultado'], navigationExtras)
+        }
+    });
+    
+  }
+
+  guardarResultadoForm(estudianteGuardado: EstudianteI, resultadoEnviar: Resultado){
+    // console.log(estudianteGuardado);
+    // console.log(estudianteGuardado.idEstudiante);
+    // console.log(resultadoEnviar);
+    this.resultadoService.createR(resultadoEnviar).subscribe({
+      next: (datos)=> {
+        const resultadoGuardado = datos;
+        // console.log(resultadoGuardado);
+        const navigationExtras: NavigationExtras = {
+          state:{
+            bdform: true,
+            nombre: [`${estudianteGuardado.nombre} ${estudianteGuardado.apPaterno} ${estudianteGuardado.apMaterno}`],
+            colegio: estudianteGuardado.colegio,
+            carnet: estudianteGuardado.ciEstudiante,
+            interes: resultadoGuardado.interes,
+            aptitud: resultadoGuardado.aptitud,
+            holland: resultadoGuardado.puntajeHolland,
+            chaside: this.chasidePtj,
+            celular: estudianteGuardado.celular,
+            curso: estudianteGuardado.curso,
+            edad: estudianteGuardado.edad,
           }
         }
         this.router.navigate(['/formulario/resultado'], navigationExtras)

@@ -1,0 +1,130 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="text-dark text-center mb-4">
+            <i class="fas fa-compass me-2"></i> Tus mejores opciones vocacionales son:
+        </h4>
+    </div>
+</div>
+<div class="row">
+@for (facultad of facultadesArray; track facultad; let i = $index) {
+    @if (facultad[0] == 'FCS') {
+        
+            <!-- FACULTAD DE CIENCIAS SOCIALES -->
+            <div class="col-lg-4 mb-4">
+                <div class="card card-custom option-card">
+                    <div class="option-number">{{i+1}}</div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <img src="./assets/logos-facultades/FCS.png" alt="Logo FCS" class="faculty-logo mb-2">
+                            <h5 class="text-primary mb-1">{{FCS.nombre}}</h5>
+                            <span class="badge bg-primary">{{FCS.codigo}}</span>
+                        </div>
+    
+    
+                        <div class="text-center mb-3">
+                            <h6 class="text-muted mb-2">Personalidades de test Holland que coinciden</h6>
+                            @for(personalidad of hollandFCSArray; track personalidad[0] ){
+                            <span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>
+                            }
+    
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
+                            <div class="career-list">
+                                @for( carrera of carrerasFCS; track carrera){
+                                <div class="career-item">{{carrera}}</div>
+                                }
+                            </div>
+                        </div>
+    
+                        <div class="text-center">
+                            <a href="http://agro.umsa.bo/" target="_blank" class="btn btn-primary btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    }
+    @if (facultad[0]== 'FDCP') {
+        
+            <!-- FACULTAD DE DERECHO Y CIENCIAS POLITICAS -->
+            <div class="col-lg-4 mb-4">
+                <div class="card card-custom option-card">
+                    <div class="option-number">{{i+1}}</div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <img src="./assets/logos-facultades/FDCP.png" alt="Logo FDCP" class="faculty-logo mb-2">
+                            <h5 class="text-primary mb-1">{{FDCP.nombre}}</h5>
+                            <span class="badge bg-primary">{{FDCP.codigo}}</span>
+                        </div>
+    
+    
+                        <div class="text-center mb-3">
+                            <h6 class="text-muted mb-2">Personalidades de test Holland que coinciden</h6>
+                            @for(personalidad of hollandFDCPArray; track personalidad){
+                            <span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>
+                            }
+    
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
+                            <div class="career-list">
+                                @for( carrera of carrerasFDCP; track carrera){
+                                <div class="career-item">{{carrera}}</div>
+                                }
+                            </div>
+                        </div>
+    
+                        <div class="text-center">
+                            <a href="http://agro.umsa.bo/" target="_blank" class="btn btn-primary btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    }
+    @if (facultad[0] == 'FHCE') {
+        
+            <!-- FACULTAD DE HUMANIDADES Y CIENCIAS DE LA EDUCACION -->
+            <div class="col-lg-4 mb-4">
+                <div class="card card-custom option-card">
+                    <div class="option-number">{{i+1}}</div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <img src="./assets/logos-facultades/FHCE.png" alt="Logo FHCE" class="faculty-logo mb-2">
+                            <h5 class="text-primary mb-1">{{FHCE.nombre}}</h5>
+                            <span class="badge bg-primary">{{FHCE.codigo}}</span>
+                        </div>
+    
+    
+                        <div class="text-center mb-3">
+                            <h6 class="text-muted mb-2">Personalidades de test Holland que coinciden</h6>
+                            @for(personalidad of hollandFHCEArray; track personalidad){
+                            <span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>
+                            }
+    
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
+                            <div class="career-list">
+                                @for( carrera of carrerasFHCE; track carrera){
+                                <div class="career-item">{{carrera}}</div>
+                                }
+                            </div>
+                        </div>
+    
+                        <div class="text-center">
+                            <a href="http://agro.umsa.bo/" target="_blank" class="btn btn-primary btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>       
+    }
+}
+</div>
