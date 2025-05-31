@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 :root {
     --umsa-blue: #1756a3;
     --umsa-blue-light: #4377b6;
@@ -8,13 +9,17 @@
     --umsa-shadow: rgba(0, 74, 152, 0.2);
     --card-border-radius: 20px;
     --transition-speed: 0.3s;
+
+
+    --tx-xs: clamp(0.7rem, 1vw, 0.75rem);
+    --tx-sm: clamp(0.8rem, 1vw, 0.875rem);
+    --tx-base: clamp(1rem, 1.2vw, 1rem);
+    --tx-md: clamp(1.1rem, 1.5vw, 1.25rem);
+    --tx-lg: clamp(1.3rem, 2vw, 1.5rem);
+    --tx-xl: clamp(2rem, 3vw, 2.5rem);
+    --tx-xxl: clamp(2.5rem, 4vw, 3rem);
 }
 
-.enlace_activo {
-    background-color: var(--umsa-blue-dark) !important;
-    color: var(--umsa-gray) !important;
-    border-radius: 5px;
-}
 
 
 body {
@@ -22,15 +27,19 @@ body {
     background-repeat: initial;
     background-position: left;
     background-size: 6%;
-    margin-top: 170px !important;
+    margin-top: 140px !important;
+    font-family: "Inter", sans-serif !important;
+    font-size: var(--tx-base) !important;
+    font-style: normal !important;
 }
 
 @media (max-width: 991.98px) {
     body {
-        margin-top:0 !important;
+        margin-top: 0 !important;
     }
 }
+
 footer {
     height: 250px;
-    background-color: #4377b6;
+    background-color: var(--umsa-blue);
 }

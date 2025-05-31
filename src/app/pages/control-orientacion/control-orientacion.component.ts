@@ -19,6 +19,7 @@ import * as XLSX from 'xlsx';
 import { debounceTime, distinctUntilChanged, forkJoin, Observable, Subject, of, takeUntil } from 'rxjs';
 import { ToastrModule } from 'ngx-toastr';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-control-orientacion',
@@ -123,7 +124,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     private chasideService: ChasideService,
     private hollandService: HollandService,
     private datePipe: DatePipe,
-    private notificacionService: NotificacionService
+    private notificacionService: NotificacionService,
+      private router: Router
   ) {
     this.inicializarFormularios();
     this.configurarBusqueda();
@@ -188,7 +190,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     }
   }
 
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -228,18 +229,17 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       });
   }
 
-  cerrarSesion(): void {
-    this.authService.cerrarSesion().subscribe({
-      next: () => {
-        this.isAuthenticated = false;
-      },
-      error: (error) => {
-        console.error('Error al cerrar sesión:', error);
-        // Aún así actualizar el estado local
-        this.isAuthenticated = false;
-      }
-    });
-  }
+  // cerrarSesion(): void {
+  //   this.authService.cerrarSesion().subscribe({
+  //     next: () => {
+  //       this.isAuthenticated = false;
+  //     },
+  //     error: (error) => {
+  //       console.error('Error al cerrar sesión:', error);
+  //       this.isAuthenticated = false;
+  //     }
+  //   });
+  // }
   // CARGA DE DATOS
 
   cargarEstudiantes(): void {
@@ -256,7 +256,16 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         this.mostrarNotificacion('No se pudieron cargar los estudiantes', 'error');
         this.estudiantes = [];
         this.estudiantesFiltrados = [];
+        this.authService.cerrarSesion().subscribe({
+          next: () => {
+            this.router.navigate(['/control-orientacion']);
+          },
+          error: () => {
+            this.router.navigate(['/control-orientacion']); 
+          }
+        });
       }
+
     });
   }
 

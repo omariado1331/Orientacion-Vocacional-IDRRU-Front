@@ -1,12 +1,13 @@
 import { Component, AfterViewInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
@@ -14,10 +15,26 @@ export class NavbarComponent implements AfterViewInit, OnDestroy {
   private ticking = false;
   private lastScrollTop = 0;
   private isBrowser: boolean;
+  private destroy$ = new Subject<void>();
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService) {
+  // Estado de autenticación
+  isAuthenticated = false;
+
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private authService: AuthService
+  ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
 
+    // Inicializar estado de autenticación
+    this.isAuthenticated = this.authService.estaAutenticado();
+
+    // Suscribirse a cambios en el estado de autenticación
+    this.authService.obtenerEstadoAutenticacion()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(estado => {
+        this.isAuthenticated = estado;
+      });
   }
 
   ngAfterViewInit(): void {
@@ -27,7 +44,8 @@ export class NavbarComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   @HostListener('window:scroll', [])
@@ -36,6 +54,7 @@ export class NavbarComponent implements AfterViewInit, OnDestroy {
       this.handleScroll();
     }
   }
+
   private handleScroll(): void {
     if (!this.ticking) {
       requestAnimationFrame(() => {
@@ -52,5 +71,19 @@ export class NavbarComponent implements AfterViewInit, OnDestroy {
       });
       this.ticking = true;
     }
+  }
+
+  /**
+   * Cierra la sesión del usuario
+   */
+  cerrarSesion(): void {
+    this.authService.cerrarSesion().subscribe({
+      next: () => {
+        console.log('Sesión cerrada correctamente');
+      },
+      error: (error) => {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
   }
 }

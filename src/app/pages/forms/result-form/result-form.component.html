@@ -1,356 +1,154 @@
-<!-- <h1 class="text-center mt-2">
-    <p class="text-danger">{{title}}</p> 
-</h1>
-<div class="container">
-<p>
-    De acuerdo con tus respuestas, has presentado afinidad con tres tipos de personalidad. Cada uno representa
-    como ves el mundo, como aprendes y como te relacionas con los demás
-</p>
-<p>
-    Conocer tus perfiles te ayuda a identificar las áreas de estudio y actividades en las que te sientes cómodo(a)
-     y motivado(a)
-</p> 
-<p>
-    A continuación se presentan tus perfiles principales y una descripción de cada uno: 
-</p>
-</div>
-<div class="container align-items-center">
-    <div class="row">
-    <div class="col-md-4"> 
-        <table class="table">
-            <thead class="table-primary border border-dark">
-                <tr class="text-center" >
-                    <th><h5>REALISTA</h5></th>
-                </tr>
-            </thead>
-            <tbody class="border border-dark">
-                <tr class="text-center">
-                    
-                    <td> <img src="./assets/iconos-holland/realista.png" alt="" width="150px">
-                        <p>Eres una persona práctica, activa y te gusta aprender haciendo.
-                         Disfrutas usar tus manos, herramientas o máquinas, y prefieres 
-                         ambientes de trabajo concretos y con tareas físicas o técnicas. 
-                         Podrías destacar en áreas como mecánica, electrónica, construcción, 
-                         deportes o agricultura. Aprendes mejor con la experiencia directa, 
-                         resolviendo cosas en el mundo real.</p></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="col-md-4"> 
-        <table class="table">
-            <thead class="table-primary border border-dark">
-                <tr class="text-center" >
-                    <th><h5>INVESTIGADOR</h5></th>
-                </tr>
-            </thead>
-            <tbody class="border border-dark">
-                <tr class="text-center">
-                    
-                    <td> <img src="./assets/iconos-holland/cientifico.png" alt="" width="150px">
-                        <p>Te gusta comprender cómo funcionan las cosas. Eres curioso, analítico
-                             y disfrutas resolver problemas o buscar respuestas. Prefieres actividades 
-                             donde puedas pensar, investigar, experimentar o estudiar temas científicos. 
-                             Te sentirías cómodo en campos como la ciencia, la tecnología, la medicina 
-                             o la ingeniería. Te motiva aprender por tu cuenta y buscar explicaciones 
-                             profundas.</p></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    
-    <div class="col-md-4"> 
-        <table class="table">
-            <thead class="table-primary border border-dark">
-                <tr class="text-center" >
-                    <th><h5>ARTISTICO</h5></th>
-                </tr>
-            </thead>
-            <tbody class="border border-dark">
-                <tr class="text-center">
-                    
-                    <td> <img src="./assets/iconos-holland/artistico.png" alt="" width="150px">
-                        <p>Tienes una gran imaginación, disfrutas expresarte de forma creativa y 
-                            te atraen las ideas nuevas y originales. No te gustan las reglas rígidas 
-                            y valoras la libertad para crear. Puedes destacar en el arte, el diseño, 
-                            la música, la escritura, el teatro o la comunicación visual. Ves el mundo 
-                            de una forma única y lo expresas a tu manera.</p></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    </div>
-</div> -->
-
-<div class="row justify-content-center mb-4 mt-4">
-    <div class="col-lg-11">
-        <div class="card header-card">
-            <div class="card-body text-center py-5">
-                <div class="profile-avatar mb-3">
-                    <i class="fas fa-user-graduate"><img src="./assets/iconos-holland/cientifico.png " alt="" class="faculty-logo"></i>
-                </div>
-                <h2 class="mb-1">{{this.nombre}}</h2>
-                <p class="mb-0 fs-5 opacity-75">COLEGIO: {{this.colegio}}</p>
-                <div class="mt-3">
-                    <span class="badge bg-light text-dark me-2">
-                        <i class="fas fa-id-card me-1"></i>C.I: 321654
-                    </span>
-                    <span class="badge bg-light text-dark me-2">
-                        <i class="fas fa-birthday-cake me-1"></i>18 años
-                    </span>
-                    <span class="badge bg-light text-dark">
-                        <i class="fas fa-phone me-1"></i>45625
-                    </span>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    @if (!this.bdform) {
+        <div class="container">
+            <h5 class="text-danger text-center">Los datos no se guardaron en la base de datos</h5>
+        </div>
+    }
+<div #contenidoPDF id="contenidoPDF">
+    <div class="row justify-content-center mb-4 mt-4">
+        <div class="col-lg-11">
+            <div class="card header-card">
+                <div class="card-body text-center py-5">
+                    <div class="profile-avatar mb-3">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h2 class="mb-1">{{nombre}}</h2>
+                    <p class="mb-0 fs-5 opacity-75">COLEGIO: {{colegio}}</p>
+                    <div class="mt-3">
+                        <span class="badge bg-light text-dark me-2">
+                            <i class="fas fa-id-card me-1"></i>CI: {{carnet}}
+                        </span>
+                        <span class="badge bg-light text-dark me-2">
+                            <i class="fas fa-birthday-cake me-1"></i>{{edad}} años
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-phone me-1"></i>{{celular}}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-11">
-        <!-- Resultados Generales -->
-        <div class="row mb-4">
-            <div class="col-lg-6 mb-4">
-                <div class="card card-custom">
-                    <div class="card-body">
-                        <h5 class="section-title">
-                            <i class="fas fa-chart-line me-2"></i>Resultados Generales
-                        </h5>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="text-center">
-                                    <h6 class="text-muted mb-2">Aptitud Promedio</h6>
-                                    <div class="progress progress-custom mb-2">
-                                        <div class="progress-bar progress-bar-custom" role="progressbar" 
-                                             style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
-                                            80%
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <!-- Resultados Generales -->
+            <div class="row mb-4">
+                <div class="col-lg-6 mb-4">
+                    <div class="card card-custom">
+                        <div class="card-body">
+                            <h5 class="section-title">
+                                <i class="fas fa-chart-line me-2"></i>Resultados Generales
+                            </h5>
+                            
+                            <div class="row">
+                                <h5 class="text-primary text-center mb-1" >Test Chaside</h5>
+                                <div class="col-md-6 mb-3">
+                                    <div class="text-center">
+                                        <h6 class="text-muted mb-2">Aptitud</h6>
+                                        <div class="progress progress-custom mb-2">
+                                            <div class="progress-bar progress-bar-custom" role="progressbar" 
+                                                style="width: 100%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="5">
+                                                {{aptitud}} puntos
+                                            </div>
                                         </div>
+                                    
                                     </div>
-                                    <span class="badge badge-custom bg-primary">Excelente</span>
                                 </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="text-center">
-                                    <h6 class="text-muted mb-2">Interés Promedio</h6>
-                                    <div class="progress progress-custom mb-2">
-                                        <div class="progress-bar progress-bar-custom" role="progressbar" 
-                                             style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-                                            75%
+                                <div class="col-md-6 mb-3">
+                                    <div class="text-center">
+                                        <h6 class="text-muted mb-2">Interés</h6>
+                                        <div class="progress progress-custom mb-2">
+                                            <div class="progress-bar progress-bar-custom" role="progressbar" 
+                                                style="width: 100%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                                {{interes}} puntos
+                                            </div>
                                         </div>
+                                        
                                     </div>
-                                    <span class="badge badge-custom bg-success">Muy Bueno</span>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="text-center">
+                                        <span class="badge badge-custom bg-success mx-auto">{{ramaChaside}}
+                                        </span>
+                                    </div>
+                                    <div class="text-center mt-1">
+                                        <span class="badge badge-custom bg-success mx-auto">{{tablaChaside}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <h6 class="text-muted mb-2">Test de Holland (Personalidades dominantes) </h6>
+                                <div class="mb-2">
+                                    <span class="holland-code holland-R holland-code-small">{{holland[0]}}</span>
+                                    <span class="holland-code holland-S holland-code-small">{{holland[1]}}</span>
+                                    <span class="holland-code holland-E holland-code-small">{{holland[2]}}</span>
+                                </div>
+                                <div class="holland-legend">
+                                    <strong>{{holland[0]}}:</strong> {{personalidadP}} | <strong>{{holland[1]}}:</strong> {{personalidadS}} | <strong>{{holland[2]}}:</strong> {{personalidadT}}
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="text-center mt-3">
-                            <h6 class="text-muted mb-2">Personalidades Dominantes</h6>
-                            <div class="mb-2">
-                                <span class="holland-code holland-R holland-code-small">R</span>
-                                <span class="holland-code holland-S holland-code-small">S</span>
-                                <span class="holland-code holland-E holland-code-small">E</span>
+                <div class="col-lg-6 mb-4">
+                    <div class="card card-custom">
+                        <div class="card-body">
+                            <h5 class="section-title">
+                                <i class="fas fa-user me-2"></i>Información Personal
+                            </h5>
+                            <div class="info-item">
+                                <i class="fas fa-school"></i>
+                                <span><strong>Colegio:</strong> {{colegio}}</span>
                             </div>
-                            <div class="holland-legend">
-                                <strong>R:</strong> Realista | <strong>S:</strong> Social | <strong>E:</strong> Emprendedor
+                            <div class="info-item">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span><strong>Curso:</strong> {{curso}}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span><strong>Edad:</strong> {{edad}} años</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span><strong>Celular:</strong> {{celular}}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <span><strong>Fecha de Evaluación:</strong> {{fechaStr}}</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            @if(chaside == 'C'){
+                <app-tabla-c [perfil]="holland"></app-tabla-c>
+            }
+            @if(chaside == 'H'){
+                <app-tabla-h [perfil]="holland"></app-tabla-h>
+            }
+            @if(chaside == 'A'){
+                <app-tabla-a [perfil]="holland"></app-tabla-a>
+            }
+            @if(chaside == 'S'){
+                <app-tabla-s [perfil]="holland"></app-tabla-s>
+            }
+            @if(chaside == 'I'){
+                <app-tabla-i [perfil]="holland"></app-tabla-i>
+            }
+            @if(chaside == 'D'){
+                <app-tabla-d [perfil]="holland"></app-tabla-d>
+            }
+            @if(chaside == 'E'){
+                <app-tabla-e [perfil]="holland"></app-tabla-e>
+            }
 
-            <div class="col-lg-6 mb-4">
-                <div class="card card-custom">
-                    <div class="card-body">
-                        <h5 class="section-title">
-                            <i class="fas fa-user me-2"></i>Información Personal
-                        </h5>
-                        <div class="info-item">
-                            <i class="fas fa-school"></i>
-                            <span><strong>Colegio:</strong> SAN SIMON</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span><strong>Curso:</strong> 6TO</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span><strong>Edad:</strong> 18 años</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-mobile-alt"></i>
-                            <span><strong>Celular:</strong> 45625</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-calendar-check"></i>
-                            <span><strong>Fecha de Evaluación:</strong> 21/05/2025</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Opciones Vocacionales -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h4 class="text-white text-center mb-4">
-                    <i class="fas fa-compass me-2"></i>Tus 3 Mejores Opciones Vocacionales
-                </h4>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Primera Opción -->
-            <div class="col-lg-4 mb-4">
-                <div class="card card-custom option-card">
-                    <div class="option-number">1</div>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <img src="./assets/logos-facultades/FA.png" alt="Logo FA" class="faculty-logo mb-2">
-                            <h5 class="text-primary mb-1">Facultad de Agronomía</h5>
-                            <span class="badge bg-primary">FA</span>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-6 text-center">
-                                <div class="score-badge">
-                                    <small>Aptitud</small><br>
-                                    <strong>85</strong>
-                                </div>
-                            </div>
-                            <div class="col-6 text-center">
-                                <div class="score-badge">
-                                    <small>Interés</small><br>
-                                    <strong>82</strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-center mb-3">
-                            <h6 class="text-muted mb-2">Personalidad Holland</h6>
-                            <span class="holland-code holland-R holland-code-small">R</span>
-                        </div>
-
-                        <div class="mb-3">
-                            <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
-                            <div class="career-list">
-                                <div class="career-item">Ingeniería Agronómica</div>
-                                <div class="career-item">Ing. en Producción y Comercialización Agropecuaria</div>
-                                <div class="career-item">Programa Medicina Veterinaria y Zootecnia</div>
-                            </div>
-                        </div>
-
-                        <div class="text-center">
-                            <a href="http://agro.umsa.bo/" target="_blank" class="btn btn-primary btn-sm">
-                                <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Segunda Opción -->
-            <div class="col-lg-4 mb-4">
-                <div class="card card-custom option-card">
-                    <div class="option-number">2</div>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <img src="./assets/logos-facultades/FMENT.png" alt="Logo FS" class="faculty-logo mb-2">
-                            <h5 class="text-success mb-1">Facultad de Medicina</h5>
-                            <span class="badge bg-success">FM</span>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-6 text-center">
-                                <div class="score-badge" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-                                    <small>Aptitud</small><br>
-                                    <strong>78</strong>
-                                </div>
-                            </div>
-                            <div class="col-6 text-center">
-                                <div class="score-badge" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-                                    <small>Interés</small><br>
-                                    <strong>80</strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-center mb-3">
-                            <h6 class="text-muted mb-2">Personalidad Holland</h6>
-                            <span class="holland-code holland-S holland-code-small">S</span>
-                        </div>
-
-                        <div class="mb-3">
-                            <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
-                            <div class="career-list">
-                                <div class="career-item">Medicina</div>
-                                <div class="career-item">Enfermería</div>
-                                <div class="career-item">Nutrición y Dietética</div>
-                                <div class="career-item">Fonoaudiología</div>
-                            </div>
-                        </div>
-
-                        <div class="text-center">
-                            <a href="#" target="_blank" class="btn btn-success btn-sm">
-                                <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tercera Opción -->
-            <div class="col-lg-4 mb-4">
-                <div class="card card-custom option-card">
-                    <div class="option-number">3</div>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <img src="./assets/logos-facultades/FCEF.png" alt="Logo FE" class="faculty-logo mb-2">
-                            <h5 class="text-warning mb-1">Facultad de Economía</h5>
-                            <span class="badge bg-warning text-dark">FE</span>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-6 text-center">
-                                <div class="score-badge" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
-                                    <small>Aptitud</small><br>
-                                    <strong>75</strong>
-                                </div>
-                            </div>
-                            <div class="col-6 text-center">
-                                <div class="score-badge" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
-                                    <small>Interés</small><br>
-                                    <strong>73</strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-center mb-3">
-                            <h6 class="text-muted mb-2">Personalidad Holland</h6>
-                            <span class="holland-code holland-E holland-code-small">E</span>
-                        </div>
-
-                        <div class="mb-3">
-                            <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
-                            <div class="career-list">
-                                <div class="career-item">Economía</div>
-                                <div class="career-item">Administración de Empresas</div>
-                                <div class="career-item">Contaduría Pública</div>
-                                <div class="career-item">Ingeniería Comercial</div>
-                            </div>
-                        </div>
-
-                        <div class="text-center">
-                            <a href="#" target="_blank" class="btn btn-warning btn-sm text-dark">
-                                <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+    </div>
+</div>
         <!-- Información Adicional -->
         <div class="row">
             <div class="col-12">
@@ -363,16 +161,16 @@
                             <div class="col-md-6">
                                 <h6 class="text-muted">¿Qué significan tus personalidades Holland?</h6>
                                 <div class="mb-2">
-                                    <span class="holland-code holland-R holland-code-small">R</span>
-                                    <strong>Realista:</strong> Prefieres trabajar con objetos, herramientas, máquinas y animales.
+                                    <span class="holland-code holland-R holland-code-small">{{holland[0]}}</span>
+                                    <strong>{{personalidadP}}:</strong> {{descripcionP}}
                                 </div>
                                 <div class="mb-2">
-                                    <span class="holland-code holland-S holland-code-small">S</span>
-                                    <strong>Social:</strong> Te gusta ayudar, enseñar, entrenar y curar a otras personas.
+                                    <span class="holland-code holland-S holland-code-small">{{holland[1]}}</span>
+                                    <strong>{{personalidadS}}:</strong> {{descripcionS}}
                                 </div>
                                 <div class="mb-2">
-                                    <span class="holland-code holland-E holland-code-small">E</span>
-                                    <strong>Emprendedor:</strong> Disfrutas liderar, influenciar y convencer a otros.
+                                    <span class="holland-code holland-E holland-code-small">{{holland[2]}}</span>
+                                    <strong>{{personalidadT}}:</strong> {{descripcionT}}
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -392,11 +190,20 @@
 
         <!-- Footer -->
         <div class="text-center mt-4">
-            <p class="text-white-50">
+            <p class="text-dark-50">
                 <i class="fas fa-info-circle me-1"></i>
                 Estos resultados son una guía para tu orientación vocacional. 
                 Te recomendamos consultar con un orientador para mayor información.
             </p>
         </div>
+    
+    <div class="container mb-3">
+        <div class="d-flex justify-content-center align-items-center" >
+           
+                <button class="btn btn-primary mx-2" (click)="generarPdf()"> GENERAR PDF </button>
+                <a [routerLink]="['/']"><button class="btn btn-primary mx-2">VOLVER AL INICIO</button></a>
+                <button class="btn btn-primary mx-2">COMPARTIR</button>
+        
+        
+        </div>
     </div>
-</div>

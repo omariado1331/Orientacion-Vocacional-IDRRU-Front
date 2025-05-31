@@ -57,73 +57,51 @@
 </div>
 <!-- Panel de control autenticado -->
 <div *ngIf="isAuthenticated" class="panel-container">
-  <header class="bg-umsa-blue-dark shadow-sm mb-4">
-    <div class="container-fluid py-3">
-      <div class="d-flex justify-content-between align-items-center flex-wrap">
-        <div class="d-flex align-items-center mb-2 mb-md-0">
-          <img [src]="logoUrl" alt="Logo Universidad" class="me-3" style="height: 50px;">
-          <h1 class="h4 mb-0 text-light">Panel de control</h1>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <button class="btn btn-danger" (click)="cerrarSesion()">
-            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-          </button>
-        </div>
-
-      </div>
-    </div>
-  </header>
-
   <div class="container-fluid px-4">
     <!-- Sección de búsqueda y filtros -->
-    <div class="card shadow mb-4">
-      <div class="card-header py-3 d-flex justify-content-between align-items-center flex-wrap">
-        <h5 class="mb-0 text-primary d-flex align-items-center">
-          <i class="bi bi-funnel-fill me-2"></i>Filtros y Búsqueda
-        </h5>
-        <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
-          <button class="btn btn-sm btn-warning" (click)="limpiarTodosFiltros()">
-            <i class="bi bi-x-circle-fill me-1"></i> Limpiar Filtros
-          </button>
-
-          <div class="btn-group" role="group">
-            <button class="btn  btn-primary dropdown-toggle" type="button" id="exportarDropdown"
-              data-bs-toggle="dropdown" aria-expanded="false"
-              [disabled]="exportando || estudiantesFiltrados.length === 0">
-              <i class="bi bi-download me-2"></i>Exportar
-              <span *ngIf="exportando" class="spinner-border spinner-border-sm ms-2" role="status"
-                aria-hidden="true"></span>
+    <div class="card shadow-sm mb-2" style="border-radius: 12px; border: none;">
+      <div class="card-header py-2"
+        style="background: linear-gradient(135deg, var(--umsa-blue),  var(--umsa-blue-dark)); border-radius: 12px 12px 0 0; color: white;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <h6 class="mb-0 d-flex align-items-center">
+            <i class="bi bi-funnel-fill me-2"></i>Filtros y Búsqueda
+          </h6>
+          <div class="d-flex gap-2 mt-1 mt-md-0">
+            <button class="btn btn-warning btn-sm" (click)="limpiarTodosFiltros()">
+              <i class="bi bi-x-circle me-1"></i>Limpiar filtros
             </button>
-            <ul class="dropdown-menu" aria-labelledby="exportarDropdown">
-              <li>
-                <a class="dropdown-item" (click)="exportarEstudiantes('excel')">
-                  <i class="bi bi-file-earmark-excel me-2 text-success"></i>Excel
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" (click)="exportarEstudiantes('pdf')">
-                  <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>PDF
-                </a>
-              </li>
-            </ul>
+            <div class="btn-group" role="group">
+              <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                [disabled]="exportando || estudiantesFiltrados.length === 0">
+                <i class="bi bi-download me-1"></i>Exportar datos
+                <span *ngIf="exportando" class="spinner-border spinner-border-sm ms-1"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" (click)="exportarEstudiantes('excel')">
+                    <i class="bi bi-file-earmark-excel me-2 text-success"></i>Excel</a></li>
+                <li><a class="dropdown-item" (click)="exportarEstudiantes('pdf')">
+                    <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>PDF</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-      <div class="card-body">
-        <div class="row g-3">
-          <!-- Búsqueda global -->
-          <div class="col-md-12">
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input type="text" class="form-control" placeholder="Buscar por nombre, apellido, CI o colegio..."
-                [value]="searchQuery" (input)="buscarGlobal($event)">
-            </div>
-          </div>
 
-          <!-- Filtros -->
-          <div class="col-md-3">
-            <label class="form-label">Provincia</label>
-            <select class="form-select" [(ngModel)]="filtros.provincia" (change)="onProvinciaChange(filtros.provincia)">
+      <div class="card-body p-3">
+        <!-- Búsqueda Global -->
+        <div class="mb-3">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-primary text-white"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Buscar por nombre, apellido, CI o colegio..."
+              [value]="searchQuery" (input)="buscarGlobal($event)">
+          </div>
+        </div>
+
+        <!-- Filtros Principales -->
+        <div class="row g-2 mb-3">
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" [(ngModel)]="filtros.provincia"
+              (change)="onProvinciaChange(filtros.provincia)">
               <option value="">Todas las provincias</option>
               <option *ngFor="let provincia of opcionesFiltros.provincias" [value]="provincia.idProvincia">
                 {{ provincia.nombre }}
@@ -131,9 +109,8 @@
             </select>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Municipio</label>
-            <select class="form-select" [(ngModel)]="filtros.municipio"
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" [(ngModel)]="filtros.municipio"
               (change)="aplicarFiltro('municipio', filtros.municipio)">
               <option value="">Todos los municipios</option>
               <option *ngFor="let municipio of opcionesFiltros.municipios" [value]="municipio.idMunicipio">
@@ -142,9 +119,8 @@
             </select>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Colegio</label>
-            <select class="form-select" [(ngModel)]="filtros.colegio"
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" [(ngModel)]="filtros.colegio"
               (change)="aplicarFiltro('colegio', filtros.colegio)">
               <option value="">Todos los colegios</option>
               <option *ngFor="let colegio of opcionesFiltros.colegios" [value]="colegio">
@@ -153,42 +129,53 @@
             </select>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Curso</label>
-            <select class="form-select" [(ngModel)]="filtros.curso" (change)="aplicarFiltro('curso', filtros.curso)">
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" [(ngModel)]="filtros.curso"
+              (change)="aplicarFiltro('curso', filtros.curso)">
               <option value="">Todos los cursos</option>
               <option *ngFor="let curso of opcionesFiltros.cursos" [value]="curso">
                 {{ curso }}
               </option>
             </select>
           </div>
+        </div>
 
-          <!-- Filtrado por rango de fechas -->
-          <div class="col-md-6">
-            <label class="form-label">Rango de Fechas</label>
-            <div class="d-flex">
-              <div class="input-group me-2">
-                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
-                <input type="date" class="form-control" [(ngModel)]="filtros.fechaInicio" placeholder="Fecha inicio">
+        <!-- Filtros de Fecha -->
+        <div class="rounded">
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-lg-6">
+              <label class="form-label text-muted fw-semibold mb-1">
+                <i class="bi bi-calendar-range me-1"></i>Rango de Fechas
+              </label>
+              <div class="row g-1">
+                <div class="col-5">
+                  <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaInicio">
+                </div>
+                <div class="col-2 text-center">
+                  <small class="text-muted">hasta</small>
+                </div>
+                <div class="col-5">
+                  <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaFin">
+                </div>
               </div>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
-                <input type="date" class="form-control" [(ngModel)]="filtros.fechaFin" placeholder="Fecha fin">
-              </div>
-              <button class="btn btn-primary ms-2" (click)="aplicarFiltroFecha()">
+            </div>
+            <div class="col-12 col-lg-1">
+              <button class="btn btn-primary btn-sm w-100" (click)="aplicarFiltroFecha()">
                 <i class="bi bi-funnel"></i>
               </button>
             </div>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Fecha específica</label>
-            <select class="form-select" [(ngModel)]="filtros.fecha" (change)="aplicarFiltro('fecha', filtros.fecha)">
-              <option value="">Todas las fechas</option>
-              <option *ngFor="let fecha of opcionesFiltros.fechasRegistro" [value]="fecha">
-                {{ fecha }}
-              </option>
-            </select>
+            <div class="col-12 col-lg-5">
+              <label class="form-label text-muted fw-semibold mb-1">
+                <i class="bi bi-calendar-event me-1"></i>Fecha Específica
+              </label>
+              <select class="form-select form-select-sm" [(ngModel)]="filtros.fecha"
+                (change)="aplicarFiltro('fecha', filtros.fecha)">
+                <option value="">Todas las fechas</option>
+                <option *ngFor="let fecha of opcionesFiltros.fechasRegistro" [value]="fecha">
+                  {{ fecha }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -243,33 +230,33 @@
               <div class="px-4">
                 <!-- Información personal -->
                 <div class="card mb-4 border-0 shadow-sm">
-                  <div class="card-header bg-white py-3">
+                  <div class="card-header bg-white py-2">
                     <h5 class="mb-0 d-flex align-items-center">
                       <i class="bi bi-person-lines-fill me-2 text-primary"></i>
                       Datos Personales
                     </h5>
                   </div>
                   <div class="card-body">
-                    <div class="row g-3">
+                    <div class="row gx-3">
                       <div class="col-md-6">
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">CI:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.ciEstudiante }}</p>
+                          <p class="mb-0 fs-6 ">{{ estudianteSeleccionado.ciEstudiante }}</p>
                         </div>
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Nombre Completo:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.nombre }} {{ estudianteSeleccionado.apPaterno
+                          <p class="mb-0 fs-6">{{ estudianteSeleccionado.nombre }} {{ estudianteSeleccionado.apPaterno
                             }} {{ estudianteSeleccionado.apMaterno }}</p>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Edad:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.edad }} años</p>
+                          <p class="mb-0 fs-6">{{ estudianteSeleccionado.edad }} años</p>
                         </div>
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Celular:</label>
-                          <p class="mb-0 fs-5">
+                          <p class="mb-0 fs-6">
                             <span *ngIf="estudianteSeleccionado.celular">
                               <i class="bi bi-telephone me-1"></i>{{ estudianteSeleccionado.celular }}
                             </span>
@@ -281,13 +268,13 @@
                       <div class="col-md-6">
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Colegio:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.colegio }}</p>
+                          <p class="mb-0 fs-6">{{ estudianteSeleccionado.colegio }}</p>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Curso:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.curso }}</p>
+                          <p class="mb-0 fs-6">{{ estudianteSeleccionado.curso }}</p>
                         </div>
                       </div>
                     </div>
@@ -296,15 +283,15 @@
 
                 <!-- Resultados de Orientación -->
                 <div *ngIf="resultadoEstudiante && resultadoEstudiante.length > 0">
-                  <h5 class="mb-3 d-flex align-items-center">
+                  <h5 class="mb-2 d-flex align-items-center">
                     <span class="badge bg-primary rounded-pill me-2">{{ resultadoEstudiante.length }}</span>
                     <i class="bi bi-graph-up me-2 text-primary"></i>
                     Resultados de Orientación Vocacional
                   </h5>
 
                   <!-- Tabs para múltiples resultados -->
-                  <ul class="nav nav-tabs mb-3" *ngIf="resultadoEstudiante.length > 1">
-                    <li class="nav-item" *ngFor="let resultado of resultadoEstudiante; let i = index">
+                  <ul class="nav nav-tabs mb-1" *ngIf="resultadoEstudiante.length > 1">
+                    <li class="nav-item small" *ngFor="let resultado of resultadoEstudiante; let i = index">
                       <button class="nav-link" [ngClass]="{'active': i === 0}" data-bs-toggle="tab"
                         [attr.data-bs-target]="'#resultado-' + i">
                         Resultado {{ i + 1 }}
@@ -312,36 +299,41 @@
                       </button>
                     </li>
                   </ul>
-
                   <div class="tab-content">
                     <div class="tab-pane fade show" [ngClass]="{'active': i === 0}"
                       *ngFor="let resultado of resultadoEstudiante; let i = index" [attr.id]="'resultado-' + i">
-                      <div class="card mb-4 border-0 shadow-sm">
+                      <div class="card mb-2 border-0 shadow-sm">
                         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                          <h6 class="mb-0 d-flex align-items-center">
+                          <h6 class="mb-0 d-flex align-items-center h6">
                             <i class="bi bi-calendar-check me-2 text-primary"></i>
                             Evaluación del {{ resultado.fecha | date:'dd/MM/yyyy HH:mm' }}
                           </h6>
                           <span class="badge bg-success">Completado</span>
                         </div>
                         <div class="card-body">
-                          <div class="row mb-4">
+                          <div class="row mb-0">
                             <div class="col-md-6">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary">
+                                  <h6 class="card-title text-primary text-uppercase">
                                     <i class="bi bi-star me-2"></i>Interés y Aptitud
                                   </h6>
-                                  <div class="mb-3">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Interés:</label>
-                                    <div class="d-flex align-items-center">
-                                      <span class="fs-5 me-2">{{ resultado.interes }}</span>
+                                  <div class="row">
+                                    <div class="col-md-6">
+                                      <div class="mb-2">
+                                        <label class="d-block text-uppercase small text-muted mb-1">Interés:</label>
+                                        <div class="d-flex align-items-center">
+                                          <span class="fs-5 me-2">{{ resultado.interes }}</span>
+                                        </div>
+                                      </div>
                                     </div>
-                                  </div>
-                                  <div class="mb-0">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Aptitud:</label>
-                                    <div class="d-flex align-items-center">
-                                      <span class="fs-5 me-2">{{ resultado.aptitud }}</span>
+                                    <div class="col-md-6">
+                                      <div class="mb-0">
+                                        <label class="d-block text-uppercase small text-muted mb-1">Aptitud:</label>
+                                        <div class="d-flex align-items-center">
+                                          <span class="fs-5 me-2">{{ resultado.aptitud }}</span>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -350,12 +342,12 @@
                             <div class="col-md-6">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary">
+                                  <h6 class="card-title text-primary text-uppercase">
                                     <i class="bi bi-award me-2"></i>Evaluación Holland
                                   </h6>
-                                  <label class="d-block text-uppercase small text-muted mb-1">Código: </label>
-                                  <div class="holland-code">
-                                    <span class="badge bg-primary me-1"
+                                  <label class="d-block text-uppercase small text-muted mb-1">PERSONALIDADES: </label>
+                                  <div class="">
+                                    <span class="badge bg-primary me-2 fs-6"
                                       *ngFor="let letra of resultado.puntajeHolland.split('')">
                                       {{ letra }}
                                     </span>
@@ -366,26 +358,26 @@
                           </div>
 
                           <!-- Resultados detallados -->
-                          <div class="row mb-3">
+                          <div class="row mb-0">
                             <!-- Datos CHASIDE específicos -->
                             <div class="col-md-6 mb-3" *ngIf="resultado.chaside">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary d-flex align-items-center">
+                                  <h6 class="card-title text-primary d-flex align-items-center text-uppercase">
                                     <i class="bi bi-clipboard-data me-2"></i>
                                     Test CHASIDE
                                   </h6>
                                   <div class="mb-0">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Código CHASIDE:</label>
+                                    <label class="d-block text-uppercase small text-muted mb-1">CODIGO:</label>
                                     <div class="chaside-code">
-                                      <span class="text-uppercase fw-bold me-1">
+                                      <span class="text-uppercase me-1 fs-5">
                                         {{ resultado.chaside.codigo }}
                                       </span>
                                     </div>
-                                    <label
-                                      class="d-block text-uppercase small text-muted mb-1 mt-2">Descripción:</label>
+                                    <label class="d-block text-uppercase small text-muted mb-1 mt-2">AREA DE
+                                      ESTUDIO:</label>
                                     <p class="mb-0 fw-semibold">{{ resultado?.chaside?.descripcion }}</p>
-                                    <p class="mt-2 small text-muted mb-0">
+                                    <p class="mt-3 small text-muted mb-0">
                                       C: Administrativas y Contables, H: Humanísticas, A: Artísticas, S: Medicina y Cs.
                                       de la Salud,
                                       I: Ingeniería, D: Defensa y Seguridad, E: Ciencias Exactas
@@ -399,16 +391,16 @@
                             <div class="col-md-6 mb-3" *ngIf="resultado.holland">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary d-flex align-items-center">
+                                  <h6 class="card-title text-primary d-flex align-items-center text-uppercase">
                                     <i class="bi bi-person-bounding-box me-2"></i>
                                     Test Holland
                                   </h6>
                                   <div class="mb-0">
                                     <label class="d-block text-uppercase small text-muted mb-1">Tipo principal:</label>
-                                    <p class="mb-2 fs-5">{{ resultado.holland.nombre }}</p>
-                                    <label class="d-block text-uppercase small text-muted mb-1 ">Descripción:</label>
+                                    <p class="mb-2 fs-5 text-uppercase">{{ resultado.holland.nombre }}</p>
+                                    <label class="d-block text-uppercase small text-muted mb-1 ">PERSONALIDAD:</label>
                                     <p class="mb-2 fw-semibold">{{ resultado?.holland?.descripcion }}</p>
-                                    <p class="mt-2 small text-muted mb-0">
+                                    <p class="mt-3 small text-muted mb-0">
                                       R: Realista, I: Investigador, A: Artístico, S: Social, E: Emprendedor, C:
                                       Convencional
                                     </p>
@@ -452,7 +444,6 @@
                     </div>
                   </div>
                 </div>
-
                 <div class="alert alert-info d-flex align-items-center" *ngIf="!resultadoEstudiante?.length">
                   <i class="bi bi-info-circle fs-4 me-3"></i>
                   <div>
@@ -785,12 +776,13 @@
     </div>
     <!-- Tabla de estudiantes -->
     <div class="card shadow mb-4">
-      <div class="card-header py-3">
-        <h5 class="mb-0 text-primary"><i class="bi bi-table me-2"></i>Listado de Estudiantes</h5>
+      <div class="card-header"
+        style="background: linear-gradient(135deg, var(--umsa-blue),  var(--umsa-blue-dark)); border-radius: 12px 12px 0 0; color: white;">
+        <h5 class="mb-0"><i class="bi bi-table me-2"></i>Listado de Estudiantes</h5>
       </div>
       <div class="card-body">
         <!-- Selector de items por página -->
-        <div class="row mb-3">
+        <div class="row mb-2">
           <div class="col-md-6">
             <div class="d-flex align-items-center">
               <span class="me-2">Mostrar</span>
@@ -816,7 +808,7 @@
 
         <div class="table-responsive ">
           <table class="table table-bordered table-hover ">
-            <thead class="table-umsa">
+            <thead class="table-umsa text-uppercase small">
               <tr>
                 <th class="cursor-pointer" (click)="ordenarPor('ciEstudiante')">
                   CI
@@ -843,7 +835,7 @@
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="align-middle">
               <tr *ngIf="estudiantesPaginados.length === 0">
                 <td colspan="7" class="text-center py-4">
                   <i class="bi bi-exclamation-circle text-muted me-2"></i>
@@ -860,19 +852,19 @@
 
                 <td class="text-center">
                   <div class="btn-group btn-group-sm" role="group">
-                    <button class="btn px-3 py-2 rounded-start btn-primary" title="Ver Perfil"
+                    <button class="btn px-3 rounded-start btn-primary" title="Ver Perfil"
                       (click)="verPerfilEstudiante(estudiante.idEstudiante)" style="transition: all 0.2s;">
-                      <i class="bi bi-person-badge fs-5"></i>
+                      <i class="bi bi-person-badge fs-6"></i>
                     </button>
 
-                    <button class="btn px-3 py-2 btn-warning" title="Editar" (click)="abrirModalEditar(estudiante)"
-                      style="transition: all 0.2s; margin: 0 2px;">
-                      <i class="bi bi-pencil fs-5"></i>
+                    <button class="btn px-3 btn-warning" title="Editar" (click)="abrirModalEditar(estudiante)"
+                      style="transition: all 0.2s; margin: 0 7px;">
+                      <i class="bi bi-pencil fs-6"></i>
                     </button>
 
-                    <button class="btn px-3 py-2 rounded-end btn-danger" title="Eliminar"
+                    <button class="btn px-3 rounded-end btn-danger" title="Eliminar"
                       (click)="eliminarEstudiante(estudiante.idEstudiante)" style="transition: all 0.2s;">
-                      <i class="bi bi-trash fs-5"></i>
+                      <i class="bi bi-trash fs-6"></i>
                     </button>
                   </div>
                 </td>
