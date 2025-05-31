@@ -24,6 +24,9 @@ export class ChasideAptitudPService {
     {pregunta: '¿Dirigirías un grupo de teatro independiente?', area: 'A'},
     {pregunta: '¿Consideras que la salud pública debe ser prioritaria, gratuita y eficiente para todos?', area: 'S'},
     {pregunta: '¿Estarías dispuesto a renunciar a un momento placentero para ofrecer tu servicio como profesional?', area: 'S'},
+  ];
+
+  preguntasAptitudChasideDos: chasidePregunta[] = [
     {pregunta: '¿Ayudas habitualmente a personas invidentes a cruzar la calle?', area: 'S'},
     {pregunta: '¿A una posición negativa siempre planteas un pensamiento positivo?', area: 'S'},
     {pregunta: '¿Planificas detalladamente tus trabajos antes de empezar?', area: 'I'},
@@ -38,5 +41,5 @@ export class ChasideAptitudPService {
     {pregunta: '¿Te interesan más los misterios de la naturaleza que los secretos de la tecnología?', area: 'E'},
     {pregunta: '¿Te inhibes al entrar a un lugar nuevo con gente desconocida?', area: 'E'},
     {pregunta: '¿Tienes interés por saber cuáles son las causas que determinan ciertos fenómenos, aunque saberlo no incida en tu vida?', area: 'E'}
-  ];
+  ]
 }

@@ -1,11 +1,11 @@
-import { Component, PLATFORM_ID, Inject, computed, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { NavigationExtras, RouterModule } from '@angular/router';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators, FormBuilder} from '@angular/forms';
-import { Estudiante, EstudianteI } from '../../../interfaces/estudiante-interface';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators, FormBuilder, Form} from '@angular/forms';
+import { EstudianteI } from '../../../interfaces/estudiante-interface';
 import { ProvinciaService } from '../../../services/provincia.service';
 import { Provincia } from '../../../interfaces/provincia-interface';
 import { MunicipioService } from '../../../services/municipio.service';
-import { Municipio, MunicipioN } from '../../../interfaces/municipio-interface';
+import { MunicipioN } from '../../../interfaces/municipio-interface';
 import { Router } from '@angular/router';
 import { ChasideInteresPService } from '../../../services/chaside-interes-p.service';
 import { ChasideAptitudPService } from '../../../services/chaside-aptitud-p.service';
@@ -37,8 +37,12 @@ export class FormEstudianteComponent {
   //arreglos para cargar en el DOM de preguntas chasides y holland, de municipio y provincias
   provincias: Provincia[] = [];
   municipios: MunicipioN[] = [];
-  pregChasideAptitud: chasidePregunta[] = [];
   pregChasideInteres: chasidePregunta[] = [];
+  pregChasideInteresDos: chasidePregunta[] = [];
+  pregChasideInteresTres: chasidePregunta[] = [];
+  pregChasideInteresCuatro: chasidePregunta[] = [];
+  pregChasideAptitud: chasidePregunta[] = [];
+  pregChasideAptitudDos: chasidePregunta[] = [];
   pregHollandFirst: hollandPregunta[] = [];
   pregHollandSecond: hollandPregunta[] = [];
   pregHollandThird: hollandPregunta[] = [];
@@ -73,14 +77,31 @@ export class FormEstudianteComponent {
   //condicionales para mostrar los formularios
   formularioActived: boolean= false;
   chasideActivated: boolean = true;
+  chasideActivatedDos: boolean = true;
+  chasideActivatedTres: boolean = true;
+  chasideActivatedCuatro: boolean = true;
+  chasideActivatedCinco: boolean = true;
+  chasideActivatedSeis: boolean = true;
   hollandActivated: boolean = true;
+  hollandActivatedDos: boolean = true;
+  hollandActivatedTres: boolean = true;
+  hollandActivatedCuatro: boolean = true; 
 
   //formularios
   form : FormGroup;
+  //señales para verificar si se llenó las preguntas
   enviadoEst = signal(false);
   enviadoCh = signal(false);
+  enviadoChDos = signal(false);
+  enviadoChTres = signal(false);
+  enviadoChCuatro = signal(false);
+  enviadoChCinco = signal(false);
+  enviadoChSeis = signal(false);
   enviadoHl = signal(false);
-
+  enviadoHlDos = signal(false);
+  enviadoHlTres = signal(false);
+  enviadoHlCuatro = signal(false);
+  
   resultadoEnviar : Resultado = {
     idResultado: null,
     interes: 0,
@@ -109,41 +130,57 @@ export class FormEstudianteComponent {
     private resultadoService: ResultadoService) 
     { 
       this.pregChasideInteres = this.chasideInteresPService.preguntasInteresChasides;
+      this.pregChasideInteresDos = this.chasideInteresPService.preguntasInteresChasideDos;
+      this.pregChasideInteresTres = this.chasideInteresPService.preguntasInteresChasideTres;
+      this.pregChasideInteresCuatro = this.chasideInteresPService.preguntasChasideInteresCuatro;
       this.pregChasideAptitud = this.chasideAptitudPService.preguntasAptitudChaside;
+      this.pregChasideAptitudDos = this.chasideAptitudPService.preguntasAptitudChasideDos;
       this.pregHollandFirst = this.hollandFirstService.preguntasHollandFirst;
       this.pregHollandSecond= this.hollandSecondService.preguntasHollandSecond
       this.pregHollandThird = this.hollandThirdService.preguntasHollandThird;
       this.pregHollandAutoev = this.hollandAutoevService.preguntasHollandAutoev;
 
       this.form = this.formBuilder.group({
-        carnetNum: new FormControl(123, Validators.required),
+        carnetNum: new FormControl(null, Validators.required),
         carnetExt: new FormControl('', Validators.required),
-        nombre: new FormControl('OMAR', Validators.required),
-        apPaterno: new FormControl('CALLE', Validators.required),
-        apMaterno: new FormControl('GUACHALLA', Validators.required),
-        colegio: new FormControl('SIMON BOLIVAR', Validators.required),
-        curso: new FormControl('6TO SECUNDARIA', Validators.required),
-        edad: new FormControl(21, Validators.required),
-        celular: new FormControl('3215', Validators.required),
+        nombre: new FormControl('', Validators.required),
+        apPaterno: new FormControl('', Validators.required),
+        apMaterno: new FormControl('', Validators.required),
+        colegio: new FormControl('', Validators.required),
+        curso: new FormControl('', Validators.required),
+        edad: new FormControl(null, Validators.required),
+        celular: new FormControl('', Validators.required),
         provincia: new FormControl('', Validators.required),
         municipio: new FormControl('', Validators.required),
         respuestasChI : this.formBuilder.array(this.pregChasideInteres.map(
-          () => new FormControl(1, Validators.required)
+          () => new FormControl(null, Validators.required)
+        )),
+        respuestasChIDos: this.formBuilder.array(this.pregChasideInteresDos.map(
+          () => new FormControl(null, Validators.required)
+        )),
+        respuestasChITres: this.formBuilder.array(this.pregChasideInteresTres.map(
+          () => new FormControl(null, Validators.required)
+        )),
+        respuestasChICuatro: this.formBuilder.array(this.pregChasideInteresCuatro.map(
+          () => new FormControl(null, Validators.required)
         )),
         respuestasChA : this.formBuilder.array(this.pregChasideAptitud.map(
-          () => new FormControl(1, Validators.required)
+          () => new FormControl(null, Validators.required)
+        )),
+        respuestasChADos : this.formBuilder.array(this.pregChasideAptitudDos.map(
+          () => new FormControl(null, Validators.required)
         )),
         respuestasHF : this.formBuilder.array(this.pregHollandFirst.map(
-          () => new FormControl(0)
+          () => new FormControl(null)
         )),
         respuestasHS : this.formBuilder.array(this.pregHollandSecond.map(
-          () => new FormControl(0)
+          () => new FormControl(null)
         )),
         respuestasHT : this.formBuilder.array(this.pregHollandThird.map(
-          () => new FormControl(0)
+          () => new FormControl(null)
         )),
         respuestasHA : this.formBuilder.array(this.pregHollandAutoev.map(
-          () => new FormControl(7, Validators.required)
+          () => new FormControl(null, Validators.required)
         ))
       });
   
@@ -184,8 +221,20 @@ export class FormEstudianteComponent {
     get respuestasChI(): FormArray{
       return this.form.get('respuestasChI') as FormArray
     }
+    get respuestasChIDos(): FormArray{
+      return this.form.get('respuestasChIDos') as FormArray
+    }
+    get respuestasChITres(): FormArray{
+      return this.form.get('respuestasChITres') as FormArray
+    }
+    get respuestasChICuatro(): FormArray{
+      return this.form.get('respuestasChICuatro') as FormArray
+    }
     get respuestasChA(): FormArray{
       return this.form.get('respuestasChA') as FormArray
+    }
+    get respuestasChADos(): FormArray{
+      return this.form.get('respuestasChADos') as FormArray
     }
     get respuestasHF(): FormArray{
       return this.form.get('respuestasHF') as FormArray
@@ -251,17 +300,102 @@ export class FormEstudianteComponent {
       window.scrollTo({ top: 0.5, behavior: 'instant' });
     }
   }
-  mostrarHolland(){
-    this.formularioActived = true;
+  mostrarChasideDos(){
+    if(this.respuestasChI.invalid){
+      alert('Debes contestar TODAS las preguntas')
+      this.enviadoCh.set(true);
+    }else{
     this.chasideActivated = true;
+    this.chasideActivatedDos = false;  
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
+  }
+  mostrarChasideTres(){
+    if(this.respuestasChIDos.invalid){
+      alert('Debes contestar TODAS las preguntas')
+      this.enviadoChDos.set(true);
+    }else{
+    this.chasideActivatedDos = true;
+    this.chasideActivatedTres = false; 
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
+  }
+  mostrarChasideCuatro(){
+    if(this.respuestasChITres.invalid){
+      alert('Debes contestar TODAS las preguntas')
+      this.enviadoChTres.set(true);
+    }else{
+    this.chasideActivatedTres = true;
+    this.chasideActivatedCuatro = false;
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
+  }
+  mostrarChasideCinco(){
+    if(this.respuestasChICuatro.invalid){
+      alert('Debes contestar TODAS las preguntas')
+      this.enviadoChCuatro.set(true);
+    }else{
+    this.chasideActivatedCuatro = true;
+    this.chasideActivatedCinco = false;
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
+  }
+  mostrarChasideSeis(){
+    if(this.respuestasChA.invalid){
+      alert('Debes contestar TODAS las preguntas')
+      this.enviadoChCinco.set(true);
+    }else{
+    this.chasideActivatedCinco = true;
+    this.chasideActivatedSeis = false;
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
+  }
+  mostrarHolland(){
+    if(this.respuestasChADos.invalid){
+      alert('Debes contestar TODAS las preguntas')
+      this.enviadoChSeis.set(true);
+    }else{
+    this.chasideActivatedSeis = true;
     this.hollandActivated = false;
     window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
+  }
+  mostrarHollandDos(){
+    if(!this.respuestasHF.dirty){
+      alert('Debes marcar algunas opciones')
+      this.enviadoHl.set(true);
+    }else{
+    this.hollandActivated = true;
+    this.hollandActivatedDos = false;
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
+  }
+  mostrarHollandTres(){
+    if(!this.respuestasHS.dirty){
+      alert('Debes marcar algunas opciones')
+      this.enviadoHlDos.set(true);
+    }else{
+    this.hollandActivatedDos = true;
+    this.hollandActivatedTres = false;
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
+  }
+  mostrarHollandCuatro(){
+    if(!this.respuestasHT.dirty){
+      alert('Debes marcar algunas opciones')
+      this.enviadoHlTres.set(true);
+    }else{
+    this.hollandActivatedTres = true;
+    this.hollandActivatedCuatro = false;
+    window.scrollTo({ top: 0.5, behavior: 'instant' });
+    }
   }
 
   guardarResultado(){
-    this.enviadoEst.set(true);
-    this.enviadoCh.set(true);
-    this.enviadoHl.set(true);
+    if(this.respuestasHA.invalid){
+      alert('Debes responder todas las preguntas')
+      this.enviadoHlCuatro.set(true);
+    }
     if(this.form.invalid){
       return;
     }else{
@@ -287,9 +421,9 @@ export class FormEstudianteComponent {
 
       //resultado general chaside
       const resultadoChaside = { C: 0, H: 0, A: 0, S: 0, I: 0, D: 0, E: 0 };
-
-      //resultado seccion interes
+      //resultado chaside interes
       const resultadoInteres = { C: 0, H: 0, A: 0, S: 0, I: 0, D: 0, E: 0 };
+      //resultado seccion UNO chaside interes
       this.respuestasChI.controls.forEach((control, i) =>{
         const area = this.pregChasideInteres[i].area;
         //sumar los resultados de interes
@@ -297,13 +431,44 @@ export class FormEstudianteComponent {
         //sumar los resultados al resultado general
         resultadoChaside[area] += Number(control.value);
       });
-      //resultado seccion aptitud
+      //resultado seccion DOS chaside interes
+      this.respuestasChIDos.controls.forEach((control, i) =>{
+        const area = this.pregChasideInteresDos[i].area;
+        //sumar los resultados de interes
+        resultadoInteres[area] += Number(control.value);
+        //sumar los resultados al resultado general
+        resultadoChaside[area] += Number(control.value);
+      });
+      //resultado seccion TRES chaside interes
+      this.respuestasChITres.controls.forEach((control, i) =>{
+        const area = this.pregChasideInteresTres[i].area;
+        //sumar los resultados de interes
+        resultadoInteres[area] += Number(control.value);
+        //sumar los resultados al resultado general
+        resultadoChaside[area] += Number(control.value);
+      });
+      //resultado seccion CUATRO chaside interes
+      this.respuestasChICuatro.controls.forEach((control, i) =>{
+        const area = this.pregChasideInteresCuatro[i].area;
+        //sumar los resultados de interes
+        resultadoInteres[area] += Number(control.value);
+        //sumar los resultados al resultado general
+        resultadoChaside[area] += Number(control.value);
+      });
+      // resultado seccion aptitud chaside
       const resultadoAptitud = { C: 0, H: 0, A: 0, S: 0, I: 0, D: 0, E: 0 };
+      //resultado seccion UNO chaside aptitud
       this.respuestasChA.controls.forEach((control, i) =>{
         const area = this.pregChasideAptitud[i].area;
         resultadoAptitud[area] += Number(control.value);
         resultadoChaside[area] += Number(control.value);
-      })
+      });
+      //resultado seccion UNO chaside aptitud
+      this.respuestasChADos.controls.forEach((control, i) =>{
+        const area = this.pregChasideAptitudDos[i].area;
+        resultadoAptitud[area] += Number(control.value);
+        resultadoChaside[area] += Number(control.value);
+      });
 
       this.chasidePtj = Object.entries(resultadoChaside).reduce((a, b) => {
         return b[1] > a[1] ? b : a;
@@ -311,7 +476,6 @@ export class FormEstudianteComponent {
 
       this.puntajeInteres = resultadoInteres[this.chasidePtj as keyof typeof resultadoInteres];
       this.puntajeAptitud = resultadoAptitud[this.chasidePtj as keyof typeof resultadoAptitud];
-
 
       //resultado general de test de holland
       const resultadoHolland = {R: 0, I: 0, A: 0, S: 0, E: 0, C: 0};
