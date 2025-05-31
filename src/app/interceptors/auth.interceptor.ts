@@ -25,12 +25,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/estudiante',
     '/resultado',
   ];
-
   const esPostLibre = method === 'POST' && (path.startsWith('/estudiante') || path.startsWith('/resultado'));
   const necesitaToken = !esPostLibre && urlsProtegidas.some(url => path.startsWith(url));
 
   if (necesitaToken) {
-    const token = authService.getToken();
+    const token = authService.obtenerToken();
     if (token) {
       const authReq = req.clone({
         setHeaders: {

@@ -22,9 +22,14 @@ body {
     background-repeat: initial;
     background-position: left;
     background-size: 6%;
+    margin-top: 170px !important;
 }
 
-
+@media (max-width: 991.98px) {
+    body {
+        margin-top:0 !important;
+    }
+}
 footer {
     height: 250px;
     background-color: #4377b6;

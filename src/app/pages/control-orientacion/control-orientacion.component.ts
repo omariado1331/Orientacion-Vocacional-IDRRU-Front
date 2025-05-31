@@ -9,7 +9,7 @@ import { EstudianteService } from '../../services/estudiante.service';
 import { ResultadoService } from '../../services/resultado.service';
 import { ProvinciaService } from '../../services/provincia.service';
 import { MunicipioService } from '../../services/municipio.service';
-import { FacultadService } from '../../services/facultad.service';
+import { Facultad, FacultadService } from '../../services/facultad.service';
 import { ChasideService } from '../../services/chaside.service';
 import { HollandService } from '../../services/holland.service';
 import { NotificacionService } from '../../services/notificacion.service';
@@ -32,6 +32,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   // CONSTANTES Y UTILIDADES
   Math = Math;
   logoUrl = 'assets/escudo.png';
+  logoUrlc = 'assets/umsac.png';
   logoIDRU = 'assets/idrdu.png';
   // ESTADO DE AUTENTICACIÓN
   isAuthenticated = false;
@@ -56,6 +57,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   estudianteSeleccionado: any = null;
   resultadoEstudiante: ResultadoDto[] = [];
   resultados: any[] = [];
+  todasLasFacultades: Facultad[] = [];
   // OPCIONES PARA SELECTORES
   chasideOpciones: any[] = [];
   hollandOpciones: any[] = [];
@@ -173,11 +175,19 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.resultadoForm = this.formBuilder.group({});
-    this.isAuthenticated = this.authService.isAuthenticated();
+    this.isAuthenticated = this.authService.estaAutenticado();
+    this.authService.obtenerEstadoAutenticacion().subscribe(estado => {
+      this.isAuthenticated = estado;
+      if (estado) {
+        this.cargarDatos();
+      }
+    });
+
     if (this.isAuthenticated) {
       this.cargarDatos();
     }
   }
+
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -192,20 +202,19 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   // AUTENTICACIÓN
 
-  onSubmit(): void {
+  enviarFormulario(): void {
     if (this.loginForm?.invalid) {
       return;
     }
-
     this.loading = true;
     this.error = '';
 
-    const credentials: LoginRequest = {
+    const credenciales: LoginRequest = {
       username: this.loginForm?.controls['username'].value,
       password: this.loginForm?.controls['password'].value
     };
 
-    this.authService.login(credentials)
+    this.authService.iniciarSesion(credenciales)
       .subscribe({
         next: () => {
           this.isAuthenticated = true;
@@ -219,11 +228,18 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       });
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.isAuthenticated = false;
+  cerrarSesion(): void {
+    this.authService.cerrarSesion().subscribe({
+      next: () => {
+        this.isAuthenticated = false;
+      },
+      error: (error) => {
+        console.error('Error al cerrar sesión:', error);
+        // Aún así actualizar el estado local
+        this.isAuthenticated = false;
+      }
+    });
   }
-
   // CARGA DE DATOS
 
   cargarEstudiantes(): void {
@@ -1067,36 +1083,47 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
         const margin = 10;
+
         try {
-          const logoUMSA = await this.cargarImagen(this.logoUrl);
+          const logoUMSA = await this.cargarImagen(this.logoUrlc);
           const logoIDRDU = await this.cargarImagen(this.logoIDRU);
-          if (logoUMSA) {
-            doc.addImage(logoUMSA, 'PNG', margin, margin, 30, 30);
-          }
-          if (logoIDRDU) {
-            doc.addImage(logoIDRDU, 'PNG', pageWidth - margin - 30, margin, 30, 30);
-          }
+          if (logoUMSA) doc.addImage(logoUMSA, 'PNG', margin, margin, 30, 30);
+          if (logoIDRDU) doc.addImage(logoIDRDU, 'PNG', pageWidth - margin - 30, margin, 30, 30);
         } catch (error) {
           console.warn('No se pudieron cargar las imágenes para el PDF', error);
         }
+
         let yPos = margin + 15;
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth / 2, yPos, { align: 'center' });
 
-        yPos += 7;
+        // Encabezado
+        const colorAzulUMSA: [number, number, number] = [0, 51, 153];
+        const colorVinoUMSA: [number, number, number] = [128, 0, 32];
+        const colorAzulClaro: [number, number, number] = [235, 245, 255];
+        const colorGrisClaro: [number, number, number] = [240, 240, 240];
+        const colorVerdeClaro: [number, number, number] = [230, 255, 230];
+
         doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...colorAzulUMSA);
+        doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 6;
+
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
         doc.text('INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 4;
 
-        yPos += 10;
-        doc.setFontSize(15);
+        doc.setFontSize(10);
+        doc.setTextColor(...colorVinoUMSA);
         doc.text('SISTEMA DE ORIENTACIÓN VOCACIONAL', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 8;
 
-        yPos += 7;
         doc.setFontSize(14);
         doc.setFont('helvetica', 'normal');
+        doc.setTextColor(0, 0, 0);
         doc.text('Listado de Estudiantes', pageWidth / 2, yPos, { align: 'center' });
         yPos += 10;
+
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
 
@@ -1198,7 +1225,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         for (let i = 1; i <= totalPages; i++) {
           doc.setPage(i);
           doc.setFontSize(8);
-          doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - margin);
+          doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin - 20, pageHeight - margin, { align: 'right' });
         }
         const fechaActual = new Date().toISOString().split('T')[0];
         doc.save(`listado_estudiantes_umsa_${fechaActual}.pdf`);
@@ -1256,6 +1283,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     const margenDerecho = 15;
     const anchoUtil = doc.internal.pageSize.width - margenIzquierdo - margenDerecho;
     let y = 15;
+    this.facultadService.getAll().subscribe(facultades => {
+      this.todasLasFacultades = facultades;
+    });
     const estudiante = this.estudianteSeleccionado;
     if (!this.resultadoEstudiante || this.resultadoEstudiante.length === 0) {
       this.mostrarNotificacion('No hay resultados disponibles para exportar', 'warning');
@@ -1300,7 +1330,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
     const obtenerDescripcionArea = (codigo: string): string => {
       const areas = {
-        'C': 'Administrativas y Contables',
+        'C': 'Administrativas, Contables y Económicas',
         'H': 'Humanísticas y Sociales',
         'A': 'Artísticas',
         'S': 'Medicina y Cs. de la Salud',
@@ -1310,27 +1340,60 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       };
       return areas[codigo as keyof typeof areas] || '';
     };
+    const correspondeACodigoChaside = (facultad: any, codigoChaside: string): boolean => {
+      const mapeoCodigoANumero = {
+        'C': 1, // Administrativas, Contables y Económicas
+        'H': 2, // Humanísticas y Sociales
+        'A': 3, // Artísticas
+        'S': 4, // Medicina y Cs. de la Salud
+        'I': 5, // Ingeniería y Computación
+        'D': 6, // Defensa y Seguridad
+        'E': 7  // Ciencias Exactas y Agrarias
+      };
+      return facultad.chaside === mapeoCodigoANumero[codigoChaside as keyof typeof mapeoCodigoANumero];
+    };
 
     const obtenerDescripcionHolland = (codigo: 'R' | 'I' | 'A' | 'S' | 'E' | 'C'): string => {
       const descripciones = {
-        'R': 'Realista: Prefiere trabajar con objetos, máquinas, herramientas, plantas o animales',
-        'I': 'Investigador: Prefiere observar, aprender, investigar, analizar, evaluar o resolver problemas',
-        'A': 'Artístico: Prefiere actividades libres, ambiguas y no sistemáticas que permitan la creatividad',
-        'S': 'Social: Prefiere trabajar con personas, informar, ayudar, formar, curar o orientar',
-        'E': 'Emprendedor: Prefiere actividades para persuadir, liderar y gestionar por objetivos',
-        'C': 'Convencional: Prefiere actividades concretas, ordenadas y sistemáticas'
+        'R': 'Realista: Práctico, físico, concreto, orientado a la acción',
+        'I': 'Investigador: Prefiere observar, aprender, investigar, analizar',
+        'A': 'Artístico: Prefiere actividades creativas y expresivas',
+        'S': 'Social: Prefiere trabajar con personas, ayudar y orientar',
+        'E': 'Emprendedor: Prefiere liderar, persuadir y gestionar',
+        'C': 'Convencional: Prefiere actividades ordenadas y sistemáticas'
       };
       return descripciones[codigo];
     };
-
     const procesarAreasCHASIDE = (chasideData: any) => {
+      // if (!chasideData?.codigo) {
+      //   return { intereses: [], aptitudes: [] };
+      // }
+      // const partes = chasideData.codigo.replace('Tabla 1', '').split('-');
+      // return {
+      //   intereses: partes[0]?.split('') || [],
+      //   aptitudes: partes[1]?.split('') || []
+      // };
       if (!chasideData?.codigo) {
         return { intereses: [], aptitudes: [] };
       }
-      const partes = chasideData.codigo.replace('Tabla 1', '').split('-');
+
+      // Suponiendo que el código CHASIDE viene como una sola letra
+      // Si necesitas procesar códigos más complejos, ajusta esta lógica
+      const codigo = chasideData.codigo.toString().toUpperCase();
+
+      // Si el código contiene guiones o es un formato específico, procesarlo aquí
+      if (codigo.includes('-')) {
+        const partes = codigo.split('-');
+        return {
+          intereses: partes[0]?.split('') || [],
+          aptitudes: partes[1]?.split('') || []
+        };
+      }
+
+      // Si es un código simple, asumimos que representa tanto interés como aptitud
       return {
-        intereses: partes[0]?.split('') || [],
-        aptitudes: partes[1]?.split('') || []
+        intereses: [codigo],
+        aptitudes: [codigo]
       };
     };
 
@@ -1349,7 +1412,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     doc.setDrawColor(...colorAzulUMSA);
     doc.setFillColor(...colorAzulClaro);
     doc.setLineWidth(0.3);
-    doc.roundedRect(margenIzquierdo, y, anchoUtil, 25, 2, 2, 'FD');
+    doc.roundedRect(margenIzquierdo, y, anchoUtil, 28, 2, 2, 'FD');
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
@@ -1376,18 +1439,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       }));
 
     const todosHolland = this.resultadoEstudiante
-      .filter(r => r.holland)
+      .filter(r => r.holland && r.puntajeHolland)
       .map((r, idx) => {
-        let codigoHolland = '';
-        switch (r.holland.personalidad) {
-          case 1: codigoHolland = 'RIA'; break;
-          case 2: codigoHolland = 'ISE'; break;
-          case 3: codigoHolland = 'AIS'; break;
-          case 4: codigoHolland = 'SEC'; break;
-          case 5: codigoHolland = 'ECS'; break;
-          case 6: codigoHolland = 'CRI'; break;
-          default: codigoHolland = 'N/A';
-        }
+        const codigoHolland = r.puntajeHolland || 'N/A';
         return {
           data: r.holland,
           codigo: codigoHolland,
@@ -1395,15 +1449,37 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           fechaCreacion: r.fecha
         };
       });
-
-    const todasFacultades = this.resultadoEstudiante
-      .filter(r => r.facultad)
-      .map((r, idx) => ({
-        data: r.facultad,
-        orden: idx + 1,
-        fechaCreacion: r.fecha
+    const facultadesRecomendadas = new Map<number, any>();
+    const todosChasideUnicos = new Set<string>();
+    this.resultadoEstudiante
+      .filter(r => r.chaside && r.chaside.codigo)
+      .forEach(resultado => {
+        const codigoChaside = resultado.chaside.codigo;
+        todosChasideUnicos.add(codigoChaside);
+        if (this.todasLasFacultades) {
+          this.todasLasFacultades
+            .filter(facultad => correspondeACodigoChaside(facultad, codigoChaside))
+            .forEach(facultad => {
+              if (!facultadesRecomendadas.has(facultad.idFacultad)) {
+                facultadesRecomendadas.set(facultad.idFacultad, {
+                  data: facultad,
+                  codigosChaside: [codigoChaside],
+                  fechaCreacion: resultado.fecha
+                });
+              } else {
+                const existing = facultadesRecomendadas.get(facultad.idFacultad);
+                if (!existing.codigosChaside.includes(codigoChaside)) {
+                  existing.codigosChaside.push(codigoChaside);
+                }
+              }
+            });
+        }
+      });
+    const todasFacultades = Array.from(facultadesRecomendadas.values())
+      .map((item, idx) => ({
+        ...item,
+        orden: idx + 1
       }));
-
     if (todosChaside.length > 0) {
       verificarEspacioDisponible(70);
       crearTitulo('RESULTADOS TEST CHASIDE');
@@ -1413,6 +1489,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       doc.setFontSize(7);
       doc.text('Cod.', margenIzquierdo + 5, y + 6);
       doc.text('Área', margenIzquierdo + 20, y + 6);
+
       const anchoColumnaResultado = 15;
       todosChaside.forEach((chaside, idx) => {
         const posX = margenIzquierdo + anchoUtil - ((todosChaside.length - idx) * anchoColumnaResultado);
@@ -1422,6 +1499,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         doc.text(`${fechaStr}`, posX, y + 6);
       });
       y += 10;
+
       const codigosCHASIDE = ['C', 'H', 'A', 'S', 'I', 'D', 'E'];
       codigosCHASIDE.forEach(codigo => {
         const tieneAlgunDestacado = todosChaside.some(
@@ -1440,6 +1518,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         doc.text(codigo, margenIzquierdo + 5, y + 3.5);
         doc.setFont('helvetica', 'normal');
         doc.text(obtenerDescripcionArea(codigo), margenIzquierdo + 20, y + 3.5);
+
         todosChaside.forEach((chaside, idx) => {
           const posX = margenIzquierdo + anchoUtil - ((todosChaside.length - idx) * anchoColumnaResultado);
 
@@ -1460,6 +1539,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
         y += 5;
       });
+
       y += 3;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(7);
@@ -1478,7 +1558,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       doc.setFontSize(7);
       doc.text('Evaluación', margenIzquierdo + 5, y + 6);
       doc.text('Código', margenIzquierdo + 35, y + 6);
-      doc.text('Preferencias', margenIzquierdo + 60, y + 6);
+      doc.text('Tipo Principal', margenIzquierdo + 60, y + 6);
+      doc.text('Descripción', margenIzquierdo + 90, y + 6);
       doc.text('Fecha', margenIzquierdo + anchoUtil - 20, y + 6);
       y += 10;
 
@@ -1494,14 +1575,15 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         doc.setFont('helvetica', 'bold');
         doc.text(`${holland.orden}`, margenIzquierdo + 5, y + 5);
         doc.text(holland.codigo, margenIzquierdo + 35, y + 5);
-        const tiposPrincipales = holland.codigo.split('');
-        if (tiposPrincipales.length > 0) {
-          const descripcion = obtenerDescripcionHolland(tiposPrincipales[0] as 'R' | 'I' | 'A' | 'S' | 'E' | 'C');
-          const descripcionCorta = descripcion.split(':')[1]?.trim() || '';
+        const tipoPrincipal = holland.codigo.charAt(0) as 'R' | 'I' | 'A' | 'S' | 'E' | 'C';
+        if (tipoPrincipal && ['R', 'I', 'A', 'S', 'E', 'C'].includes(tipoPrincipal)) {
+          doc.text(holland.data.nombre || tipoPrincipal, margenIzquierdo + 60, y + 5);
+
+          const descripcion = holland.data.descripcion || obtenerDescripcionHolland(tipoPrincipal);
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(6);
-          doc.text(descripcionCorta, margenIzquierdo + 60, y + 5, {
-            maxWidth: anchoUtil - 100
+          doc.text(descripcion, margenIzquierdo + 90, y + 5, {
+            maxWidth: anchoUtil - 130
           });
         }
 
@@ -1516,36 +1598,42 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     if (todasFacultades.length > 0) {
       verificarEspacioDisponible(50);
       crearTitulo('RECOMENDACIONES ACADÉMICAS', colorVinoUMSA);
+
       todasFacultades.forEach((facultadItem, idx) => {
-        verificarEspacioDisponible(30);
+        verificarEspacioDisponible(40);
         const facultad = facultadItem.data;
         doc.setFillColor(...colorVerdeClaro);
         doc.setDrawColor(0, 100, 0);
-        doc.roundedRect(margenIzquierdo, y, anchoUtil, 8, 2, 2, 'FD');
+        doc.roundedRect(margenIzquierdo, y, anchoUtil, 10, 2, 2, 'FD');
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
         doc.setTextColor(0, 80, 0);
-        doc.text(`${facultadItem.orden}: ${facultad.nombre}`, margenIzquierdo + 5, y + 5);
+        doc.text(`${facultadItem.orden}. ${facultad.nombre}`, margenIzquierdo + 5, y + 6);
         doc.setTextColor(0, 0, 0);
-        y += 11;
-        const espacioImagen = 40;
-        try {
-          if (facultad.imgLogo) {
-            // doc.addImage(facultad.imgLogo, 'PNG', margenIzquierdo, y, 40, 20);
-            // y += 22;
-          }
-        } catch (error) {
-          console.error('Error al cargar imagen de facultad', error);
+        y += 13;
+
+        if (facultadItem.codigosChaside && facultadItem.codigosChaside.length > 0) {
+          doc.setFontSize(7);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Basado en áreas CHASIDE:', margenIzquierdo, y);
+          doc.setFont('helvetica', 'normal');
+          const areasTexto = facultadItem.codigosChaside
+            .map((codigo: string) => `${codigo}: ${obtenerDescripcionArea(codigo)}`)
+            .join(', ');
+          doc.text(areasTexto, margenIzquierdo + 45, y, { maxWidth: anchoUtil - 50 });
+          y += 8;
         }
         if (facultad.carreras && facultad.carreras.length > 0) {
           doc.setFontSize(7);
           doc.setFont('helvetica', 'bold');
-          doc.text('Carreras recomendadas:', margenIzquierdo, y);
+          doc.text('Carreras disponibles:', margenIzquierdo, y);
           y += 5;
+
           const columnasCarreras = 2;
           const anchoColumna = anchoUtil / columnasCarreras;
           let columnaActual = 0;
-          (facultad.carreras as string[]).slice(0, 8).forEach((carrera: string, index: number) => {
+
+          (facultad.carreras as string[]).slice(0, 10).forEach((carrera: string) => {
             const xPos = margenIzquierdo + (columnaActual * anchoColumna);
             doc.setFontSize(6);
             doc.setFont('helvetica', 'normal');
@@ -1557,6 +1645,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
             }
           });
           if (columnaActual > 0) y += 4;
+          y += 2;
         }
         if (facultad.url) {
           doc.setFontSize(6);
@@ -1564,9 +1653,20 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           doc.setTextColor(0, 0, 200);
           doc.text(`Más información: ${facultad.url}`, margenIzquierdo, y);
           doc.setTextColor(0, 0, 0);
+          y += 4;
         }
+
         y += 5;
       });
+    } else {
+      verificarEspacioDisponible(30);
+      crearTitulo('RECOMENDACIONES ACADÉMICAS', colorVinoUMSA);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.text('Para obtener recomendaciones específicas de facultades y carreras,', margenIzquierdo, y);
+      y += 5;
+      doc.text('consulte con un orientador vocacional basándose en sus resultados CHASIDE y Holland.', margenIzquierdo, y);
+      y += 10;
     }
     verificarEspacioDisponible(30);
     crearTitulo('CONSIDERACIONES IMPORTANTES', colorVinoUMSA);

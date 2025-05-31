@@ -1,109 +1,113 @@
-<div class="container-fluid vh-100 d-flex align-items-center justify-content-center" *ngIf="!isAuthenticated">
-  <div class="card shadow-lg border-0" style="max-width: 400px; width: 100%;">
-    <div class="card-body p-4 text-umsa">
-      <!-- Encabezado con logo a la izquierda y texto a la derecha -->
-      <div class="login-header d-flex align-items-center bg-umsa-blue-dark text-white rounded mb-4 px-3 py-2">
-        <img [src]="logoUrl" alt="Logo Universidad" class="img-fluid me-3" style="max-height: 110px;">
-        <div>
-          <h5 class="mb-1 fw-bold">Sistema de Orientación Vocacional</h5>
-          <small class="text-light">Inicie sesión para acceder al panel de control</small>
-        </div>
+<div class="login-container" *ngIf="!isAuthenticated">
+  <div class="login-wrapper">
+    <div class="umsa-header">
+      <div class="umsa-title">
+        <h1>Instituto de Desarrollo Regional y Desconcentración Universitaria</h1>
+        <h2>INICIA SESION</h2>
+        <div class="umsa-divider"></div>
       </div>
-
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="mb-3">
-          <label for="username" class="form-label">Usuario</label>
-          <div class="input-group">
-            <span class="input-group-text bg-umsa-blue text-white"><i class="bi bi-person-fill"></i></span>
-            <input type="text" id="username" formControlName="username" class="form-control"
-              placeholder="Ingrese su usuario"
+    </div>
+    <div class="login-card shadow-lg border-0">
+      <div class="card-body p-4">
+        <div class="login-header d-flex align-items-center bg-umsa-blue-dark text-white rounded mb-4 px-3 py-3">
+          <img [src]="logoUrl" alt="Logo Universidad" class="logo-img me-3">
+          <div>
+            <h5 class="mb-1 fw-bold">Sistema de Orientación Vocacional</h5>
+            <small class="text-light">Inicie sesión para acceder al panel de control</small>
+          </div>
+        </div>
+        <form [formGroup]="loginForm" (ngSubmit)="enviarFormulario()">
+          <div class="form-floating mb-3">
+            <input type="text" id="username" formControlName="username" class="form-control modern-input"
+              placeholder="Usuario"
               [ngClass]="{'is-invalid': loginForm.get('username')?.touched && loginForm.get('username')?.invalid}">
+            <label for="username"><i class="bi bi-person-fill me-2"></i>Usuario</label>
+            <div class="invalid-feedback"
+              *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.invalid">
+              <i class="bi bi-exclamation-circle me-1"></i>Usuario requerido
+            </div>
           </div>
-          <div class="invalid-feedback"
-            *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.invalid">
-            Usuario requerido
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label for="password" class="form-label">Contraseña</label>
-          <div class="input-group">
-            <span class="input-group-text bg-umsa-blue text-white"><i class="bi bi-lock-fill"></i></span>
-            <input type="password" id="password" formControlName="password" class="form-control"
-              placeholder="Ingrese su contraseña"
+          <div class="form-floating mb-4">
+            <input type="password" id="password" formControlName="password" class="form-control modern-input"
+              placeholder="Contraseña"
               [ngClass]="{'is-invalid': loginForm.get('password')?.touched && loginForm.get('password')?.invalid}">
+            <label for="password"><i class="bi bi-lock-fill me-2"></i>Contraseña</label>
+            <div class="invalid-feedback"
+              *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+              <i class="bi bi-exclamation-circle me-1"></i>Contraseña requerida
+            </div>
           </div>
-          <div class="invalid-feedback"
-            *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
-            Contraseña requerida
+          <div class="alert alert-danger modern-alert" *ngIf="error">
+            <i class="bi bi-shield-exclamation me-2"></i>
+            {{ error }}
           </div>
+          <button type="submit" class="btn btn-umsa-modern w-100 py-3 mb-3" [disabled]="loginForm.invalid || loading"
+            [ngClass]="{'loading': loading}">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <i *ngIf="!loading" class="bi bi-box-arrow-in-right me-2"></i>
+            <span>{{ loading ? 'Iniciando Sesión...' : 'Iniciar Sesión' }}</span>
+          </button>
+        </form>
+        <div class="text-center">
+          <small class="text-muted fw-medium">© {{ 2025 }} UMSA - Sistema de Orientación Vocacional</small>
         </div>
-
-        <div class="alert alert-danger" *ngIf="error">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          {{ error }}
-        </div>
-
-        <button type="submit" class="btn btn-umsa w-100 py-2" [disabled]="loginForm.invalid || loading">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          <i *ngIf="!loading" class="bi bi-box-arrow-in-right me-2"></i>
-          Iniciar Sesión
-        </button>
-      </form>
-      <div class="text-center mt-4">
-        <small class="text-muted">© {{ 2025 }} UMSA - Sistema de Orientación Vocacional</small>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Panel de control cuando está autenticado -->
-<div *ngIf="isAuthenticated">
-  <!-- Header con logo y título -->
+<!-- Panel de control autenticado -->
+<div *ngIf="isAuthenticated" class="panel-container">
   <header class="bg-umsa-blue-dark shadow-sm mb-4">
     <div class="container-fluid py-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="d-flex align-items-center mb-2 mb-md-0">
           <img [src]="logoUrl" alt="Logo Universidad" class="me-3" style="height: 50px;">
-          <h1 class="h3 mb-0 text-light">Sistema de Orientación Vocacional</h1>
+          <h1 class="h4 mb-0 text-light">Panel de control</h1>
         </div>
-        <div>
-          <button class="btn btn-outline-danger" (click)="logout()">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-danger" (click)="cerrarSesion()">
             <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
           </button>
         </div>
+
       </div>
     </div>
   </header>
+
   <div class="container-fluid px-4">
-    <!-- Sección de título y estadísticas -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2><i class="bi bi-speedometer2 me-2"></i>Panel de Control</h2>
-      <div>
-        <div class="btn-group" role="group">
-          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportarDropdown"
-            data-bs-toggle="dropdown" aria-expanded="false"
-            [disabled]="exportando || estudiantesFiltrados.length === 0">
-            <i class="bi bi-download me-2"></i>Exportar
-            <span *ngIf="exportando" class="spinner-border spinner-border-sm ms-2" role="status"
-              aria-hidden="true"></span>
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="exportarDropdown">
-            <li><a class="dropdown-item" (click)="exportarEstudiantes('excel')"><i
-                  class="bi bi-file-earmark-excel me-2"></i>Excel</a></li>
-            <li><a class="dropdown-item" (click)="exportarEstudiantes('pdf')"><i
-                  class="bi bi-file-earmark-pdf me-2"></i>PDF</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
     <!-- Sección de búsqueda y filtros -->
     <div class="card shadow mb-4">
-      <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 text-primary"><i class="bi bi-funnel-fill me-2"></i>Filtros y Búsqueda</h5>
-        <button class="btn btn-sm btn-warning" (click)="limpiarTodosFiltros()">
-          <i class="bi bi-x-circle-fill me-1"></i> Limpiar Filtros
-        </button>
+      <div class="card-header py-3 d-flex justify-content-between align-items-center flex-wrap">
+        <h5 class="mb-0 text-primary d-flex align-items-center">
+          <i class="bi bi-funnel-fill me-2"></i>Filtros y Búsqueda
+        </h5>
+        <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+          <button class="btn btn-sm btn-warning" (click)="limpiarTodosFiltros()">
+            <i class="bi bi-x-circle-fill me-1"></i> Limpiar Filtros
+          </button>
+
+          <div class="btn-group" role="group">
+            <button class="btn  btn-primary dropdown-toggle" type="button" id="exportarDropdown"
+              data-bs-toggle="dropdown" aria-expanded="false"
+              [disabled]="exportando || estudiantesFiltrados.length === 0">
+              <i class="bi bi-download me-2"></i>Exportar
+              <span *ngIf="exportando" class="spinner-border spinner-border-sm ms-2" role="status"
+                aria-hidden="true"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="exportarDropdown">
+              <li>
+                <a class="dropdown-item" (click)="exportarEstudiantes('excel')">
+                  <i class="bi bi-file-earmark-excel me-2 text-success"></i>Excel
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" (click)="exportarEstudiantes('pdf')">
+                  <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>PDF
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
       <div class="card-body">
         <div class="row g-3">
@@ -191,8 +195,7 @@
     </div>
     <!-- Modal para Ver Perfil de Estudiante -->
     <div class="modal fade" [ngClass]="{'show d-block': modalPerfilVisible}" tabindex="-1"
-      [ngStyle]="{'display': modalPerfilVisible ? 'block' : 'none'}" aria-labelledby="perfilEstudianteModalLabel"
-      [attr.aria-hidden]="!modalPerfilVisible">
+      [ngStyle]="{'display': modalPerfilVisible ? 'block' : 'none'}" aria-labelledby="perfilEstudianteModalLabel">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
           <div class="modal-header bg-primary text-white">
@@ -350,19 +353,12 @@
                                   <h6 class="card-title text-primary">
                                     <i class="bi bi-award me-2"></i>Evaluación Holland
                                   </h6>
-                                  <div class="mb-3">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Puntaje Holland:</label>
-                                    <p class="mb-0 fs-5">{{ resultado.puntajeHolland }}</p>
-                                  </div>
-                                  <div *ngIf="resultado.facultad?.nombre">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Facultad
-                                      recomendada:</label>
-                                    <p class="mb-0 fs-5">
-                                      <span class="badge bg-primary me-2">
-                                        <i class="bi bi-building me-1"></i>
-                                      </span>
-                                      {{ resultado.facultad.nombre }}
-                                    </p>
+                                  <label class="d-block text-uppercase small text-muted mb-1">Código: </label>
+                                  <div class="holland-code">
+                                    <span class="badge bg-primary me-1"
+                                      *ngFor="let letra of resultado.puntajeHolland.split('')">
+                                      {{ letra }}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -384,9 +380,11 @@
                                     <div class="chaside-code">
                                       <span class="text-uppercase fw-bold me-1">
                                         {{ resultado.chaside.codigo }}
-
                                       </span>
                                     </div>
+                                    <label
+                                      class="d-block text-uppercase small text-muted mb-1 mt-2">Descripción:</label>
+                                    <p class="mb-0 fw-semibold">{{ resultado?.chaside?.descripcion }}</p>
                                     <p class="mt-2 small text-muted mb-0">
                                       C: Administrativas y Contables, H: Humanísticas, A: Artísticas, S: Medicina y Cs.
                                       de la Salud,
@@ -406,9 +404,14 @@
                                     Test Holland
                                   </h6>
                                   <div class="mb-0">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Tipo de
-                                      personalidad:</label>
-                                    <p class="mb-0 fs-5">{{ resultado.holland.personalidad }}</p>
+                                    <label class="d-block text-uppercase small text-muted mb-1">Tipo principal:</label>
+                                    <p class="mb-2 fs-5">{{ resultado.holland.nombre }}</p>
+                                    <label class="d-block text-uppercase small text-muted mb-1 ">Descripción:</label>
+                                    <p class="mb-2 fw-semibold">{{ resultado?.holland?.descripcion }}</p>
+                                    <p class="mt-2 small text-muted mb-0">
+                                      R: Realista, I: Investigador, A: Artístico, S: Social, E: Emprendedor, C:
+                                      Convencional
+                                    </p>
                                   </div>
                                 </div>
                               </div>
@@ -422,9 +425,24 @@
                                 <i class="bi bi-lightbulb me-2"></i>
                                 Recomendaciones
                               </h6>
-                              <p class="mb-0">
-                                Basado en los resultados de los tests, se recomienda explorar carreras relacionadas con
-                                <strong>{{ resultado.facultad?.nombre || 'las áreas de mayor puntaje' }}</strong>.
+                              <p class="mb-2">
+                                Basado en los resultados de los tests:
+                              </p>
+                              <ul class="mb-0">
+                                <li *ngIf="resultado.chaside">
+                                  <strong>CHASIDE ({{ resultado.chaside.codigo }}):</strong>
+                                  {{ resultado?.chaside?.descripcion }}
+                                </li>
+                                <li *ngIf="resultado.holland">
+                                  <strong>Holland ({{ resultado.puntajeHolland }}):</strong>
+                                  Perfil {{ resultado.holland.nombre }} - {{ resultado?.holland?.descripcion }}
+                                </li>
+                                <li *ngIf="resultado.facultad">
+                                  <strong>Facultad recomendada:</strong>
+                                  {{ resultado.facultad.nombre }}
+                                </li>
+                              </ul>
+                              <p class="mt-2 mb-0 small text-muted">
                                 Es importante complementar estos resultados con una orientación personalizada.
                               </p>
                             </div>
@@ -462,8 +480,7 @@
     </div>
     <!-- Modal para Editar Estudiante y Resultados -->
     <div class="modal fade" [ngClass]="{'show d-block': modalEditarVisible}" tabindex="-1"
-      [ngStyle]="{'display': modalEditarVisible ? 'block' : 'none'}" aria-labelledby="editarEstudianteModalLabel"
-      [attr.aria-hidden]="!modalEditarVisible">
+      [ngStyle]="{'display': modalEditarVisible ? 'block' : 'none'}" aria-labelledby="editarEstudianteModalLabel">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content shadow-lg border-0 rounded-4">
           <div class="modal-header bg-primary text-white">
@@ -633,8 +650,7 @@
                   <div class="col-md-6">
                     <div class="form-floating">
                       <select class="form-select border-2 rounded-3" id="id_municipio" formControlName="id_municipio"
-                        [ngClass]="{'is-invalid border-danger': editarForm.controls['id_municipio'].invalid && editarForm.controls['id_municipio'].touched}"
-                        [disabled]="!editarForm.get('id_provincia')?.value">
+                        [ngClass]="{'is-invalid border-danger': editarForm.controls['id_municipio'].invalid && editarForm.controls['id_municipio'].touched}">
                         <option [value]="null">Seleccione un municipio</option>
                         <option *ngFor="let municipio of municipiosFiltrados" [value]="municipio.idMunicipio">
                           {{ municipio.nombre }}
@@ -798,9 +814,9 @@
           </div>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive ">
           <table class="table table-bordered table-hover ">
-            <thead class="table-dark">
+            <thead class="table-umsa">
               <tr>
                 <th class="cursor-pointer" (click)="ordenarPor('ciEstudiante')">
                   CI
@@ -844,17 +860,17 @@
 
                 <td class="text-center">
                   <div class="btn-group btn-group-sm" role="group">
-                    <button class="btn btn-light px-3 py-2 rounded-start btn-outline-primary" title="Ver Perfil"
+                    <button class="btn px-3 py-2 rounded-start btn-primary" title="Ver Perfil"
                       (click)="verPerfilEstudiante(estudiante.idEstudiante)" style="transition: all 0.2s;">
                       <i class="bi bi-person-badge fs-5"></i>
                     </button>
 
-                    <button class="btn btn-light px-3 py-2 btn-outline-warning" title="Editar"
-                      (click)="abrirModalEditar(estudiante)" style="transition: all 0.2s; margin: 0 2px;">
+                    <button class="btn px-3 py-2 btn-warning" title="Editar" (click)="abrirModalEditar(estudiante)"
+                      style="transition: all 0.2s; margin: 0 2px;">
                       <i class="bi bi-pencil fs-5"></i>
                     </button>
 
-                    <button class="btn btn-light px-3 py-2 rounded-end btn-outline-danger" title="Eliminar"
+                    <button class="btn px-3 py-2 rounded-end btn-danger" title="Eliminar"
                       (click)="eliminarEstudiante(estudiante.idEstudiante)" style="transition: all 0.2s;">
                       <i class="bi bi-trash fs-5"></i>
                     </button>

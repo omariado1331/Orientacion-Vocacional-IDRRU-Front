@@ -1,16 +1,275 @@
-.container {
-  padding-bottom: 3rem;
+.login-container {
+  min-height: 60vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem 1rem;
+  position: relative;
 }
 
-.card {
+.login-wrapper {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .login-wrapper {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+.umsa-header {
+  text-align: center;
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.umsa-title h1 {
+  color: var(--umsa-blue);
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  line-height: 1.2;
+}
+
+.umsa-title h2 {
+  color: var(--umsa-blue-light);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.umsa-divider {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--umsa-blue-light), var(--umsa-blue));
+  margin: 0 auto;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 118, 252, 0.4);
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: var(--card-border-radius);
-  border: none;
-  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
-  background-color: white;
+  box-shadow: var(--shadow-soft);
+  transition: all var(--transition-speed) ease;
+  animation: slideInRight 0.8s ease-out 0.2s both;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 500px;
+  margin: auto auto 60px;
 }
 
-.card-body {
-  background-color: var(--umsa-gray);
+.login-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+}
+
+.login-header {
+  background: linear-gradient(135deg, var(--umsa-blue-dark), var(--umsa-blue)) !important;
+  border-radius: 15px !important;
+  box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 3s infinite;
+}
+
+.logo-img {
+  max-height: 140px;
+  position: relative;
+  z-index: 1;
+}
+
+.login-header h5,
+.login-header small {
+  position: relative;
+  z-index: 1;
+}
+
+.form-floating {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.modern-input {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 0.75rem 0.5rem;
+  font-size: 1.5rem;
+  transition: all var(--transition-speed) ease;
+  background: rgba(248, 250, 252, 0.8);
+  height: calc(3.5rem + 15px);
+}
+
+.modern-input:focus {
+  border-color: var(--umsa-blue);
+  box-shadow: 0 0 0 0.25rem rgba(30, 64, 175, 0.15);
+  background: white;
+  transform: translateY(-2px);
+}
+
+.modern-input.is-invalid {
+  border-color: #ef4444;
+  background: rgba(254, 242, 242, 0.8);
+}
+
+.form-floating>label {
+  color: var(--umsa-text);
+  font-weight: 500;
+  opacity: 0.8;
+  font-size: 1.2rem;
+}
+
+.form-floating>.modern-input:focus~label,
+.form-floating>.modern-input:not(:placeholder-shown)~label {
+  opacity: 1;
+  transform: scale(0.75) translateY(-0.5rem) translateX(0.15rem);
+  color: var(--umsa-blue);
+}
+
+.btn-umsa-modern {
+  background: linear-gradient(135deg, var(--umsa-blue), var(--umsa-blue-light));
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all var(--transition-speed) ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(30, 64, 175, 0.4);
+  color: white;
+}
+
+.btn-umsa-modern::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-umsa-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(30, 64, 175, 0.6);
+  color: white;
+}
+
+.btn-umsa-modern:hover::after {
+  left: 100%;
+}
+
+.btn-umsa-modern:disabled {
+  opacity: 0.7;
+  transform: none;
+  cursor: not-allowed;
+}
+
+.btn-umsa-modern.loading {
+  cursor: wait;
+}
+
+.modern-alert {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border: 1px solid #fca5a5;
+  border-radius: 12px;
+  color: #991b1b;
+  font-weight: 500;
+  animation: shake 0.5s ease-in-out;
+}
+
+.invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #dc3545;
+  font-weight: 500;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@media (max-width: 768px) {
+  .login-card .card-body {
+    padding: 2rem 1.5rem;
+  }
+
+  .login-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .logo-img {
+    max-height: 80px;
+  }
 }
 
 .text-umsa-blue {
@@ -25,52 +284,28 @@
   background-color: var(--umsa-blue);
 }
 
-.btn-umsa {
-  background-color: var(--umsa-blue);
-  border-color: var(--umsa-blue);
-  color: white;
-  font-weight: 500;
-}
-
-.btn-umsa:hover {
-  background-color: var(--umsa-blue-dark);
-  border-color: var(--umsa-blue-dark);
-}
-
-.spinner-border {
-  width: 1rem;
-  height: 1rem;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.display-2 {
-  font-size: 3rem;
-  animation: fadeIn 1s ease-out;
-}
-
 .bg-umsa-blue-dark {
   background-color: var(--umsa-blue-dark);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);
 }
 
-.text-light {
-  color: #f1f1f1;
+.panel-container {
+  width: 95%;
+  margin: 0 auto;
 }
 
-.login-header img {
-  filter: drop-shadow(0 0 2px #000);
+.page-item.disabled .page-link {
+  cursor: default;
+  pointer-events: none;
 }
 
-.page-link {
+.page-item:not(.disabled) .page-link {
   cursor: pointer;
+}
+
+.table-umsa,
+.table-umsa th {
+  background-color: var(--umsa-blue-dark) !important;
+  color: white !important;
 }
