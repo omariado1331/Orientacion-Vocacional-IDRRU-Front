@@ -148,7 +148,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       curso: ['', [Validators.required]],
       edad: [null, [Validators.required, Validators.min(10), Validators.max(30)]],
       celular: ['', [Validators.pattern('^[0-9]*$')]],
-      id_provincia: [null, [Validators.required]],
+      idProvincia: [null, [Validators.required]],
       id_municipio: [null, [Validators.required]]
     });
 
@@ -311,13 +311,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     const municipio = this.municipios.find(m => m.idMunicipio === id);
     return municipio ? municipio.nombre : 'Desconocido';
   }
+
   onProvinciaChangeEditar(event: any): void {
     const provinciaId = event.target.value;
-
     if (provinciaId && provinciaId !== 'null') {
-
       this.municipiosFiltrados = this.municipiosPorProvincia[provinciaId] || [];
-
       this.editarForm.patchValue({
         id_municipio: null
       });
@@ -328,15 +326,17 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       });
     }
   }
+
   getProvinciaByMunicipio(municipioId: number): any {
     for (let provinciaId in this.municipiosPorProvincia) {
       const municipio = this.municipiosPorProvincia[provinciaId].find(m => m.idMunicipio === municipioId);
       if (municipio) {
-        return this.provincias.find(p => p.id == provinciaId);
+        return this.provincias.find(p => p.idProvincia == Number(provinciaId));
       }
     }
     return null;
   }
+
   cargarDatosParaResultados(): void {
     forkJoin({
       chaside: this.chasideService.getAll(),
@@ -662,15 +662,12 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   // GESTIÓN DE MODALES
 
   abrirModalEditar(estudiante: any): void {
-    this.estudianteSeleccionado = { ...estudiante };
-    this.loading = true;
-    this.editarForm.reset();
-    this.resultados = [];
-    this.cargarDatosParaResultados();
     let provinciaEstudiante = null;
     if (estudiante.id_municipio) {
       provinciaEstudiante = this.getProvinciaByMunicipio(estudiante.id_municipio);
     }
+
+    // Patch del formulario
     this.editarForm.patchValue({
       ciEstudiante: estudiante.ciEstudiante,
       nombre: estudiante.nombre,
@@ -680,13 +677,17 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       curso: estudiante.curso,
       edad: estudiante.edad,
       celular: estudiante.celular,
-      id_provincia: provinciaEstudiante ? provinciaEstudiante.id : null,
+      idProvincia: provinciaEstudiante ? provinciaEstudiante.idProvincia : null,
       id_municipio: estudiante.id_municipio
     });
+
+    // Filtrar municipios
     if (provinciaEstudiante) {
-      this.municipiosFiltrados = this.municipiosPorProvincia[provinciaEstudiante.id] || [];
+      this.municipiosFiltrados = this.municipiosPorProvincia[provinciaEstudiante.idProvincia] || [];
+      console.log('Municipios filtrados:', this.municipiosFiltrados);
     } else {
       this.municipiosFiltrados = [];
+      console.log('No se encontró provincia, municipios filtrados vacío');
     }
     this.resultadoService.getByEstudianteId(estudiante.idEstudiante).subscribe({
       next: (resultados: ResultadoDto[]) => {
@@ -1282,6 +1283,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       img.src = url;
     });
   }
+
   exportarPerfilPDF(): void {
     const doc = new jsPDF();
     const colorAzulUMSA: [number, number, number] = [0, 51, 153];
