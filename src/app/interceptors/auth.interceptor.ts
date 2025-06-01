@@ -23,10 +23,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/holland',
     '/chaside',
     '/estudiante',
-    '/resultado',
+    '/resultado/', 
   ];
   const esPostLibre = method === 'POST' && (path.startsWith('/estudiante') || path.startsWith('/resultado'));
-  const necesitaToken = !esPostLibre && urlsProtegidas.some(url => path.startsWith(url));
+  const esBusquedaProvincia = path.startsWith('/resultado/busqueda-provincia');
+  const necesitaToken = !esPostLibre && !esBusquedaProvincia && urlsProtegidas.some(url => path.startsWith(url));
 
   if (necesitaToken) {
     const token = authService.obtenerToken();

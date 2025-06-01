@@ -1,40 +1,26 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { ProvinciaI } from '../interfaces/provincia-interface';
 import { Provincia } from '../interfaces/provincia-interface';
+import { environment } from '../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProvinciaService {
 
-  private mockProvincias: Provincia[] = [
-    { id: 1, nombre: 'ABEL ITURRALDE' },
-    { id: 2, nombre: 'AROMA' },
-    { id: 3, nombre: 'BAUTISTA SAAVEDRA' },
-    { id: 4, nombre: 'CAMACHO' },
-    { id: 5, nombre: 'CARANAVI' },
-    { id: 6, nombre: 'FRANZ TAMAYO' },
-    { id: 7, nombre: 'GUALBERTO VILLAROEL' },
-    { id: 8, nombre: 'INGAVI' },
-    { id: 9, nombre: 'INQUISIVO' },
-    { id: 10, nombre: 'JOSE MANUEL PANDO' },
-    { id: 11, nombre: 'LARECAJA' },
-    { id: 12, nombre: 'LOAYZA' },
-    { id: 13, nombre: 'LOS ANDES' },
-    { id: 14, nombre: 'MANCO KAPAC' },
-    { id: 15, nombre: 'MUÑECAS' },
-    { id: 16, nombre: 'MURILLO' },
-    { id: 17, nombre: 'NOR YUNGAS' },
-    { id: 18, nombre: 'OMASUYOS' },
-    { id: 19, nombre: 'PACAJES' },
-    { id: 20, nombre: 'SUDYUNGAS' }
-  ];
+  private apiUrl = `${environment.apiUrl}/provincia`;
+  constructor(private http: HttpClient) { }
 
-  constructor() { }
-
-  getProvincias(): Observable<Provincia[]> {
-    return of(this.mockProvincias);
+  getProvincias(): Observable<ProvinciaI[]> {
+      return this.http.get<ProvinciaI[]>(`${this.apiUrl}`);
   }
+
+  getById(id: number): Observable<ProvinciaI> {
+      return this.http.get<ProvinciaI>(`${this.apiUrl}/${id}`);
+  }
+
   provincias: Provincia[] = [
     new Provincia(1, 'ABEL ITURRALDE'),
     new Provincia(2, 'AROMA'),

@@ -25,11 +25,7 @@ export class NavbarComponent implements AfterViewInit, OnDestroy {
     private authService: AuthService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-
-    // Inicializar estado de autenticación
     this.isAuthenticated = this.authService.estaAutenticado();
-
-    // Suscribirse a cambios en el estado de autenticación
     this.authService.obtenerEstadoAutenticacion()
       .pipe(takeUntil(this.destroy$))
       .subscribe(estado => {

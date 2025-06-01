@@ -7,6 +7,6 @@ export class Provincia {
 }
 
 export interface ProvinciaI {
-  id: number;
+  idProvincia: number;
   nombre: string;
 }

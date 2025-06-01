@@ -125,7 +125,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     private hollandService: HollandService,
     private datePipe: DatePipe,
     private notificacionService: NotificacionService,
-      private router: Router
+    private router: Router
   ) {
     this.inicializarFormularios();
     this.configurarBusqueda();
@@ -240,6 +240,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   //     }
   //   });
   // }
+
   // CARGA DE DATOS
 
   cargarEstudiantes(): void {
@@ -261,7 +262,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
             this.router.navigate(['/control-orientacion']);
           },
           error: () => {
-            this.router.navigate(['/control-orientacion']); 
+            this.router.navigate(['/control-orientacion']);
           }
         });
       }
@@ -275,7 +276,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         this.provincias = data;
         this.opcionesFiltros.provincias = data.map(p => ({
           nombre: p.nombre,
-          idProvincia: p.id
+          idProvincia: p.idProvincia
         }));
       },
       error: (err) => {
@@ -1209,12 +1210,12 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           },
           columnStyles: {
             0: { cellWidth: 20 }, // CI
-            1: { cellWidth: 25 }, // Nombre
-            2: { cellWidth: 40 }, // Apellidos
-            3: { cellWidth: 50 }, // Colegio
-            4: { cellWidth: 20 }, // Curso
+            1: { cellWidth: 40 }, // Nombre
+            2: { cellWidth: 60 }, // Apellidos
+            3: { cellWidth: 85 }, // Colegio
+            4: { cellWidth: 40 }, // Curso
             5: { cellWidth: 15 }, // Edad
-            6: { cellWidth: 25 }  // Celular
+            6: { cellWidth: 20 }  // Celular
           },
           margin: { left: margin, right: margin }
         });
@@ -1699,4 +1700,3 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     this.mostrarNotificacion('Perfil exportado a PDF correctamente', 'success');
   }
 }
-

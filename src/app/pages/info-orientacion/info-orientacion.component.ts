@@ -77,14 +77,10 @@ export class InfoOrientacionComponent implements OnInit {
    */
   toggleCarreras(facultad: Facultad, event: Event): void {
     event.stopPropagation();
-    console.log('Facultad clickeada:', facultad.nombre, 'ID:', facultad.idFacultad);
-    console.log('Facultad actualmente seleccionada ID:', this.facultadSeleccionadaId);
     if (this.facultadSeleccionadaId === facultad.idFacultad) {
       this.facultadSeleccionadaId = null;
-      console.log('Cerrando facultad');
     } else {
       this.facultadSeleccionadaId = facultad.idFacultad;
-      console.log('Abriendo facultad:', facultad.idFacultad);
     }
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));

@@ -300,7 +300,7 @@ html {
 }
 
 .btn-logout:active {
-  transform: translateY(-50%) translateY(-1px) scale(0.98);
+  transform: translateY(0%) translateY(-1px) scale(0.98);
   transition: all 0.1s ease;
 }
 

@@ -151,8 +151,8 @@
                 <div class="col-5">
                   <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaInicio">
                 </div>
-                <div class="col-2 text-center">
-                  <small class="text-muted">hasta</small>
+                <div class="col-2 text-center fs-6 text-muted">
+                  <small class="text-muted">- hasta -</small>
                 </div>
                 <div class="col-5">
                   <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaFin">
@@ -200,7 +200,6 @@
               </div>
               <p class="mt-2 text-muted">Cargando información del estudiante...</p>
             </div>
-
             <!-- Contenido del perfil -->
             <div *ngIf="!loading && estudianteSeleccionado" class="perfil-container">
               <!-- Banner y datos principales -->
@@ -226,7 +225,6 @@
                   </div>
                 </div>
               </div>
-
               <div class="px-4">
                 <!-- Información personal -->
                 <div class="card mb-4 border-0 shadow-sm">
