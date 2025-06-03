@@ -172,7 +172,7 @@ tr:nth-child(even) {
 
 .leyenda-lateral {
   position: fixed;
-  top: 170px;
+  top: 150px;
   left: 70px;
   width: 250px;
   background-color: #ffffff;
