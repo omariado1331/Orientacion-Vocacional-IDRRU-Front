@@ -13,7 +13,7 @@ import { ProvinciaService } from '../../services/provincia.service';
 import { MunicipioService } from '../../services/municipio.service';
 import { Provincia } from '../../interfaces/provincia-interface';
 import { Municipio } from '../../interfaces/municipio-interface';
-
+import { DatePipe } from '@angular/common';
 
 Chart.register(...registerables);
 Chart.register(ChartDataLabels);
@@ -309,8 +309,70 @@ private generarGrafico(): void {
     this.cd.detectChanges();
 }
 
+
+private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number): Promise<number> {
+  const colorAzulUMSA: [number, number, number] = [0, 51, 153];
+  const colorVinoUMSA: [number, number, number] = [128, 0, 32];
+  const logoWidth = 70; // Ancho del logo
+  const logoHeight = 70; // Alto del logo
+
+  let yPos = margin + 25;
+
+  // 1. Cambiar rutas (usar assets/ en lugar de src/assets/)
+  const logoIzquierdoUrl = "assets/umsac.png"; // Ruta corregida
+  const logoDerechoUrl = "assets/idrdu.png";
+
+  // 2. Convertir imágenes a Base64 antes de usarlas
+  const [logoIzqBase64, logoDerBase64] = await Promise.all([
+    this.convertirImagenABase64(logoIzquierdoUrl),
+    this.convertirImagenABase64(logoDerechoUrl)
+  ]);
+
+
+
+  // 3. Usar las imágenes convertidas
+  doc.addImage(logoIzqBase64, 'PNG', margin, yPos - 10, logoWidth, logoHeight);
+  doc.addImage(logoDerBase64, 'PNG', pageWidth - margin - logoWidth, yPos - 10, logoWidth, logoHeight);
+
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colorAzulUMSA);
+  doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 16;
+
+  doc.setFontSize(9);
+  doc.setTextColor(0, 0, 0);
+  doc.text('INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 15;
+
+  doc.setFontSize(10);
+  doc.setTextColor(...colorVinoUMSA);
+  doc.text('SISTEMA DE ORIENTACIÓN VOCACIONAL', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 25;
+
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(0, 0, 0);
+  doc.text('Reporte de Resultados', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 14;
+
+  return yPos;
+}
+
+
+// Añade este nuevo método en tu clase
+private async convertirImagenABase64(url: string): Promise<string> {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(blob);
+  });
+}
+
 //PDF
-generarPDFconGraficoYTabla() {
+async generarPDFconGraficoYTabla() {
   //debuggear
   //console.log('Municipio seleccionado:', this.nombreMunicipioSeleccionado);
 
@@ -318,17 +380,22 @@ generarPDFconGraficoYTabla() {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
+  const margin1 = 10;  // declara e inicializa primero
+
+  let yPos = await this.dibujarCabecera(doc, pageWidth, margin1);
+
+
   // Título centrado
-  const titulo = 'REPORTE DEL TEST VOCACIONAL';
-  doc.setFontSize(18);
-  doc.setFont('helvetica', 'bold');
-  const tituloWidth = doc.getTextWidth(titulo);
-  const tituloY = 50;
-  doc.text(titulo, (pageWidth - tituloWidth) / 2, tituloY);
+  //const titulo = 'REPORTE DEL TEST VOCACIONAL';
+ // doc.setFontSize(18);
+ // doc.setFont('helvetica', 'bold');
+  //const tituloWidth = doc.getTextWidth(titulo);
+  const tituloY = 80;
+  //doc.text(titulo, (pageWidth - tituloWidth) / 2, tituloY);
 
   // Filtros uno debajo de otro
   const marginLeft = 40;
-  const filtroY = tituloY + 40;
+  const filtroY = tituloY + 45;
   const lineHeight = 20;
 
   //(arreglo de objetos):
@@ -360,7 +427,7 @@ generarPDFconGraficoYTabla() {
     
   ];*/
   // tamaño titulo de los nombres 
-  doc.setFontSize(16);
+  doc.setFontSize(12);
   filtros.forEach((filtro, i) => {
     
     const y = filtroY + i * lineHeight;
@@ -369,12 +436,12 @@ generarPDFconGraficoYTabla() {
     doc.text(filtro.titulo, marginLeft, y);
 
     // Este para provincia y municipio
-    doc.setFontSize(15);
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
     doc.text(filtro.valor, marginLeft + doc.getTextWidth(filtro.titulo) + 25, y);
 
     // Este es para el resto, es decir el año
-    doc.setFontSize(15);
+    doc.setFontSize(12);
     
   });
 
@@ -417,7 +484,7 @@ generarPDFconGraficoYTabla() {
 
 
   const colCount = columns.length;
-  const tableWidth = 480;
+  const tableWidth = 520;
   const colWidth = tableWidth / colCount;
 
   // Aquí va el autoTable con los parámetros actualizados
@@ -437,7 +504,7 @@ generarPDFconGraficoYTabla() {
   },
   //Estilo
   //Define el ancho de cada columna 
-  styles: { fontSize: 12, cellPadding: 6, halign: 'center' },
+  styles: { fontSize: 10, cellPadding: 6, halign: 'center' },
   //Estilo general fuente, espaciado, alinear horizontalmente
   headStyles: { fillColor: [78, 121, 167], textColor: 255 },
   // filas con rayas
@@ -449,7 +516,7 @@ generarPDFconGraficoYTabla() {
   const leyendaStartY = (doc as any).autoTable.previous.finalY + 30;
   const leyendaX = marginLeft;
   const colorBoxSize = 14;
-  const spacingY = 22;
+  const spacingY = 18;
 
   //PDF 
 const descripcionesFijas: {[key: string]: string} = {
@@ -476,14 +543,14 @@ const leyenda = this.chartData.labels.map((label, index) => {
   };
 });
 
-  doc.setFontSize(14);
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.text('RESULTADOS:', leyendaX, leyendaStartY);
 
-  doc.setFontSize(12);
+  doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
   leyenda.forEach((item, i) => {
-    const y = leyendaStartY + 12 + (i + 1) * spacingY;
+    const y = leyendaStartY + 8 + (i + 1) * spacingY;
 
     doc.setFillColor(item.color);
     doc.rect(leyendaX, y - 12, colorBoxSize, colorBoxSize, 'F');
@@ -502,21 +569,40 @@ const leyenda = this.chartData.labels.map((label, index) => {
     const imgX = (pageWidth - maxImgWidth) / 2;
 
     const lastLeyendaY = leyendaStartY + 12 + leyenda.length * spacingY;
-    let imgY = lastLeyendaY + 50;
+    let imgY = lastLeyendaY + 12;
 
     if (imgY + imgHeight > pageHeight - 20) {
       imgY = pageHeight - imgHeight - 20;
     }
     
-   
-
     doc.addImage(imgData, 'PNG', imgX, imgY, maxImgWidth, imgHeight);
   } else {
     console.warn('No se encontró el canvas del gráfico');
   }
 
+  const margin = 10;
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'italic');
+  const footerY = pageHeight - 40;
+  doc.text('UMSA: Teléfono: (591-2) 2612298 | E-mail: informate@umsa.bo', pageWidth / 2, footerY, { align: 'center' });
+  doc.text('Av. Villazón N° 1995, Plaza del Bicentenario - Zona Central, La Paz, Bolivia', pageWidth / 2, footerY + 20, { align: 'center' });
+  doc.text('IDRDU: Av. 6 de Agosto, Edificio HOY Nro. 2170 Piso 12', pageWidth / 2, footerY + 10, { align: 'center' });
+
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+  }
+
+
+
   doc.save('reporte-con-grafico.pdf');
 
+
+
 }
+
+
 
 }

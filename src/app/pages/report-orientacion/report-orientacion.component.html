@@ -86,10 +86,11 @@
 
 <div class="botones-exportar"
      *ngIf="mostrarBotonesExportar 
-            && nombreProvinciaSeleccionada && nombreProvinciaSeleccionada !== 'Todos'
-            && nombreMunicipioSeleccionado && nombreMunicipioSeleccionado !== 'Todos'
+            && idProvincia 
+            && idMunicipio 
             && year">
   <button (click)="generarPDFconGraficoYTabla()">Descargar PDF</button>
 </div>
+
 
 </div>
