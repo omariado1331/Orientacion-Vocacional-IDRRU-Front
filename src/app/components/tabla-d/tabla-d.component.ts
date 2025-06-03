@@ -36,7 +36,6 @@ export class TablaDComponent {
   carrerasANAPOL = [
     'Ingeniería de Tránsito y Viabilidad',
     'Investigación Criminal',
-    'Topografía y Geodesia',
     'Orden y Seguridad',
     'Administración Policial',
   ]

@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { NavigationExtras, RouterModule } from '@angular/router';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators, FormBuilder, Form} from '@angular/forms';
 import { EstudianteI } from '../../../interfaces/estudiante-interface';
@@ -114,7 +114,6 @@ export class FormEstudianteComponent {
   }
   resultIdChaside = ['C','H','A','S','I','D','E'];
   resultIdHolland = ['R','I','A','S','E','C'];
-
   constructor(
     private provinciaService: ProvinciaService, 
     private municipioService: MunicipioService,
@@ -517,6 +516,7 @@ export class FormEstudianteComponent {
     this.resultadoEnviar.idHolland = idHollandEnviar;
 
     let estudianteGuardado: EstudianteI;
+    
     //conecta con el back para guardar el estudiante y recibir los datos guardados
     this.estudianteService.create(this.estudianteI).subscribe({
       next: (datos) => 

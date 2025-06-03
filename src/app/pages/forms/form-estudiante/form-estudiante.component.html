@@ -356,8 +356,8 @@
                             <div class="col-md-1"></div>
                         }
                     </div>
-                    <button class="btn btn-danger mt-3 mb-3 mx-auto text-center" type="button" (click)="mostrarHollandDos()">SIGUIENTE</button>
                 </div>
+                <button class="btn btn-success mt-3 mb-3 mx-auto" type="button" (click)="mostrarHollandDos()">SIGUIENTE</button>
             </div>
         </div>
 
@@ -382,8 +382,8 @@
                             <div class="col-md-1"></div>
                         }
                     </div>
-                    <button class="btn btn-danger mt-3 mb-3 mx-auto" type="button" (click)="mostrarHollandTres()">SIGUIENTE</button>
                 </div>
+                <button class="btn btn-success mt-3 mb-3 mx-auto" type="button" (click)="mostrarHollandTres()">SIGUIENTE</button>
             </div>
         </div>
 
@@ -408,8 +408,9 @@
                             <div class="col-md-1"></div>
                         }
                     </div>
-                    <button class="btn btn-danger mt-3 mb-3 mx-auto" type="button" (click)="mostrarHollandCuatro()">SIGUIENTE</button>
+                    
                 </div>
+                <button class="btn btn-success mt-3 mb-3 mx-auto" type="button" (click)="mostrarHollandCuatro()">SIGUIENTE</button>
             </div>
         </div>
 
@@ -426,7 +427,7 @@
                     <div class="row mt-3" formArrayName="respuestasHA">
                         @for (preguntahav of pregHollandAutoev; track preguntahav; let l = $index) {
                             <div class="col-md-3 mb-2">
-                                <p [class.error]="enviadoCh() && respuestasHA.at(l).invalid" >{{preguntahav.pregunta}}</p>
+                                <p [class.error]="enviadoChCuatro() && respuestasHA.at(l).invalid" >{{preguntahav.pregunta}}</p>
                             </div>
                             @for (val of [1,2,3,4,5,6,7]; track val) {
                                 <div class="col-md-1 mb-2">

@@ -16,10 +16,9 @@ export class TablaCComponent {
     codigo: 'FCEF'
   }
   carrerasFCEF= [
-    'Medicina',
-    'Enfermeria',
-    'Nutrición y Dietética',
-    'Tecnología Médica'
+    'Administración de Empresas',
+    'Contaduría Pública',
+    'Economía',
   ]
   hollandFCEFArray = Object.entries(this.hollandFCEF);
 

@@ -18,7 +18,7 @@ import html2canvas from 'html2canvas';
   styleUrl: './result-form.component.css'
 })
 export class ResultFormComponent {
-  @ViewChild('contenidoPDF', {static: false}) contenido!: ElementRef;
+
   bdform: boolean = false;
   nombre: string = '';
   colegio: string = '';
@@ -65,6 +65,7 @@ export class ResultFormComponent {
   descripcionT: string = '';
   ramaChaside: string = '';
   tablaChaside: string='';
+  facultades: any[] = [];
   constructor(
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -97,7 +98,7 @@ export class ResultFormComponent {
       this.interes = state.interes!;
       this.aptitud = state.aptitud!;
       this.holland = state.holland!;
-      this.chaside = 'E';
+      this.chaside = state.chaside!;
       this.celular = state.celular!;
       this.curso = state.curso!;
       this.edad = state.edad!;
@@ -114,20 +115,356 @@ export class ResultFormComponent {
   fecha = new Date();
   fechaStr = this.fecha.toLocaleDateString('es-ES');
   
-  generarPdf(){
-    if(isPlatformBrowser(this.platformId)){
-      const elemento = this.contenido.nativeElement;
-      html2canvas(elemento).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidht = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidht) / imgProps.width;
-
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidht, pdfHeight);
-        pdf.save('resultados.pdf')
-      })
+  async generarPdf(){
+    const titulostyle = {
+      fontSize: 14,
+      fontStyle: 'bold',
+      textAlign: 'center',
+      marginBottom: 5
     }
+    if(isPlatformBrowser(this.platformId)){
+      const doc = new jsPDF('portrait', 'mm', 'letter');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 10;
+      try {
+        const logoUMSA = await this.cargarImagen('assets/umsaescudo.png');
+        const logoIDRDU = await this.cargarImagen('assets/idrdu.png');
+        if (logoUMSA) {
+          doc.addImage(logoUMSA, 'PNG', margin, margin, 15, 25);
+        }
+        if (logoIDRDU) {
+          doc.addImage(logoIDRDU, 'PNG', pageWidth - margin - 30, margin, 25, 25);
+        }
+      } catch (error) {
+        console.warn('No se pudieron cargar las imágenes para el PDF', error);
+      }
+      const yPos = 10;
+      doc.setFontSize(14)
+      doc.setFont('times')
+      doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth/2, yPos+10, {align: 'center'})
+      doc.text('Instituto de Desarrollo Regional', pageWidth/2, yPos+20, {align: 'center'})
+      doc.text('y Desconcentración Universitaria', pageWidth/2, yPos+25, {align: 'center'})
+      doc.setFont('times', 'bold')
+      doc.text('RESULTADOS DEL TEST VOCACIONAL', pageWidth/2, yPos+35, {align: 'center'})
+      doc.line(10, yPos+40, pageWidth-10, yPos+40)
+      doc.text('TUS MEJORES OPCIONES SON:', pageWidth/2 , yPos+100, {align: 'center'})
+      doc.setFontSize(11)
+      doc.text('INTERPRETACIÓN DE RESULTADOS DE TEST HOLLAND: ', 10, yPos+220, {align: 'left'})
+      doc.text('DATOS DEL ESTUDIANTE', 10, yPos+50, {align: 'left'})
+      doc.text('TEST CHASIDE', pageWidth/2, yPos+50, {align: 'left'})
+      doc.text('TEST DE HOLLAND', pageWidth/2, yPos+70, {align: 'left'})
+      doc.setFont('times', 'normal')
+      doc.text(`Nombre: ${this.nombre}`, 10, yPos+55, {align: 'left'})
+      doc.text(`Carnet: ${this.carnet}`, 10, yPos+60, {align: 'left'})
+      doc.text(`Curso: ${this.curso}`, 10, yPos+65, {align: 'left'})
+      doc.text(`Colegio: ${this.colegio}`, 10, yPos+70, {align: 'left'})
+      doc.text(`Edad: ${this.edad}`, 10, yPos+75, {align: 'left'})
+      doc.text(`Fecha de Evaluación: ${this.fechaStr}`, 10, yPos+80, {align: 'left'})
+      doc.text(`Mejor Puntaje Obtenido: ${this.interes+this.aptitud}`, pageWidth/2, yPos+55, {align: 'left'})
+      doc.text('Mejor Opción Vocacional:', pageWidth/2, yPos+60, {align: 'left'})
+      doc.text(`${this.ramaChaside}`, pageWidth* 3/4 , yPos+65, {align: 'center'})
+      doc.text('Personalidades Dominantes: ', pageWidth/2, yPos+75, {align: 'left'})
+      doc.text(`${this.personalidadP}, ${this.personalidadS}, ${this.personalidadT}`, pageWidth * 3/4 , yPos+80, {align: 'center'})
+      if(this.chaside == 'C'){
+        try {
+          const logoFCEF = await this.cargarImagen('assets/logos-facultades/FCEF.png');
+          if (logoFCEF) {
+            doc.addImage(logoFCEF, 'PNG', pageWidth/2 -20, yPos+105, 40, 40);
+          }
+        } catch (error) {
+          console.warn('No se pudieron cargar las imágenes para el PDF', error);
+        }
+        doc.setFont('times', 'bold')
+        doc.text('Facultad de Ciencias Económicas', pageWidth/2, yPos+150, {align: 'center'});
+        doc.text('y Fincieras', pageWidth/2, yPos+155, {align: 'center'});
+        doc.setFont('times', 'normal')
+        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
+        doc.text('ADMINISTRACIÓN DE EMPRESAS', pageWidth/2 -29, yPos+170, {align: 'left'});
+        doc.text('CONTADURÍA PÚBLICA', pageWidth/2 -29, yPos+175, {align: 'left'});
+        doc.text('ECONOMÍA', pageWidth/2 -29, yPos+180, {align: 'left'});
+      }
+      if(this.chaside == 'H'){
+        try {
+          const logoFCS = await this.cargarImagen('assets/logos-facultades/FCS.png');
+          const logoFDCP = await this.cargarImagen('assets/logos-facultades/FDCP.png');
+          const logoFHCE = await this.cargarImagen('assets/logos-facultades/FHCE.png');
+          if (logoFCS) {
+            doc.addImage(logoFCS, 'PNG', pageWidth/4 -35, yPos+105, 40, 40);
+          }
+          if (logoFDCP) {
+            doc.addImage(logoFDCP, 'PNG', pageWidth/2 -20, yPos+105, 40, 40);
+          }
+          if (logoFHCE) {
+            doc.addImage(logoFHCE, 'PNG', pageWidth* 3/4 -5, yPos+105, 40, 40);
+          }
+        } catch (error) {
+          console.warn('No se pudieron cargar las imágenes para el PDF', error);
+        }
+        doc.setFont('times', 'bold')
+        doc.text('Facultad de Ciencias Sociales', pageWidth/4 -15, yPos+155, {align: 'center'});
+        //doc.text('Ciencias Políticas', pageWidth/4 -35, yPos+155, {align: 'center'});
+        doc.text('Facultad de Derecho y', pageWidth/2, yPos+150, {align: 'center'});
+        doc.text('Ciencias Políticas', pageWidth/2, yPos+155, {align: 'center'});
+        doc.text('Facultad Humanidades y', pageWidth* 3/4 +15, yPos+150, {align: 'center'});
+        doc.text('Ciecias de la Educación', pageWidth* 3/4 +15, yPos+155, {align: 'center'});
+
+        doc.setFont('times', 'normal')
+        doc.text('Carreras Disponibles:', pageWidth/4 -15, yPos+165, {align: 'center'});
+        doc.text('- ANTROPOLOGÍA Y', pageWidth/4 -44, yPos+170, {align: 'left'});
+        doc.text('  ARQUEOLOGÍA', pageWidth/4 -44, yPos+175, {align: 'left'});
+        doc.text('- COMUNICACIÓN SOCIAL', pageWidth/4 -44, yPos+180, {align: 'left'});
+        doc.text('- SOCIOLOGÍA', pageWidth/4 -44, yPos+185, {align: 'left'});
+        doc.text('- TRABAJO SOCIAL', pageWidth/4 -44, yPos+190, {align: 'left'});
+
+        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
+        doc.text('- DERECHO', pageWidth/2 -29, yPos+170, {align: 'left'});
+        doc.text('- CIENCIAS POLÍTICAS', pageWidth/2 -29, yPos+175, {align: 'left'});
+
+        doc.text('Carreras Disponibles:', pageWidth* 3/4 +15, yPos+165, {align: 'center'});
+        doc.text('- BIBLIOTECOLOGÍA Y CIENCIAS', pageWidth* 3/4 -14, yPos+170, {align: 'left'});
+        doc.text('  DE LA EDUCACIÓN', pageWidth* 3/4 -14, yPos+175, {align: 'left'});
+        doc.text('- FILOSOFÍA', pageWidth* 3/4 -14, yPos+180, {align: 'left'});
+        doc.text('- HISTORIA', pageWidth* 3/4 -14, yPos+185, {align: 'left'});
+        doc.text('- LINGÜISTICA E IDIOMAS', pageWidth* 3/4 -14, yPos+190, {align: 'left'});
+        doc.text('- LITERATURA', pageWidth* 3/4 -14, yPos+195, {align: 'left'});
+        doc.text('- PSICOLOGÍA', pageWidth* 3/4 -14, yPos+200, {align: 'left'});
+        doc.text('- TURISMO', pageWidth* 3/4 -14, yPos+205, {align: 'left'});
+      }
+      if(this.chaside == 'A'){
+        try {
+          const logoFAADU = await this.cargarImagen('assets/logos-facultades/FAADU.png');
+          if (logoFAADU) {
+            doc.addImage(logoFAADU, 'PNG', pageWidth/2 -25, yPos+105, 50, 50);
+          }
+        } catch (error) {
+          console.warn('No se pudieron cargar las imágenes para el PDF', error);
+        }
+        doc.setFont('times', 'bold')
+        doc.text('Facultad de Arquitectura, Artes', pageWidth/2, yPos+165, {align: 'center'});
+        doc.text('Diseño y Urbanismo', pageWidth/2, yPos+170, {align: 'center'});
+        doc.setFont('times', 'normal')
+        doc.text('Carreras Disponibles:', pageWidth/2, yPos+180, {align: 'center'});
+        doc.text('ARQUITECTURA', pageWidth/2 -29, yPos+185, {align: 'left'});
+        doc.text('ARTES', pageWidth/2 -29, yPos+190, {align: 'left'});
+        doc.text('DISEÑO', pageWidth/2 -29, yPos+195, {align: 'left'});
+      }
+
+      if(this.chaside == 'S'){
+        try {
+          const logoFMENT = await this.cargarImagen('assets/logos-facultades/FMENT.png');
+          const logoFO = await this.cargarImagen('assets/logos-facultades/FO.png');
+          const logoFCFB = await this.cargarImagen('assets/logos-facultades/FCFB.png');
+          if (logoFMENT) {
+            doc.addImage(logoFMENT, 'PNG', pageWidth/4 -35, yPos+105, 40, 40);
+          }
+          if (logoFO) {
+            doc.addImage(logoFO, 'PNG', pageWidth/2 -20, yPos+105, 45, 45);
+          }
+          if (logoFCFB) {
+            doc.addImage(logoFCFB, 'PNG', pageWidth* 3/4 -5, yPos+105, 40, 40);
+          }
+        } catch (error) {
+          console.warn('No se pudieron cargar las imágenes para el PDF', error);
+        }
+        doc.setFont('times', 'bold')
+        doc.text('Facultad de Medicina, Enfermería,', pageWidth/4 -15, yPos+150, {align: 'center'});
+        doc.text('Nutrición y Tecnología Médica', pageWidth/4 -15, yPos+155, {align: 'center'});
+        doc.text('Facultad de Odontología', pageWidth/2, yPos+155, {align: 'center'});
+        //doc.text('Ciencias Políticas', pageWidth/2, yPos+155, {align: 'center'});
+        doc.text('Facultad de Ciencias', pageWidth* 3/4 +15, yPos+150, {align: 'center'});
+        doc.text('Farmacéuticas y Bioquímicas', pageWidth* 3/4 +15, yPos+155, {align: 'center'});
+
+        doc.setFont('times', 'normal')
+        doc.text('Carreras Disponibles:', pageWidth/4 -15, yPos+165, {align: 'center'});
+        doc.text('- MEDICINA', pageWidth/4 -44, yPos+170, {align: 'left'});
+        doc.text('- ENFERMERÍA', pageWidth/4 -44, yPos+175, {align: 'left'});
+        doc.text('- NUTRICIÓN Y DIETÉTICA', pageWidth/4 -44, yPos+180, {align: 'left'});
+        doc.text('- TECNOLOGÍA MÉDICA', pageWidth/4 -44, yPos+185, {align: 'left'});
+
+        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
+        doc.text('- ODONTOLOGÍA', pageWidth/2 -29, yPos+170, {align: 'left'});
+
+        doc.text('Carreras Disponibles:', pageWidth* 3/4 +15, yPos+165, {align: 'center'});
+        doc.text('- BIOQUÍMICA', pageWidth* 3/4 -14, yPos+170, {align: 'left'});
+        doc.text('- QUÍMICA FARMACÉUTICA', pageWidth* 3/4 -14, yPos+175, {align: 'left'});
+      }
+
+      if(this.chaside == 'I'){
+        try {
+          const logoFT = await this.cargarImagen('assets/logos-facultades/FT.png');
+          const logoFI = await this.cargarImagen('assets/logos-facultades/FI.png');
+          const logoFCG = await this.cargarImagen('assets/logos-facultades/FCG.png');
+          if (logoFT) {
+            doc.addImage(logoFT, 'PNG', pageWidth/4 -35, yPos+105, 40, 40);
+          }
+          if (logoFI) {
+            doc.addImage(logoFI, 'PNG', pageWidth/2 -20, yPos+105, 40, 40);
+          }
+          if (logoFCG) {
+            doc.addImage(logoFCG, 'PNG', pageWidth* 3/4 -5, yPos+105, 40, 40);
+          }
+        } catch (error) {
+          console.warn('No se pudieron cargar las imágenes para el PDF', error);
+        }
+        doc.setFont('times', 'bold')
+        //doc.text('Facultad de Medicina, Enfermería,', pageWidth/4 -15, yPos+150, {align: 'center'});
+        doc.text('Facultad de Tecnología', pageWidth/4 -15, yPos+155, {align: 'center'});
+        doc.text('Facultad de Ingeniería', pageWidth/2, yPos+155, {align: 'center'});
+        //doc.text('Ciencias Políticas', pageWidth/2, yPos+155, {align: 'center'});
+        doc.text('Facultad de Ciencias', pageWidth* 3/4 +15, yPos+150, {align: 'center'});
+        doc.text('Geológicas', pageWidth* 3/4 +15, yPos+155, {align: 'center'});
+
+        doc.setFont('times', 'normal')
+        doc.text('Carreras Disponibles:', pageWidth/4 -15, yPos+165, {align: 'center'});
+        doc.text('- CONSTRUCCIONES CIVILES', pageWidth/4 -44, yPos+170, {align: 'left'});
+        doc.text('- QUÍMICA INDUSTRIAL', pageWidth/4 -44, yPos+175, {align: 'left'});
+        doc.text('- TOPOGRAFÍA Y GEODESIA', pageWidth/4 -44, yPos+180, {align: 'left'});
+        doc.text('- ELECTROMECÁNICA', pageWidth/4 -44, yPos+185, {align: 'left'});
+        doc.text('- TELECOMUNICACIONES', pageWidth/4 -44, yPos+190, {align: 'left'});
+        doc.text('- AERONÁUTICA', pageWidth/4 -44, yPos+195, {align: 'left'});
+        doc.text('- MECÁNICA AUTOMOTRIZ', pageWidth/4 -44, yPos+200, {align: 'left'});
+        doc.text('- MECÁNICA INDUSTRIAL', pageWidth/4 -44, yPos+205, {align: 'left'});
+
+        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
+        doc.text('- INGENIERÍA CIVIL', pageWidth/2 -29, yPos+170, {align: 'left'});
+        doc.text('- INGENIERÍA ELÉCTRICA', pageWidth/2 -29, yPos+175, {align: 'left'});
+        doc.text('- INGENIERÍA ELECTRÓNICA', pageWidth/2 -29, yPos+180, {align: 'left'});
+        doc.text('- INGENIERÍA QUÍMICA', pageWidth/2 -29, yPos+185, {align: 'left'});
+        doc.text('- INGENIERÍA MECÁNICA Y', pageWidth/2 -29, yPos+190, {align: 'left'});
+        doc.text('  ELECTROMECÁNICA', pageWidth/2 -29, yPos+195, {align: 'left'});
+        doc.text('- INGENIERÍA INDUSTRIAL', pageWidth/2 -29, yPos+200, {align: 'left'});
+        doc.text('- INGENIERÍA PETROLERA', pageWidth/2 -29, yPos+205, {align: 'left'});
+        doc.text('- INGENIERÍA METALÚRGICA', pageWidth/2 -29, yPos+210, {align: 'left'});
+
+        doc.text('Carreras Disponibles:', pageWidth* 3/4 +15, yPos+165, {align: 'center'});
+        doc.text('- INGENIERÍA GEOLÓGICA', pageWidth* 3/4 -14, yPos+170, {align: 'left'});
+        doc.text('- INGENIERÍA GEOGRÁFICA', pageWidth* 3/4 -14, yPos+175, {align: 'left'});
+      }
+
+      if(this.chaside == 'D'){
+        try {
+          const logoANAPOL = await this.cargarImagen('assets/logos-facultades/ANAPOL.jpeg');
+          const logoCOLMIL = await this.cargarImagen('assets/logos-facultades/COLMIL.jpeg');
+          if (logoANAPOL) {
+            doc.addImage(logoANAPOL, 'PNG', pageWidth/3 -20, yPos+105, 40, 40);
+          }
+          if (logoCOLMIL) {
+            doc.addImage(logoCOLMIL, 'PNG', pageWidth* 2/3 -20, yPos+105, 40, 40);
+          }
+
+        } catch (error) {
+          console.warn('No se pudieron cargar las imágenes para el PDF', error);
+        }
+        doc.setFont('times', 'bold')
+        doc.text('Academía Nacional de', pageWidth/3, yPos+150, {align: 'center'});
+        doc.text('Policias', pageWidth/3, yPos+155, {align: 'center'});
+        //doc.text('Facultad de Ingeniería', pageWidth* 2/3, yPos+150, {align: 'center'});
+        doc.text('Colegio Militar', pageWidth* 2/3, yPos+155, {align: 'center'});
+
+        doc.setFont('times', 'normal')
+        doc.text('Carreras Disponibles:', pageWidth/3 , yPos+165, {align: 'center'});
+        doc.text('- INGENIERÍA DE TRÁNSITO Y', pageWidth/3 -30, yPos+170, {align: 'left'});
+        doc.text('  VIABILIDAD', pageWidth/3 -30, yPos+175, {align: 'left'});
+        doc.text('- INVESTIGACIÓN CRIMINAL', pageWidth/3 -30, yPos+180, {align: 'left'});
+        doc.text('- ORDEN Y SEGURIDAD', pageWidth/3 -30, yPos+185, {align: 'left'});
+        doc.text('- ADMINISTRACIÓN POLICIAL', pageWidth/3 -30, yPos+190, {align: 'left'});
+
+        doc.text('Carreras Disponibles:', pageWidth* 2/3 , yPos+165, {align: 'center'});
+        doc.text('- INFANTERÍA', pageWidth* 2/3 -20, yPos+170, {align: 'left'});
+        doc.text('- ARTILLERÍA', pageWidth* 2/3 -20, yPos+175, {align: 'left'});
+        doc.text('- CABALLERÍA', pageWidth* 2/3 -20, yPos+180, {align: 'left'});
+        doc.text('- INGENIERÍA', pageWidth* 2/3 -20, yPos+185, {align: 'left'});
+        doc.text('- COMUNICACIONES', pageWidth* 2/3 -20, yPos+190, {align: 'left'});
+        doc.text('- LOGÍSTICA', pageWidth* 2/3 -20, yPos+195, {align: 'left'});
+      }
+
+      if(this.chaside == 'E'){
+        try {
+          const logoFCPN = await this.cargarImagen('assets/logos-facultades/FCPN.png');
+          const logoFA = await this.cargarImagen('assets/logos-facultades/FA.png');
+          if (logoFCPN) {
+            doc.addImage(logoFCPN, 'PNG', pageWidth/3 -20, yPos+105, 40, 40);
+          }
+          if (logoFA) {
+            doc.addImage(logoFA, 'PNG', pageWidth* 2/3 -20, yPos+105, 40, 40);
+          }
+
+        } catch (error) {
+          console.warn('No se pudieron cargar las imágenes para el PDF', error);
+        }
+        doc.setFont('times', 'bold')
+        doc.text('Facultad de Ciencias Puras', pageWidth/3, yPos+150, {align: 'center'});
+        doc.text('y Naturales', pageWidth/3, yPos+155, {align: 'center'});
+        //doc.text('Facultad de Ingeniería', pageWidth* 2/3, yPos+150, {align: 'center'});
+        doc.text('Facultad de Agronomía', pageWidth* 2/3, yPos+155, {align: 'center'});
+
+        doc.setFont('times', 'normal')
+        doc.text('Carreras Disponibles:', pageWidth/3 , yPos+165, {align: 'center'});
+        doc.text('- BIOLOGÍA', pageWidth/3 -20, yPos+170, {align: 'left'});
+        doc.text('- ESTADÍSTICA', pageWidth/3 -20, yPos+175, {align: 'left'});
+        doc.text('- FÍSICA', pageWidth/3 -20, yPos+180, {align: 'left'});
+        doc.text('- INFORMÁTICA', pageWidth/3 -20, yPos+185, {align: 'left'});
+        doc.text('- MATEMÁTICAS', pageWidth/3 -20, yPos+190, {align: 'left'});
+        doc.text('- CIENCIAS QUÍMICAS', pageWidth/3 -20, yPos+195, {align: 'left'});
+
+        doc.text('Carreras Disponibles:', pageWidth* 2/3 , yPos+165, {align: 'center'});
+        doc.text('- INGENIERÍA AGRONÓMICA', pageWidth* 2/3 -25, yPos+170, {align: 'left'});
+        doc.text('- INGENIERÍA DE PRODUCCIÓN', pageWidth* 2/3 -25, yPos+175, {align: 'left'});
+        doc.text('  Y COMERCIALIZACIÓN', pageWidth* 2/3 -25, yPos+180, {align: 'left'});
+        doc.text('- AGROPECUARIA', pageWidth* 2/3 -25, yPos+185, {align: 'left'});
+        doc.text('- MEDICINA VETERINARIA', pageWidth* 2/3 -25, yPos+190, {align: 'left'});
+        doc.text('  Y ZOOTECNIA', pageWidth* 2/3 -25, yPos+195, {align: 'left'});
+
+      }
+      
+      doc.text(`${this.personalidadP}`, 10, yPos+225, {align: 'left'})
+      doc.text(`${this.personalidadS}`, 10, yPos+235, {align: 'left'})
+      doc.text(`${this.personalidadT}`, 10, yPos+245, {align: 'left'})
+      doc.setFont('times', 'italic')
+      doc.text(`${this.descripcionP}`, pageWidth/2, yPos+230, {align: 'center'})
+      doc.text(`${this.descripcionS}`, pageWidth/2, yPos+240, {align: 'center'})
+      doc.text(`${this.descripcionT}`, pageWidth/2, yPos+250, {align: 'center'})
+      doc.line(10, yPos+255, pageWidth-10, yPos+255)
+      doc.setFontSize(8)
+      doc.setFont('times', 'italic')
+      doc.text('Instituto de Desarrollo Regional y Desconcentración Universitaria', pageWidth/2, yPos+258, {align: 'center'})
+      doc.text('Universidad Mayor de San Andrés', pageWidth/2, yPos+261, {align: 'center'})
+      doc.text(`Test de Orientación Vocacional ${this.fecha.getFullYear()}`, pageWidth/2, yPos+264, {align: 'center'})
+      doc.save('resultado.pdf')
+    }
+    
+  }
+
+  private cargarImagen(url: string): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      if (!url) {
+        resolve(null);
+        return;
+      }
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+        } else {
+          console.error('Failed to get 2D context for canvas');
+        }
+        const dataURL = canvas.toDataURL('image/png');
+        resolve(dataURL);
+      };
+
+      img.onerror = () => {
+        console.warn(`No se pudo cargar la imagen: ${url}`);
+        resolve(null);
+      };
+      img.src = url;
+    });
   }
 }
