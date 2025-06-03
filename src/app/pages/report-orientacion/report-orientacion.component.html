@@ -1,16 +1,6 @@
 <div class="top-container">
+      <h1 class="titulo">RESULTADOS DEL TEST VOCACIONAL</h1>
   <div class="filters">
-
-
-
-
-
-
-
-
-
-
-
     <label>
       Provincia:
       <select [(ngModel)]="idProvincia" (change)="onProvinciaChange()">
@@ -89,13 +79,17 @@
   </div>
 
   <div *ngIf="isBrowser && mostrarGrafico" class="grafico-container">
-    <h3 style="text-align: center;">RESPUESTAS DE TEST VOCACIONAL</h3>
+    <h3 style="text-align: center; font-weight: bold;">RESPUESTAS DEL TEST</h3>
     <canvas id="myChart" baseChart [data]="chartData" [type]="'pie'" [options]="chartOptions">
     </canvas>
   </div>
 
-  <div class="botones-exportar" *ngIf="mostrarBotonesExportar">
-    <button (click)="generarPDFconGraficoYTabla()">Descargar PDF</button>
-  </div>
+<div class="botones-exportar"
+     *ngIf="mostrarBotonesExportar 
+            && nombreProvinciaSeleccionada && nombreProvinciaSeleccionada !== 'Todos'
+            && nombreMunicipioSeleccionado && nombreMunicipioSeleccionado !== 'Todos'
+            && year">
+  <button (click)="generarPDFconGraficoYTabla()">Descargar PDF</button>
+</div>
 
 </div>

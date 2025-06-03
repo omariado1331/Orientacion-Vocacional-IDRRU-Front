@@ -13,6 +13,17 @@ body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
+.titulo {
+  text-align: center;
+  font-weight: 700;
+  font-size: 2.3rem;
+  color: #2c3e50;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+
 .filters {
   margin-top: 0px;
   display: flex;
@@ -162,7 +173,7 @@ tr:nth-child(even) {
 .leyenda-lateral {
   position: fixed;
   top: 170px;
-  right: 40px;
+  left: 70px;
   width: 250px;
   background-color: #ffffff;
   border: 1px solid #ccc;
@@ -263,7 +274,6 @@ tr:nth-child(even) {
 }
 
 .botones-exportar {
-  /* Quitá position absolute y lo demás */
   display: flex;
   gap: 30px;
   margin-top: 15px; /* para separarlos un poco de la gráfica */

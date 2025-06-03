@@ -17,16 +17,11 @@
     <p>Cargando información de facultades...</p>
   </div>
 
-  <!-- Content -->
   <div *ngIf="!cargando" class="umsa-content">
-    <!-- Facultades Grid -->
     <div class="umsa-facultades-grid">
       <div *ngFor="let facultad of facultades" class="umsa-facultad-card"
-           [class.active]="facultadSeleccionada && facultadSeleccionada.id === facultad.id">
-        
-        <!-- Facultad Card Header -->
+           [class.active]="facultadSeleccionadaId === facultad.idFacultad">
         <div class="umsa-facultad-header" (click)="toggleCarreras(facultad, $event)">
-          <!-- Logo de la facultad -->
           <div class="umsa-facultad-logo">
             <img [src]="facultad.imgLogo" [alt]="'Logo ' + facultad.nombre">
           </div>
@@ -35,12 +30,10 @@
             <span class="umsa-facultad-codigo">{{facultad.codigo}}</span>
           </div>
           <div class="umsa-facultad-toggle">
-            <i class="bi" [ngClass]="(facultadSeleccionada && facultadSeleccionada.id === facultad.id) ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+            <i class="bi" [ngClass]="facultadSeleccionadaId === facultad.idFacultad ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
           </div>
         </div>
-        
-        <!-- Facultad Carreras (expandible) -->
-        <div class="umsa-facultad-carreras" *ngIf="facultadSeleccionada && facultadSeleccionada.id === facultad.id">
+        <div class="umsa-facultad-carreras" *ngIf="facultadSeleccionadaId === facultad.idFacultad">
           <div class="umsa-carreras-list">
             <h4>Carreras ofrecidas:</h4>
             <ul>

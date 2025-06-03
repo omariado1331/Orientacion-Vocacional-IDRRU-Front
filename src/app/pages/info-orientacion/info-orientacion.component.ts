@@ -15,6 +15,7 @@ export class InfoOrientacionComponent implements OnInit {
 
   facultades: Facultad[] = [];
   facultadSeleccionada: Facultad | null = null;
+  facultadSeleccionadaId: number | null = null;
   cargando = true;
   error = false;
 
@@ -41,10 +42,15 @@ export class InfoOrientacionComponent implements OnInit {
   cargarFacultades(): void {
     this.cargando = true;
     this.error = false;
-    
+
     this.facultadService.getAll().subscribe({
       next: (data) => {
-        this.facultades = data.slice(0, 13);
+        this.facultades = data.slice(0, 13).map(facultad => {
+          return {
+            ...facultad,
+            carreras: Array.isArray(facultad.carreras) ? facultad.carreras : JSON.parse(facultad.carreras)
+          };
+        });
         this.cargando = false;
       },
       error: (error) => {
@@ -71,10 +77,10 @@ export class InfoOrientacionComponent implements OnInit {
    */
   toggleCarreras(facultad: Facultad, event: Event): void {
     event.stopPropagation();
-    if (this.facultadSeleccionada && this.facultadSeleccionada.id === facultad.id) {
-      this.facultadSeleccionada = null;
+    if (this.facultadSeleccionadaId === facultad.idFacultad) {
+      this.facultadSeleccionadaId = null;
     } else {
-      this.facultadSeleccionada = facultad;
+      this.facultadSeleccionadaId = facultad.idFacultad;
     }
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));

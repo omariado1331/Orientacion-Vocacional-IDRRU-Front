@@ -17,9 +17,9 @@ export class MunicipioN{
 
 
 export interface Municipioi {
-    id_municipio: number;
+    idMunicipio: number;
     nombre: string;
-    id_provincia: number;
+    idProvincia: number;
 }
 
 export interface Municipio {

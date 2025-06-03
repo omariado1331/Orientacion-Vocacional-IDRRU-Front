@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { ProvinciaI } from '../interfaces/provincia-interface';
 import { Provincia } from '../interfaces/provincia-interface';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -9,8 +11,7 @@ import { HttpClient } from '@angular/common/http';
 
 export class ProvinciaService {
 
-
-  private baseUrl = 'http://localhost:8080/provincia';
+  private baseUrl = `${environment.apiUrl}/provincia`;
 
   constructor(private http: HttpClient) {}
 
@@ -44,9 +45,19 @@ export class ProvinciaService {
   ];
 
 
-  getProvincias(): Observable<Provincia[]> {
+  getProvinciasAll(): Observable<Provincia[]> {
     return of(this.mockProvincias);
   }
+
+
+  getProvincias(): Observable<ProvinciaI[]> {
+      return this.http.get<ProvinciaI[]>(`${this.baseUrl}`);
+  }
+
+  getById(id: number): Observable<ProvinciaI> {
+      return this.http.get<ProvinciaI>(`${this.baseUrl}/${id}`);
+  }
+
   provincias: Provincia[] = [
     new Provincia(1, 'ABEL ITURRALDE'),
     new Provincia(2, 'AROMA'),

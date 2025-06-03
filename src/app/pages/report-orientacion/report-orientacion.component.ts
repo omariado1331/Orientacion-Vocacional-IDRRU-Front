@@ -3,7 +3,6 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ResultadoService } from '../../services/resultado.service';
 import { ResultadoDtoResponse } from '../../interfaces/resultado-dto-response';
-
 import { NgChartsModule } from 'ng2-charts';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart, registerables } from 'chart.js';
@@ -51,19 +50,19 @@ export class ReportOrientacionComponent implements OnInit {
   leyenda: { label: string, desc: string, color: string }[] = [];
   // Leyenda original, no cambia
   nombresPorLabel: { [label: string]: string[] } = {
-    'TABLA 1C': ['Administrativas', 'Contables', 'Economicas'],
+    'TABLA 1C': ['Ciencias Económicas', 'Ciencias Financieras'],
     'TABLA 2H': ['Humanísticas', 'Ciencias Jurídicas','Ciencias Sociales'],
-    'TABLA 3A': ['Artísticas'],
-    'TABLA 4S': ['Ciencias de la Salud'],
-    'TABLA 5I': ['Ingenierías', 'Carreras Técnicas', 'Computación'],
+    'TABLA 3A': ['Artes','Arquitectura ','Diseño'],
+    'TABLA 4S': ['Salud','Enfermería','Medicina'],
+    'TABLA 5I': ['Investigación', 'Ingeniería', 'Tecnología'],
     'TABLA 6D': ['Defensa', 'Seguridad'],
-    'TABLA 7E': ['Ciencias Agrarias', 'Zoológicas', 'Biológicas']
+    'TABLA 7E': ['Exactas', 'Ciencias Puras']
   };
 
   descripcionesFijas: { [key: string]: string } = {
     'TABLA 1C': 'Administrativas, Contables, Económicas',
     'TABLA 2H': 'Humanísticas, Ciencias Jurídicas, Sociales',
-    'TABLA 3A': 'Artísticas',
+    'TABLA 3A': 'Artísticasasd',
     'TABLA 4S': 'Ciencias de la Salud',
     'TABLA 5I': 'Ingenierías, Técnicas, Computación',
     'TABLA 6D': 'Defensa, Seguridad',
@@ -141,7 +140,7 @@ ngOnInit(): void {
 }
 
   cargarProvincias() {
-    this.provinciaService.getProvincias().subscribe({
+    this.provinciaService.getProvinciasAll().subscribe({
       next: (data) => this.provincias = data,
       error: (err) => console.error('Error cargando provincias', err)
     });
@@ -249,12 +248,20 @@ limpiarFiltros(): void {
   this.idMunicipio = undefined;
   this.year = undefined;
 
+  this.nombreProvinciaSeleccionada = '';
+  this.nombreMunicipioSeleccionado = '';
+
+  // Vaciar o resetear las listas de municipios y años
+  this.municipios = [];
+  this.listaAnios = [];
+
   this.resultados = [];
   this.mostrarGrafico = false;
   this.mostrarBotonesExportar = false;
 
   this.mostrarImagenNoResultados = true;  // mostrar imagen al limpiar
   // No llamar a cargarResultados para no recargar la tabla
+
 }
 
 private generarGrafico(): void {
@@ -332,11 +339,11 @@ generarPDFconGraficoYTabla() {
     return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
   }
 
-  if(this.nombreProvinciaSeleccionada){
+  if(this.nombreProvinciaSeleccionada && this.nombreProvinciaSeleccionada !== 'Todos'){
     filtros.push({titulo: 'Provincia:', valor: capitalizar(this.nombreProvinciaSeleccionada)});
   }
 
-  if(this.nombreMunicipioSeleccionado){
+  if(this.nombreMunicipioSeleccionado && this.nombreMunicipioSeleccionado !== 'Todos'){
     filtros.push({titulo: 'Municipio:', valor: capitalizar(this.nombreMunicipioSeleccionado)});
   }
 
@@ -444,14 +451,15 @@ generarPDFconGraficoYTabla() {
   const colorBoxSize = 14;
   const spacingY = 22;
 
+  //PDF 
 const descripcionesFijas: {[key: string]: string} = {
-  'TABLA 1C': 'Administrativas, Contables, Económicas',
-  'TABLA 2H': 'Humanísticas, Ciencias Jurídicas, Sociales',
-  'TABLA 3A': 'Artísticas',
-  'TABLA 4S': 'Ciencias de la Salud',
-  'TABLA 5I': 'Ingenierías, Técnicas, Computación',
+  'TABLA 1C': 'Ciencias Económicas, Ciencias Financieras',
+  'TABLA 2H': 'Humanidades, Ciencias Jurídicas, Ciencias Sociales',
+  'TABLA 3A': 'Artes, Arquitectura ,Diseño',
+  'TABLA 4S': 'Salud, Enfermería, Medicina',
+  'TABLA 5I': 'Investigación, Ingeniería, Tecnología',
   'TABLA 6D': 'Defensa, Seguridad',
-  'TABLA 7E': 'Ciencias Agrarias, Zoológicas, Biológicas'
+  'TABLA 7E': 'Ciencias Exactas, Ciencias Puras, Biológicas'
 };
 
 const colores = [

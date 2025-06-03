@@ -1,125 +1,107 @@
-<div class="container-fluid vh-100 d-flex align-items-center justify-content-center" *ngIf="!isAuthenticated">
-  <div class="card shadow-lg border-0" style="max-width: 400px; width: 100%;">
-    <div class="card-body p-4 text-umsa">
-      <!-- Encabezado con logo a la izquierda y texto a la derecha -->
-      <div class="login-header d-flex align-items-center bg-umsa-blue-dark text-white rounded mb-4 px-3 py-2">
-        <img [src]="logoUrl" alt="Logo Universidad" class="img-fluid me-3" style="max-height: 110px;">
-        <div>
-          <h5 class="mb-1 fw-bold">Sistema de Orientación Vocacional</h5>
-          <small class="text-light">Inicie sesión para acceder al panel de control</small>
-        </div>
+<div class="login-container" *ngIf="!isAuthenticated">
+  <div class="login-wrapper">
+    <div class="umsa-header">
+      <div class="umsa-title">
+        <h1>Instituto de Desarrollo Regional y Desconcentración Universitaria</h1>
+        <h2>INICIA SESION</h2>
+        <div class="umsa-divider"></div>
       </div>
-
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="mb-3">
-          <label for="username" class="form-label">Usuario</label>
-          <div class="input-group">
-            <span class="input-group-text bg-umsa-blue text-white"><i class="bi bi-person-fill"></i></span>
-            <input type="text" id="username" formControlName="username" class="form-control"
-              placeholder="Ingrese su usuario"
+    </div>
+    <div class="login-card shadow-lg border-0">
+      <div class="card-body p-4">
+        <div class="login-header d-flex align-items-center bg-umsa-blue-dark text-white rounded mb-4 px-3 py-3">
+          <img [src]="logoUrl" alt="Logo Universidad" class="logo-img me-3">
+          <div>
+            <h5 class="mb-1 fw-bold">Sistema de Orientación Vocacional</h5>
+            <small class="text-light">Inicie sesión para acceder al panel de control</small>
+          </div>
+        </div>
+        <form [formGroup]="loginForm" (ngSubmit)="enviarFormulario()">
+          <div class="form-floating mb-3">
+            <input type="text" id="username" formControlName="username" class="form-control modern-input"
+              placeholder="Usuario"
               [ngClass]="{'is-invalid': loginForm.get('username')?.touched && loginForm.get('username')?.invalid}">
+            <label for="username"><i class="bi bi-person-fill me-2"></i>Usuario</label>
+            <div class="invalid-feedback"
+              *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.invalid">
+              <i class="bi bi-exclamation-circle me-1"></i>Usuario requerido
+            </div>
           </div>
-          <div class="invalid-feedback"
-            *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.invalid">
-            Usuario requerido
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label for="password" class="form-label">Contraseña</label>
-          <div class="input-group">
-            <span class="input-group-text bg-umsa-blue text-white"><i class="bi bi-lock-fill"></i></span>
-            <input type="password" id="password" formControlName="password" class="form-control"
-              placeholder="Ingrese su contraseña"
+          <div class="form-floating mb-4">
+            <input type="password" id="password" formControlName="password" class="form-control modern-input"
+              placeholder="Contraseña"
               [ngClass]="{'is-invalid': loginForm.get('password')?.touched && loginForm.get('password')?.invalid}">
+            <label for="password"><i class="bi bi-lock-fill me-2"></i>Contraseña</label>
+            <div class="invalid-feedback"
+              *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+              <i class="bi bi-exclamation-circle me-1"></i>Contraseña requerida
+            </div>
           </div>
-          <div class="invalid-feedback"
-            *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
-            Contraseña requerida
+          <div class="alert alert-danger modern-alert" *ngIf="error">
+            <i class="bi bi-shield-exclamation me-2"></i>
+            {{ error }}
           </div>
+          <button type="submit" class="btn btn-umsa-modern w-100 py-3 mb-3" [disabled]="loginForm.invalid || loading"
+            [ngClass]="{'loading': loading}">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <i *ngIf="!loading" class="bi bi-box-arrow-in-right me-2"></i>
+            <span>{{ loading ? 'Iniciando Sesión...' : 'Iniciar Sesión' }}</span>
+          </button>
+        </form>
+        <div class="text-center">
+          <small class="text-muted fw-medium">© {{ 2025 }} UMSA - Sistema de Orientación Vocacional</small>
         </div>
-
-        <div class="alert alert-danger" *ngIf="error">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          {{ error }}
-        </div>
-
-        <button type="submit" class="btn btn-umsa w-100 py-2" [disabled]="loginForm.invalid || loading">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          <i *ngIf="!loading" class="bi bi-box-arrow-in-right me-2"></i>
-          Iniciar Sesión
-        </button>
-      </form>
-      <div class="text-center mt-4">
-        <small class="text-muted">© {{ 2025 }} UMSA - Sistema de Orientación Vocacional</small>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Panel de control cuando está autenticado -->
-<div *ngIf="isAuthenticated">
-  <!-- Header con logo y título -->
-  <header class="bg-umsa-blue-dark shadow-sm mb-4">
-    <div class="container-fluid py-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-          <img [src]="logoUrl" alt="Logo Universidad" class="me-3" style="height: 50px;">
-          <h1 class="h3 mb-0 text-light">Sistema de Orientación Vocacional</h1>
-        </div>
-        <div>
-          <button class="btn btn-outline-danger" (click)="logout()">
-            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-          </button>
-        </div>
-      </div>
-    </div>
-  </header>
+<!-- Panel de control autenticado -->
+<div *ngIf="isAuthenticated" class="panel-container">
   <div class="container-fluid px-4">
-    <!-- Sección de título y estadísticas -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2><i class="bi bi-speedometer2 me-2"></i>Panel de Control</h2>
-      <div>
-        <div class="btn-group" role="group">
-          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportarDropdown"
-            data-bs-toggle="dropdown" aria-expanded="false"
-            [disabled]="exportando || estudiantesFiltrados.length === 0">
-            <i class="bi bi-download me-2"></i>Exportar
-            <span *ngIf="exportando" class="spinner-border spinner-border-sm ms-2" role="status"
-              aria-hidden="true"></span>
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="exportarDropdown">
-            <li><a class="dropdown-item" (click)="exportarEstudiantes('excel')"><i
-                  class="bi bi-file-earmark-excel me-2"></i>Excel</a></li>
-            <li><a class="dropdown-item" (click)="exportarEstudiantes('pdf')"><i
-                  class="bi bi-file-earmark-pdf me-2"></i>PDF</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
     <!-- Sección de búsqueda y filtros -->
-    <div class="card shadow mb-4">
-      <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 text-primary"><i class="bi bi-funnel-fill me-2"></i>Filtros y Búsqueda</h5>
-        <button class="btn btn-sm btn-outline-secondary" (click)="limpiarTodosFiltros()">
-          <i class="bi bi-x-circle me-1"></i>Limpiar Filtros
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="row g-3">
-          <!-- Búsqueda global -->
-          <div class="col-md-12">
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input type="text" class="form-control" placeholder="Buscar por nombre, apellido, CI o colegio..."
-                [value]="searchQuery" (input)="buscarGlobal($event)">
+    <div class="card shadow-sm mb-2" style="border-radius: 12px; border: none;">
+      <div class="card-header py-2"
+        style="background: linear-gradient(135deg, var(--umsa-blue),  var(--umsa-blue-dark)); border-radius: 12px 12px 0 0; color: white;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <h6 class="mb-0 d-flex align-items-center">
+            <i class="bi bi-funnel-fill me-2"></i>Filtros y Búsqueda
+          </h6>
+          <div class="d-flex gap-2 mt-1 mt-md-0">
+            <button class="btn btn-warning btn-sm" (click)="limpiarTodosFiltros()">
+              <i class="bi bi-x-circle me-1"></i>Limpiar filtros
+            </button>
+            <div class="btn-group" role="group">
+              <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                [disabled]="exportando || estudiantesFiltrados.length === 0">
+                <i class="bi bi-download me-1"></i>Exportar datos
+                <span *ngIf="exportando" class="spinner-border spinner-border-sm ms-1"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" (click)="exportarEstudiantes('excel')">
+                    <i class="bi bi-file-earmark-excel me-2 text-success"></i>Excel</a></li>
+                <li><a class="dropdown-item" (click)="exportarEstudiantes('pdf')">
+                    <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>PDF</a></li>
+              </ul>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Filtros -->
-          <div class="col-md-3">
-            <label class="form-label">Provincia</label>
-            <select class="form-select" [(ngModel)]="filtros.provincia" (change)="onProvinciaChange(filtros.provincia)">
+      <div class="card-body p-3">
+        <!-- Búsqueda Global -->
+        <div class="mb-3">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-primary text-white"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Buscar por nombre, apellido, CI o colegio..."
+              [value]="searchQuery" (input)="buscarGlobal($event)">
+          </div>
+        </div>
+
+        <!-- Filtros Principales -->
+        <div class="row g-2 mb-3">
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" [(ngModel)]="filtros.provincia"
+              (change)="onProvinciaChange(filtros.provincia)">
               <option value="">Todas las provincias</option>
               <option *ngFor="let provincia of opcionesFiltros.provincias" [value]="provincia.idProvincia">
                 {{ provincia.nombre }}
@@ -127,9 +109,8 @@
             </select>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Municipio</label>
-            <select class="form-select" [(ngModel)]="filtros.municipio"
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" [(ngModel)]="filtros.municipio"
               (change)="aplicarFiltro('municipio', filtros.municipio)">
               <option value="">Todos los municipios</option>
               <option *ngFor="let municipio of opcionesFiltros.municipios" [value]="municipio.idMunicipio">
@@ -138,9 +119,8 @@
             </select>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Colegio</label>
-            <select class="form-select" [(ngModel)]="filtros.colegio"
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" [(ngModel)]="filtros.colegio"
               (change)="aplicarFiltro('colegio', filtros.colegio)">
               <option value="">Todos los colegios</option>
               <option *ngFor="let colegio of opcionesFiltros.colegios" [value]="colegio">
@@ -149,50 +129,60 @@
             </select>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Curso</label>
-            <select class="form-select" [(ngModel)]="filtros.curso" (change)="aplicarFiltro('curso', filtros.curso)">
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" [(ngModel)]="filtros.curso"
+              (change)="aplicarFiltro('curso', filtros.curso)">
               <option value="">Todos los cursos</option>
               <option *ngFor="let curso of opcionesFiltros.cursos" [value]="curso">
                 {{ curso }}
               </option>
             </select>
           </div>
+        </div>
 
-          <!-- Filtrado por rango de fechas -->
-          <div class="col-md-6">
-            <label class="form-label">Rango de Fechas</label>
-            <div class="d-flex">
-              <div class="input-group me-2">
-                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
-                <input type="date" class="form-control" [(ngModel)]="filtros.fechaInicio" placeholder="Fecha inicio">
+        <!-- Filtros de Fecha -->
+        <div class="rounded">
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-lg-6">
+              <label class="form-label text-muted fw-semibold mb-1">
+                <i class="bi bi-calendar-range me-1"></i>Rango de Fechas
+              </label>
+              <div class="row g-1">
+                <div class="col-5">
+                  <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaInicio">
+                </div>
+                <div class="col-2 text-center fs-6 text-muted">
+                  <small class="text-muted">- hasta -</small>
+                </div>
+                <div class="col-5">
+                  <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaFin">
+                </div>
               </div>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
-                <input type="date" class="form-control" [(ngModel)]="filtros.fechaFin" placeholder="Fecha fin">
-              </div>
-              <button class="btn btn-outline-primary ms-2" (click)="aplicarFiltroFecha()">
+            </div>
+            <div class="col-12 col-lg-1">
+              <button class="btn btn-primary btn-sm w-100" (click)="aplicarFiltroFecha()">
                 <i class="bi bi-funnel"></i>
               </button>
             </div>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Fecha específica</label>
-            <select class="form-select" [(ngModel)]="filtros.fecha" (change)="aplicarFiltro('fecha', filtros.fecha)">
-              <option value="">Todas las fechas</option>
-              <option *ngFor="let fecha of opcionesFiltros.fechasRegistro" [value]="fecha">
-                {{ fecha }}
-              </option>
-            </select>
+            <div class="col-12 col-lg-5">
+              <label class="form-label text-muted fw-semibold mb-1">
+                <i class="bi bi-calendar-event me-1"></i>Fecha Específica
+              </label>
+              <select class="form-select form-select-sm" [(ngModel)]="filtros.fecha"
+                (change)="aplicarFiltro('fecha', filtros.fecha)">
+                <option value="">Todas las fechas</option>
+                <option *ngFor="let fecha of opcionesFiltros.fechasRegistro" [value]="fecha">
+                  {{ fecha }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <!-- Modal para Ver Perfil de Estudiante -->
     <div class="modal fade" [ngClass]="{'show d-block': modalPerfilVisible}" tabindex="-1"
-      [ngStyle]="{'display': modalPerfilVisible ? 'block' : 'none'}" aria-labelledby="perfilEstudianteModalLabel"
-      [attr.aria-hidden]="!modalPerfilVisible">
+      [ngStyle]="{'display': modalPerfilVisible ? 'block' : 'none'}" aria-labelledby="perfilEstudianteModalLabel">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
           <div class="modal-header bg-primary text-white">
@@ -210,7 +200,6 @@
               </div>
               <p class="mt-2 text-muted">Cargando información del estudiante...</p>
             </div>
-
             <!-- Contenido del perfil -->
             <div *ngIf="!loading && estudianteSeleccionado" class="perfil-container">
               <!-- Banner y datos principales -->
@@ -236,37 +225,36 @@
                   </div>
                 </div>
               </div>
-
               <div class="px-4">
                 <!-- Información personal -->
                 <div class="card mb-4 border-0 shadow-sm">
-                  <div class="card-header bg-white py-3">
+                  <div class="card-header bg-white py-2">
                     <h5 class="mb-0 d-flex align-items-center">
                       <i class="bi bi-person-lines-fill me-2 text-primary"></i>
                       Datos Personales
                     </h5>
                   </div>
                   <div class="card-body">
-                    <div class="row g-3">
+                    <div class="row gx-3">
                       <div class="col-md-6">
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">CI:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.ciEstudiante }}</p>
+                          <p class="mb-0 fs-6 ">{{ estudianteSeleccionado.ciEstudiante }}</p>
                         </div>
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Nombre Completo:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.nombre }} {{ estudianteSeleccionado.apPaterno
+                          <p class="mb-0 fs-6">{{ estudianteSeleccionado.nombre }} {{ estudianteSeleccionado.apPaterno
                             }} {{ estudianteSeleccionado.apMaterno }}</p>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Edad:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.edad }} años</p>
+                          <p class="mb-0 fs-6">{{ estudianteSeleccionado.edad }} años</p>
                         </div>
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Celular:</label>
-                          <p class="mb-0 fs-5">
+                          <p class="mb-0 fs-6">
                             <span *ngIf="estudianteSeleccionado.celular">
                               <i class="bi bi-telephone me-1"></i>{{ estudianteSeleccionado.celular }}
                             </span>
@@ -278,13 +266,13 @@
                       <div class="col-md-6">
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Colegio:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.colegio }}</p>
+                          <p class="mb-0 fs-6">{{ estudianteSeleccionado.colegio }}</p>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="info-item mb-3">
                           <label class="d-block text-uppercase small text-muted mb-1">Curso:</label>
-                          <p class="mb-0 fs-5">{{ estudianteSeleccionado.curso }}</p>
+                          <p class="mb-0 fs-6">{{ estudianteSeleccionado.curso }}</p>
                         </div>
                       </div>
                     </div>
@@ -293,15 +281,15 @@
 
                 <!-- Resultados de Orientación -->
                 <div *ngIf="resultadoEstudiante && resultadoEstudiante.length > 0">
-                  <h5 class="mb-3 d-flex align-items-center">
+                  <h5 class="mb-2 d-flex align-items-center">
                     <span class="badge bg-primary rounded-pill me-2">{{ resultadoEstudiante.length }}</span>
                     <i class="bi bi-graph-up me-2 text-primary"></i>
                     Resultados de Orientación Vocacional
                   </h5>
 
                   <!-- Tabs para múltiples resultados -->
-                  <ul class="nav nav-tabs mb-3" *ngIf="resultadoEstudiante.length > 1">
-                    <li class="nav-item" *ngFor="let resultado of resultadoEstudiante; let i = index">
+                  <ul class="nav nav-tabs mb-1" *ngIf="resultadoEstudiante.length > 1">
+                    <li class="nav-item small" *ngFor="let resultado of resultadoEstudiante; let i = index">
                       <button class="nav-link" [ngClass]="{'active': i === 0}" data-bs-toggle="tab"
                         [attr.data-bs-target]="'#resultado-' + i">
                         Resultado {{ i + 1 }}
@@ -309,36 +297,41 @@
                       </button>
                     </li>
                   </ul>
-
                   <div class="tab-content">
                     <div class="tab-pane fade show" [ngClass]="{'active': i === 0}"
                       *ngFor="let resultado of resultadoEstudiante; let i = index" [attr.id]="'resultado-' + i">
-                      <div class="card mb-4 border-0 shadow-sm">
+                      <div class="card mb-2 border-0 shadow-sm">
                         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                          <h6 class="mb-0 d-flex align-items-center">
+                          <h6 class="mb-0 d-flex align-items-center h6">
                             <i class="bi bi-calendar-check me-2 text-primary"></i>
                             Evaluación del {{ resultado.fecha | date:'dd/MM/yyyy HH:mm' }}
                           </h6>
                           <span class="badge bg-success">Completado</span>
                         </div>
                         <div class="card-body">
-                          <div class="row mb-4">
+                          <div class="row mb-0">
                             <div class="col-md-6">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary">
+                                  <h6 class="card-title text-primary text-uppercase">
                                     <i class="bi bi-star me-2"></i>Interés y Aptitud
                                   </h6>
-                                  <div class="mb-3">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Interés:</label>
-                                    <div class="d-flex align-items-center">
-                                      <span class="fs-5 me-2">{{ resultado.interes }}</span>
+                                  <div class="row">
+                                    <div class="col-md-6">
+                                      <div class="mb-2">
+                                        <label class="d-block text-uppercase small text-muted mb-1">Interés:</label>
+                                        <div class="d-flex align-items-center">
+                                          <span class="fs-5 me-2">{{ resultado.interes }}</span>
+                                        </div>
+                                      </div>
                                     </div>
-                                  </div>
-                                  <div class="mb-0">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Aptitud:</label>
-                                    <div class="d-flex align-items-center">
-                                      <span class="fs-5 me-2">{{ resultado.aptitud }}</span>
+                                    <div class="col-md-6">
+                                      <div class="mb-0">
+                                        <label class="d-block text-uppercase small text-muted mb-1">Aptitud:</label>
+                                        <div class="d-flex align-items-center">
+                                          <span class="fs-5 me-2">{{ resultado.aptitud }}</span>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -347,22 +340,15 @@
                             <div class="col-md-6">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary">
+                                  <h6 class="card-title text-primary text-uppercase">
                                     <i class="bi bi-award me-2"></i>Evaluación Holland
                                   </h6>
-                                  <div class="mb-3">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Puntaje Holland:</label>
-                                    <p class="mb-0 fs-5">{{ resultado.puntajeHolland }}</p>
-                                  </div>
-                                  <div *ngIf="resultado.facultad?.nombre">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Facultad
-                                      recomendada:</label>
-                                    <p class="mb-0 fs-5">
-                                      <span class="badge bg-primary me-2">
-                                        <i class="bi bi-building me-1"></i>
-                                      </span>
-                                      {{ resultado.facultad.nombre }}
-                                    </p>
+                                  <label class="d-block text-uppercase small text-muted mb-1">PERSONALIDADES: </label>
+                                  <div class="">
+                                    <span class="badge bg-primary me-2 fs-6"
+                                      *ngFor="let letra of resultado.puntajeHolland.split('')">
+                                      {{ letra }}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -370,24 +356,26 @@
                           </div>
 
                           <!-- Resultados detallados -->
-                          <div class="row mb-3">
+                          <div class="row mb-0">
                             <!-- Datos CHASIDE específicos -->
                             <div class="col-md-6 mb-3" *ngIf="resultado.chaside">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary d-flex align-items-center">
+                                  <h6 class="card-title text-primary d-flex align-items-center text-uppercase">
                                     <i class="bi bi-clipboard-data me-2"></i>
                                     Test CHASIDE
                                   </h6>
                                   <div class="mb-0">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Código CHASIDE:</label>
+                                    <label class="d-block text-uppercase small text-muted mb-1">CODIGO:</label>
                                     <div class="chaside-code">
-                                      <span class="text-uppercase fw-bold me-1">
+                                      <span class="text-uppercase me-1 fs-5">
                                         {{ resultado.chaside.codigo }}
-
                                       </span>
                                     </div>
-                                    <p class="mt-2 small text-muted mb-0">
+                                    <label class="d-block text-uppercase small text-muted mb-1 mt-2">AREA DE
+                                      ESTUDIO:</label>
+                                    <p class="mb-0 fw-semibold">{{ resultado?.chaside?.descripcion }}</p>
+                                    <p class="mt-3 small text-muted mb-0">
                                       C: Administrativas y Contables, H: Humanísticas, A: Artísticas, S: Medicina y Cs.
                                       de la Salud,
                                       I: Ingeniería, D: Defensa y Seguridad, E: Ciencias Exactas
@@ -401,14 +389,19 @@
                             <div class="col-md-6 mb-3" *ngIf="resultado.holland">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary d-flex align-items-center">
+                                  <h6 class="card-title text-primary d-flex align-items-center text-uppercase">
                                     <i class="bi bi-person-bounding-box me-2"></i>
                                     Test Holland
                                   </h6>
                                   <div class="mb-0">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Tipo de
-                                      personalidad:</label>
-                                    <p class="mb-0 fs-5">{{ resultado.holland.personalidad }}</p>
+                                    <label class="d-block text-uppercase small text-muted mb-1">Tipo principal:</label>
+                                    <p class="mb-2 fs-5 text-uppercase">{{ resultado.holland.nombre }}</p>
+                                    <label class="d-block text-uppercase small text-muted mb-1 ">PERSONALIDAD:</label>
+                                    <p class="mb-2 fw-semibold">{{ resultado?.holland?.descripcion }}</p>
+                                    <p class="mt-3 small text-muted mb-0">
+                                      R: Realista, I: Investigador, A: Artístico, S: Social, E: Emprendedor, C:
+                                      Convencional
+                                    </p>
                                   </div>
                                 </div>
                               </div>
@@ -422,9 +415,24 @@
                                 <i class="bi bi-lightbulb me-2"></i>
                                 Recomendaciones
                               </h6>
-                              <p class="mb-0">
-                                Basado en los resultados de los tests, se recomienda explorar carreras relacionadas con
-                                <strong>{{ resultado.facultad?.nombre || 'las áreas de mayor puntaje' }}</strong>.
+                              <p class="mb-2">
+                                Basado en los resultados de los tests:
+                              </p>
+                              <ul class="mb-0">
+                                <li *ngIf="resultado.chaside">
+                                  <strong>CHASIDE ({{ resultado.chaside.codigo }}):</strong>
+                                  {{ resultado?.chaside?.descripcion }}
+                                </li>
+                                <li *ngIf="resultado.holland">
+                                  <strong>Holland ({{ resultado.puntajeHolland }}):</strong>
+                                  Perfil {{ resultado.holland.nombre }} - {{ resultado?.holland?.descripcion }}
+                                </li>
+                                <li *ngIf="resultado.facultad">
+                                  <strong>Facultad recomendada:</strong>
+                                  {{ resultado.facultad.nombre }}
+                                </li>
+                              </ul>
+                              <p class="mt-2 mb-0 small text-muted">
                                 Es importante complementar estos resultados con una orientación personalizada.
                               </p>
                             </div>
@@ -434,7 +442,6 @@
                     </div>
                   </div>
                 </div>
-
                 <div class="alert alert-info d-flex align-items-center" *ngIf="!resultadoEstudiante?.length">
                   <i class="bi bi-info-circle fs-4 me-3"></i>
                   <div>
@@ -462,8 +469,7 @@
     </div>
     <!-- Modal para Editar Estudiante y Resultados -->
     <div class="modal fade" [ngClass]="{'show d-block': modalEditarVisible}" tabindex="-1"
-      [ngStyle]="{'display': modalEditarVisible ? 'block' : 'none'}" aria-labelledby="editarEstudianteModalLabel"
-      [attr.aria-hidden]="!modalEditarVisible">
+      [ngStyle]="{'display': modalEditarVisible ? 'block' : 'none'}" aria-labelledby="editarEstudianteModalLabel">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content shadow-lg border-0 rounded-4">
           <div class="modal-header bg-primary text-white">
@@ -486,15 +492,15 @@
                 </div>
               </div>
 
-              <form *ngIf="editarForm" [formGroup]="editarForm">
-                <div class="row g-4">
+              <form *ngIf="editarForm" [formGroup]="editarForm" >
+                <div class="row g-4 " >
                   <!-- CI y Nombre -->
                   <div class="col-md-6">
                     <div class="form-floating">
-                      <input type="text" class="form-control border-2 rounded-3" id="ciEstudiante"
+                      <input type="text" class="form-control border-2 rounded-3" id="ciEstudiante" 
                         formControlName="ciEstudiante" placeholder="CI"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['ciEstudiante'].invalid && editarForm.controls['ciEstudiante'].touched}">
-                      <label for="ciEstudiante" class="text-muted">
+                      <label for="ciEstudiante" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-card-text me-2"></i>CI *
                       </label>
                       <div class="invalid-feedback fw-semibold"
@@ -510,7 +516,7 @@
                       <input type="text" class="form-control border-2 rounded-3" id="nombre" formControlName="nombre"
                         placeholder="Nombre"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['nombre'].invalid && editarForm.controls['nombre'].touched}">
-                      <label for="nombre" class="text-muted">
+                      <label for="nombre" class="text-muted" style="font-size: var(--tx-base) !important;" >
                         <i class="bi bi-person me-2"></i>Nombre *
                       </label>
                       <div class="invalid-feedback fw-semibold"
@@ -527,7 +533,7 @@
                       <input type="text" class="form-control border-2 rounded-3" id="apPaterno"
                         formControlName="apPaterno" placeholder="Apellido Paterno"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['apPaterno'].invalid && editarForm.controls['apPaterno'].touched}">
-                      <label for="apPaterno" class="text-muted">
+                      <label for="apPaterno" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-person-badge me-2"></i>Apellido Paterno *
                       </label>
                       <div class="invalid-feedback fw-semibold"
@@ -542,7 +548,7 @@
                     <div class="form-floating">
                       <input type="text" class="form-control border-2 rounded-3" id="apMaterno"
                         formControlName="apMaterno" placeholder="Apellido Materno">
-                      <label for="apMaterno" class="text-muted">
+                      <label for="apMaterno" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-person-badge me-2"></i>Apellido Materno
                       </label>
                     </div>
@@ -552,7 +558,7 @@
                       <input type="text" class="form-control border-2 rounded-3" id="colegio" formControlName="colegio"
                         placeholder="Colegio"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['colegio'].invalid && editarForm.controls['colegio'].touched}">
-                      <label for="colegio" class="text-muted">
+                      <label for="colegio" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-building me-2"></i>Colegio *
                       </label>
                       <div class="invalid-feedback fw-semibold"
@@ -568,7 +574,7 @@
                       <input type="text" class="form-control border-2 rounded-3" id="curso" formControlName="curso"
                         placeholder="Curso"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['curso'].invalid && editarForm.controls['curso'].touched}">
-                      <label for="curso" class="text-muted">
+                      <label for="curso" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-book me-2"></i>Curso *
                       </label>
                       <div class="invalid-feedback fw-semibold"
@@ -583,7 +589,7 @@
                       <input type="number" class="form-control border-2 rounded-3" id="edad" formControlName="edad"
                         placeholder="Edad"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['edad'].invalid && editarForm.controls['edad'].touched}">
-                      <label for="edad" class="text-muted">
+                      <label for="edad" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-calendar3 me-2"></i>Edad *
                       </label>
                       <div class="invalid-feedback fw-semibold"
@@ -599,7 +605,7 @@
                       <input type="text" class="form-control border-2 rounded-3" id="celular" formControlName="celular"
                         placeholder="Celular"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['celular'].invalid && editarForm.controls['celular'].touched}">
-                      <label for="celular" class="text-muted">
+                      <label for="celular" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-phone me-2"></i>Celular
                       </label>
                       <div class="invalid-feedback fw-semibold"
@@ -611,19 +617,19 @@
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating">
-                      <select class="form-select border-2 rounded-3" id="id_provincia" formControlName="id_provincia"
-                        [ngClass]="{'is-invalid border-danger': editarForm.controls['id_provincia'].invalid && editarForm.controls['id_provincia'].touched}"
+                      <select class="form-select border-2 rounded-3" id="idProvincia" formControlName="idProvincia"
+                        [ngClass]="{'is-invalid border-danger': editarForm.controls['idProvincia'].invalid && editarForm.controls['idProvincia'].touched}"
                         (change)="onProvinciaChangeEditar($event)">
                         <option [value]="null">Seleccione una provincia</option>
-                        <option *ngFor="let provincia of provincias" [value]="provincia.id">
+                        <option *ngFor="let provincia of provincias" [value]="provincia.idProvincia">
                           {{ provincia.nombre }}
                         </option>
                       </select>
-                      <label for="id_provincia" class="text-muted">
+                      <label for="idProvincia" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-map me-2"></i>Provincia *
                       </label>
                       <div class="invalid-feedback fw-semibold"
-                        *ngIf="editarForm.controls['id_provincia'].invalid && editarForm.controls['id_provincia'].touched">
+                        *ngIf="editarForm.controls['idProvincia'].invalid && editarForm.controls['idProvincia'].touched">
                         <i class="bi bi-exclamation-triangle me-1"></i>
                         Seleccione una provincia
                       </div>
@@ -633,14 +639,13 @@
                   <div class="col-md-6">
                     <div class="form-floating">
                       <select class="form-select border-2 rounded-3" id="id_municipio" formControlName="id_municipio"
-                        [ngClass]="{'is-invalid border-danger': editarForm.controls['id_municipio'].invalid && editarForm.controls['id_municipio'].touched}"
-                        [disabled]="!editarForm.get('id_provincia')?.value">
+                        [ngClass]="{'is-invalid border-danger': editarForm.controls['id_municipio'].invalid && editarForm.controls['id_municipio'].touched}">
                         <option [value]="null">Seleccione un municipio</option>
                         <option *ngFor="let municipio of municipiosFiltrados" [value]="municipio.idMunicipio">
                           {{ municipio.nombre }}
                         </option>
                       </select>
-                      <label for="id_municipio" class="text-muted">
+                      <label for="id_municipio" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-pin-map me-2"></i>Municipio *
                       </label>
                       <div class="invalid-feedback fw-semibold"
@@ -769,12 +774,13 @@
     </div>
     <!-- Tabla de estudiantes -->
     <div class="card shadow mb-4">
-      <div class="card-header py-3">
-        <h5 class="mb-0 text-primary"><i class="bi bi-table me-2"></i>Listado de Estudiantes</h5>
+      <div class="card-header"
+        style="background: linear-gradient(135deg, var(--umsa-blue),  var(--umsa-blue-dark)); border-radius: 12px 12px 0 0; color: white;">
+        <h5 class="mb-0"><i class="bi bi-table me-2"></i>Listado de Estudiantes</h5>
       </div>
       <div class="card-body">
         <!-- Selector de items por página -->
-        <div class="row mb-3">
+        <div class="row mb-2">
           <div class="col-md-6">
             <div class="d-flex align-items-center">
               <span class="me-2">Mostrar</span>
@@ -798,9 +804,9 @@
           </div>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive ">
           <table class="table table-bordered table-hover ">
-            <thead class="table-dark">
+            <thead class="table-umsa text-uppercase small">
               <tr>
                 <th class="cursor-pointer" (click)="ordenarPor('ciEstudiante')">
                   CI
@@ -827,7 +833,7 @@
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="align-middle">
               <tr *ngIf="estudiantesPaginados.length === 0">
                 <td colspan="7" class="text-center py-4">
                   <i class="bi bi-exclamation-circle text-muted me-2"></i>
@@ -844,20 +850,19 @@
 
                 <td class="text-center">
                   <div class="btn-group btn-group-sm" role="group">
-                    <button class="btn btn-light px-3 py-2 rounded-start btn-outline-primary"
-                      title="Ver Perfil" (click)="verPerfilEstudiante(estudiante.idEstudiante)"
-                      style="transition: all 0.2s;">
-                      <i class="bi bi-person-badge fs-5"></i>
+                    <button class="btn px-3 rounded-start btn-primary" title="Ver Perfil"
+                      (click)="verPerfilEstudiante(estudiante.idEstudiante)" style="transition: all 0.2s;">
+                      <i class="bi bi-person-badge fs-6"></i>
                     </button>
 
-                    <button class="btn btn-light px-3 py-2 btn-outline-warning" title="Editar"
-                      (click)="abrirModalEditar(estudiante)" style="transition: all 0.2s; margin: 0 2px;">
-                      <i class="bi bi-pencil fs-5"></i>
+                    <button class="btn px-3 btn-warning" title="Editar" (click)="abrirModalEditar(estudiante)"
+                      style="transition: all 0.2s; margin: 0 7px;">
+                      <i class="bi bi-pencil fs-6"></i>
                     </button>
 
-                    <button class="btn btn-light px-3 py-2 rounded-end btn-outline-danger" title="Eliminar"
+                    <button class="btn px-3 rounded-end btn-danger" title="Eliminar"
                       (click)="eliminarEstudiante(estudiante.idEstudiante)" style="transition: all 0.2s;">
-                      <i class="bi bi-trash fs-5"></i>
+                      <i class="bi bi-trash fs-6"></i>
                     </button>
                   </div>
                 </td>
@@ -867,43 +872,45 @@
         </div>
         <!-- Paginación -->
         <div class="d-flex justify-content-center mt-3" *ngIf="paginacion.totalPaginas > 1">
-          <nav>
+          <nav aria-label="Paginación de resultados">
             <ul class="pagination">
               <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === 1}">
-                <a class="page-link" (click)="cambiarPagina(1)" aria-label="Primera">
+                <a class="page-link" (click)="cambiarPagina(1)" aria-label="Primera" tabindex="-1">
                   <span aria-hidden="true">&laquo;</span>
                 </a>
               </li>
               <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === 1}">
-                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual - 1)" aria-label="Anterior">
+                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual - 1)" aria-label="Anterior"
+                  tabindex="-1">
                   <span aria-hidden="true">&lt;</span>
                 </a>
               </li>
 
               <ng-container *ngFor="let pagina of [].constructor(paginacion.totalPaginas); let i = index">
-                <li class="page-item" *ngIf="(i + 1) === 1 || 
-                                            (i + 1) === paginacion.totalPaginas || 
-                                            (i + 1) >= paginacion.paginaActual - 1 && 
-                                            (i + 1) <= paginacion.paginaActual + 1"
+                <li class="page-item" *ngIf="(i + 1) === 1 ||
+                                      (i + 1) === paginacion.totalPaginas ||
+                                      (i + 1) >= paginacion.paginaActual - 1 &&
+                                      (i + 1) <= paginacion.paginaActual + 1"
                   [ngClass]="{'active': i + 1 === paginacion.paginaActual}">
-                  <a class="page-link" (click)="cambiarPagina(i + 1)">{{ i + 1 }}</a>
+                  <a class="page-link" (click)="cambiarPagina(i + 1)" tabindex="-1">{{ i + 1 }}</a>
                 </li>
                 <li class="page-item disabled" *ngIf="(i + 1) === 2 && paginacion.paginaActual > 3">
-                  <a class="page-link">...</a>
+                  <span class="page-link">...</span>
                 </li>
                 <li class="page-item disabled"
                   *ngIf="(i + 1) === paginacion.totalPaginas - 1 && paginacion.paginaActual < paginacion.totalPaginas - 2">
-                  <a class="page-link">...</a>
+                  <span class="page-link">...</span>
                 </li>
               </ng-container>
 
               <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === paginacion.totalPaginas}">
-                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual + 1)" aria-label="Siguiente">
+                <a class="page-link" (click)="cambiarPagina(paginacion.paginaActual + 1)" aria-label="Siguiente"
+                  tabindex="-1">
                   <span aria-hidden="true">&gt;</span>
                 </a>
               </li>
               <li class="page-item" [ngClass]="{'disabled': paginacion.paginaActual === paginacion.totalPaginas}">
-                <a class="page-link" (click)="cambiarPagina(paginacion.totalPaginas)" aria-label="Última">
+                <a class="page-link" (click)="cambiarPagina(paginacion.totalPaginas)" aria-label="Última" tabindex="-1">
                   <span aria-hidden="true">&raquo;</span>
                 </a>
               </li>
