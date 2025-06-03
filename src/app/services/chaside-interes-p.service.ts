@@ -24,7 +24,10 @@ export class ChasideInteresPService {
     {pregunta: '¿Pasarías varias horas leyendo un libro de tu interés?', area: 'H'},
     {pregunta: '¿Te interesan los temas relacionados al pasado y a la evolución del hombre?', area: 'H'},
     {pregunta: '¿Participarías de una investigación sobre la violencia en el fútbol (las barras bravas)?', area: 'H'},
-    {pregunta: '¿Descubriste algún filósofo o escritor que haya expresado tus mismas ideas antes?', area: 'H'},
+    {pregunta: '¿Descubriste algún filósofo o escritor que haya expresado tus mismas ideas antes?', area: 'H'}
+  ];
+
+  preguntasInteresChasideDos: chasidePregunta[] = [
     {pregunta: '¿La libertad y la justicia son valores importantes en tu vida?', area: 'H'},
     {pregunta: '¿Lucharías por una causa justa hasta las últimas consecuencias?', area: 'H'},
     {pregunta: '¿Te gustaría dirigir un proyecto de urbanización en tu barrio?', area: 'A'},
@@ -41,7 +44,10 @@ export class ChasideInteresPService {
     {pregunta: '¿Escuchas atentamente los problemas que tienen tus amigos?', area: 'S'},
     {pregunta: '¿Convences fácilmente a otras personas sobre la validez de tus argumentos?', area: 'S'},
     {pregunta: '¿Te sentirías a gusto trabajando en un ambiente hospitalario?', area: 'S'},
-    {pregunta: '¿Participarías en una campaña de prevención contra el virus AH1N1?', area: 'S'},
+    {pregunta: '¿Participarías en una campaña de prevención contra el virus AH1N1?', area: 'S'}
+  ];
+
+  preguntasInteresChasideTres: chasidePregunta[] = [
     {pregunta: '¿Te gustaría hacer un curso de primeros auxilios?', area: 'S'},
     {pregunta: '¿Acostumbras a leer revistas relacionadas con los últimos avances científicos y tecnológicos en el área desalud?', area: 'S'},
     {pregunta: '¿Te gustaría investigar sobre alguna nueva vacuna?', area: 'S'},
@@ -58,7 +64,10 @@ export class ChasideInteresPService {
     {pregunta: '¿Te gustaría investigar científicamente sobre cultivos agrícolas?', area: 'I'},
     {pregunta: '¿Enviarías tu hoja de vida a una empresa automotriz que solicita gente para su área de producción?', area: 'I'},
     {pregunta: '¿Participarías en un grupo de defensa internacional dentro de alguna fuerza armada?', area: 'D'},
-    {pregunta: '¿Te dedicarías a ayudar a personas accidentadas o atacadas por asaltantes?', area: 'D'},
+    {pregunta: '¿Te dedicarías a ayudar a personas accidentadas o atacadas por asaltantes?', area: 'D'}
+  ];
+
+  preguntasChasideInteresCuatro: chasidePregunta[] = [
     {pregunta: '¿Participarías como profesional en un espectáculo de acrobacia aérea?', area: 'D'},
     {pregunta: '¿Te gustaría participar para mantener el orden ante grandes desórdenes o catástrofes?', area: 'D'},
     {pregunta: '¿Aceptarías que las mujeres formaran parte de las fuerzas armadas bajo las mismas condiciones que los hombres?', area: 'D'},
