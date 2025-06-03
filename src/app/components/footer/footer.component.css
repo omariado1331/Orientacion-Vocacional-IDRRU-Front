@@ -1,0 +1,146 @@
+.institucional-footer {
+        background: var(--umsa-blue) url('../../../assets/fondob.png') center no-repeat;
+        background-position: center -10px;
+        background-repeat: initial;
+        background-size: 8%;
+        width: 95%;
+        height: 120px;
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+        border-radius: 20px 20px 0 0;
+        font-size: var(--tx-sm);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        
+        margin: 0 auto;
+        transition: var(--navbar-transition);
+        transform: translateY(0);
+        opacity: 1;
+        position:inherit;
+        bottom: 0;
+        left: 2.5%;
+        right: 2.5%;
+        z-index: 1030;
+        will-change: transform, opacity;
+        transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+      
+  }
+  
+  .footer-container {
+    display: flex;
+    justify-content: left;
+    align-items: flex-start;
+    max-width: auto;
+    margin: 0;
+    flex-wrap: wrap;
+    gap:inherit;
+  }
+  
+  .logo {
+    width: 70px;
+    margin-bottom: 0.5rem;
+  }
+  .logoidr{
+    width: 100px;
+    background-color: aliceblue;
+  }
+  
+  .footer-left {
+    text-align: left;
+    font-size: 11px;
+  }
+  
+  .footer-right {
+    text-align: right;
+    font-size: 11px;
+  }
+
+  .social-icon{
+    display: flex;
+    justify-content: baseline;
+    position: inherit;
+    flex-wrap: wrap;
+  }
+  .icon-elem{
+    list-style: none;
+  }
+
+  .icon-fb, .icon-yt, .icon-ig, .icon-x, .icon-mail, .icon-geo{
+    font-size: 32px;
+    display: inline-block;
+    margin: auto 10px;
+    transition: 0.5s;
+    color: var(--umsa-blue);
+  }
+
+  .icon-fb:hover{
+    transform: translateY(-15px);
+    color: #3b5998;
+  }
+  .icon-yt:hover{
+    transform: translateY(-15px);
+    color: #c4302b;
+  }
+  .icon-ig:hover{
+    transform: translateY(-15px);
+    color:color-mix(in lch longer hue, #fd5949 80%, #285AEB  20%)
+    }
+  .icon-x:hover{
+        transform: translateY(-15px);
+        color: #000000;
+  }
+  .icon-mail:hover{
+    transform: translateY(-15px);
+    color: #1fbb00;
+  }
+  .icon-geo:hover{
+    transform: translateY(-15px);
+    color: #614209;
+  }
+
+  @media (max-width: 991.98px) {
+    .institucional-footer {
+      position: relative;
+      overflow: hidden;
+      border-radius: 20px 20px 0 0;
+      height: auto;
+      background-color: transparent;
+      transform: none;
+      left: 1%;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+  
+    .institucional-footer ul {
+      margin-right: 0 !important;
+    }
+    .logo{
+        display: none;
+    }
+    .logoidr{
+        
+        display: none;
+    }
+
+    .footer-left {
+        text-align: center;
+        font-size: 11px;
+      }
+      
+      .footer-right {
+        text-align: center;
+        font-size: 11px;
+      }
+  
+    .institucional-footer::before {
+      content: "";
+      align-items: center;
+      position: absolute;
+      inset: 0;
+      background: var(--umsa-blue) url('../../../assets/fondob.png') repeat;
+      background-size: 80px;
+      filter: blur(1px);
+      z-index: -1;
+      border-radius: 0 0 20px 20px;
+      transition: var(--navbar-transition);
+    }
+}

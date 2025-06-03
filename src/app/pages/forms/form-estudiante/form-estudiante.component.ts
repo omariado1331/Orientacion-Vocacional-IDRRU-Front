@@ -408,11 +408,11 @@ export class FormEstudianteComponent {
           this.idMunicipio = municipiod.id;
         }
     }
-    this.estudianteI.ciEstudiante = this.carnet;
-    this.estudianteI.nombre = this.nombre?.value;
-    this.estudianteI.apPaterno = this.apPaterno?.value;
-    this.estudianteI.apMaterno = this.apMaterno?.value;
-    this.estudianteI.colegio = this.colegio?.value;
+    this.estudianteI.ciEstudiante = this.carnet.toUpperCase();
+    this.estudianteI.nombre = this.nombre?.value.toUpperCase();
+    this.estudianteI.apPaterno = this.apPaterno?.value.toUpperCase();
+    this.estudianteI.apMaterno = this.apMaterno?.value.toUpperCase();
+    this.estudianteI.colegio = this.colegio?.value.toUpperCase();
     this.estudianteI.curso = this.curso?.value;
     this.estudianteI.edad = this.edad?.value;
     this.estudianteI.celular = this.celular?.value;
@@ -529,8 +529,8 @@ export class FormEstudianteComponent {
         const navigationExtras: NavigationExtras = {
           state:{
             bdform: false,
-            nombre: [`${this.nombre?.value} ${this.apPaterno?.value} ${this.apMaterno?.value}`],
-            colegio: this.colegio?.value,
+            nombre: [`${this.nombre?.value} ${this.apPaterno?.value} ${this.apMaterno?.value}`.toUpperCase()],
+            colegio: this.colegio?.value.toUpperCase(),
             carnet: this.carnet,
             interes: this.puntajeInteres,
             aptitud: this.puntajeAptitud,
@@ -539,6 +539,8 @@ export class FormEstudianteComponent {
             celular: this.celular?.value,
             curso: this.curso?.value,
             edad: this.edad?.value,
+            provincia: this.provincia?.value.toUpperCase(),
+            municipio: this.municipio?.value.toUpperCase()
           }
         }
         this.router.navigate(['/formulario/resultado'], navigationExtras)

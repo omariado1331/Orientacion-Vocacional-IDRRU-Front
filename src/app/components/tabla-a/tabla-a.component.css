@@ -47,6 +47,9 @@
     padding: 8px 15px;
     border-radius: 20px;
 }
+.badge {
+    background: linear-gradient(135deg, #5c373b 0%, #aa2647 100%);
+}
 
 .holland-code {
     display: inline-block;
@@ -69,12 +72,12 @@
     margin: 2px;
 }
 
-.holland-R { background-color: #e74c3c; }
-.holland-I { background-color: #3498db; }
-.holland-A { background-color: #f39c12; }
-.holland-S { background-color: #2ecc71; }
-.holland-E { background-color: #9b59b6; }
-.holland-C { background-color: #34495e; }
+.holland-R { background-color: #4a4a4a; }
+.holland-I { background-color: #556b2f ; }
+.holland-A { background-color: #2f4f4f ; }
+.holland-S { background-color: #a08a56 ; }
+.holland-E { background-color: #b8860b ; }
+.holland-C { background-color: #4b0082; }
 
 .section-title {
     color: #2c3e50;
@@ -126,7 +129,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #5c373b 0%, #aa2647 100%);
     color: white;
     display: flex;
     align-items: center;
