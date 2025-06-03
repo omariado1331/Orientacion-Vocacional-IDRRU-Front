@@ -40,21 +40,22 @@ export class ResultadoService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
   
-  busquedaProvincia(
-    idProvincia?: number, // recibe 3 parametros ? opcional
-    idMunicipio?: number,
-    year?: string
-  ): Observable<ResultadoDtoResponse[]> { //Es un flujo que emitira un objeto o arreglo del tipo de dato, devuelve datos asíncronos.
-    let params = new HttpParams();  //crea un contenedor vacío para query params.
-    if (idProvincia !== undefined) {  // undefined Variable declarada pero sin valor // null Valor explícito "vacío"
-      params = params.set('idProvincia', idProvincia.toString());
-    }
-    if (idMunicipio !== undefined) {
-      params = params.set('idMunicipio', idMunicipio.toString());
-    }
-    if (year !== undefined) {
-      params = params.set('year', year);
-    }
-    return this.http.get<ResultadoDtoResponse[]>(`${this.apiUrl}/busqueda-provincia`, { params }); // params Son los parámetros de consulta que se agregan a la URL (por ejemplo: ?idProvincia=5&year=2023).
+busquedaProvincia(
+  idProvincia?: number,
+  idMunicipio?: number,
+  year?: string
+): Observable<ResultadoDtoResponse[]> {
+  let params = new HttpParams();
+
+  if (typeof idProvincia === 'number' && !isNaN(idProvincia)) {
+    params = params.set('idProvincia', idProvincia.toString());
   }
+  if (typeof idMunicipio === 'number' && !isNaN(idMunicipio)) {
+    params = params.set('idMunicipio', idMunicipio.toString());
+  }
+  if (year) {
+    params = params.set('year', year);
+  }
+  return this.http.get<ResultadoDtoResponse[]>(`${this.apiUrl}/busqueda-provincia`, { params });
+}
 }

@@ -1,11 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Provincia } from '../interfaces/provincia-interface';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class ProvinciaService {
+
+
+  private baseUrl = 'http://localhost:8080/provincia';
+
+  constructor(private http: HttpClient) {}
+
+  getProvinciasList(): Observable<Provincia[]> {
+    return this.http.get<Provincia[]>(this.baseUrl);
+  }
+
+
 
   private mockProvincias: Provincia[] = [
     { id: 1, nombre: 'ABEL ITURRALDE' },
@@ -30,7 +43,6 @@ export class ProvinciaService {
     { id: 20, nombre: 'SUDYUNGAS' }
   ];
 
-  constructor() { }
 
   getProvincias(): Observable<Provincia[]> {
     return of(this.mockProvincias);

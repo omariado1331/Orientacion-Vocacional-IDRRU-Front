@@ -1,60 +1,101 @@
-<div class="container">
+<div class="top-container">
   <div class="filters">
+
+
+
+
+
+
+
+
+
+
+
     <label>
-      Provincia ID:
-      <input type="number" [(ngModel)]="idProvincia" placeholder="Ej: 1" />
+      Provincia:
+      <select [(ngModel)]="idProvincia" (change)="onProvinciaChange()">
+        <option [ngValue]="null">Selecciona una provincia</option>
+        <option *ngFor="let p of provincias" [ngValue]="p.id">{{ p.nombre }}</option>
+      </select>
     </label>
 
     <label>
-      Municipio ID:
-      <input type="number" [(ngModel)]="idMunicipio" placeholder="Ej: 10" />
+      Municipio:
+      <select [(ngModel)]="idMunicipio"  (change)="onMunicipioChange()">
+        <option [ngValue]="null">Selecciona una municipio</option>
+        <option *ngFor="let m of municipios" [ngValue]="m.idMunicipio">{{ m.nombre }}</option>
+      </select>
     </label>
 
     <label>
       Año:
-      <input type="text" [(ngModel)]="year" placeholder="Ej: 2023" />
+      <select [(ngModel)]="year">
+        <option value="">Selecciona un año</option>
+        <option *ngFor="let y of listaAnios" [value]="y">{{ y }}</option>
+      </select>
     </label>
-    
+
     <div class="buttons">
       <button (click)="cargarResultados()">Buscar</button>
       <button (click)="limpiarFiltros()">Limpiar</button>
     </div>
   </div>
 
-  <div class="table-container" *ngIf="resultados.length > 0">
-    <table>
-      <thead>
-        <tr>
-          <th>Provincia</th>
-          <th>Municipio</th>
-          <th>Chaside</th>
-          <th>Fecha</th>
-          <th>Cantidad Estudiantes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let r of resultados">
-          <td>{{ r.provincia }}</td>
-          <td>{{ r.municipio }}</td>
-          <td>{{ r.chaside }}</td>
-          <td>{{ r.fecha }}</td>
-          <td>{{ r.cantidadEstudiantes }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="container">
+
+    <!-- Imagen + mensaje cuando no hay resultados o antes de buscar -->
+    <div *ngIf="mostrarImagenNoResultados" class="no-resultados">
+      <p>LA PAZ</p>
+    </div>
+
+    <!-- Tabla cuando hay resultados -->
+    <div class="table-container" *ngIf="resultados.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Provincia</th>
+            <th>Municipio</th>
+            <th>Chaside</th>
+            <th>Fecha</th>
+            <th>Cantidad Estudiantes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of resultados">
+            <td>{{ r.provincia }}</td>
+            <td>{{ r.municipio }}</td>
+            <td>{{ r.chaside }}</td>
+            <td>{{ r.fecha }}</td>
+            <td>{{ r.cantidadEstudiantes }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 
-  <div *ngIf="resultados.length === 0" class="no-results">
-    No se encontraron resultados con esos filtros.
+  <div *ngIf="mostrarGrafico" class="leyenda-lateral">
+    <h4>TABLA DE RESULTADOS</h4>
+    <div *ngFor="let label of chartData.labels; let i = index" class="item-leyenda">
+      <div class="color-label">
+        <div [style.background]="chartData.datasets[0].backgroundColor[i]" class="color-box">
+        </div>
+        <strong>{{ label }}</strong>
+      </div>
+      <ul>
+        <li *ngFor="let descripcion of nombresPorLabel[label]">{{ descripcion }}</li>
+      </ul>
+    </div>
   </div>
-</div>
 
+  <div *ngIf="isBrowser && mostrarGrafico" class="grafico-container">
+    <h3 style="text-align: center;">RESPUESTAS DE TEST VOCACIONAL</h3>
+    <canvas id="myChart" baseChart [data]="chartData" [type]="'pie'" [options]="chartOptions">
+    </canvas>
+  </div>
 
-<div *ngIf="isBrowser && mostrarGrafico" class="grafico-container">
-  <h3 style="text-align: center;">Distribución de códigos (CHASIDE)</h3>
-  <canvas baseChart
-          [data]="chartData"
-          [type]="'pie'"
-          [options]="chartOptions">
-  </canvas>
+  <div class="botones-exportar" *ngIf="mostrarBotonesExportar">
+    <button (click)="generarPDFconGraficoYTabla()">Descargar PDF</button>
+  </div>
+
 </div>
