@@ -570,6 +570,8 @@ export class FormEstudianteComponent {
             celular: estudianteGuardado.celular,
             curso: estudianteGuardado.curso,
             edad: estudianteGuardado.edad,
+            provincia: this.provincia?.value.toUpperCase(),
+            municipio: this.municipio?.value.toUpperCase()
           }
         }
         this.router.navigate(['/formulario/resultado'], navigationExtras)
