@@ -14,7 +14,7 @@
                     <div class="row">
                         <div class="mb-2 col-md-3">
                             <label class="form-label" [class.error]="enviadoEst() && carnetNum?.invalid">Carnet de Identidad*</label>
-                            <input type="number" class="form-control" placeholder="######## Numero de Carnet" 
+                            <input type="number" style="text-transform: uppercase;" class="form-control" placeholder="Número de Carnet" 
                             formControlName="carnetNum">
                         </div>
                         <div class="mb-2 col-md-2">
@@ -34,20 +34,20 @@
                     
                         <div class="mb-2 col-md-12">
                             <label class="form-label" [class.error]="enviadoEst() && nombre?.invalid">Nombres*</label>
-                            <input type="text" class="form-control" formControlName="nombre" placeholder="INGRESA NOMBRES">
+                            <input type="text" style="text-transform: uppercase;" class="form-control" formControlName="nombre" placeholder="INGRESA NOMBRES">
                         </div>
                     
                         <div class="mb-2 col-md-6">
                             <label class="form-label" [class.error]="enviadoEst() && apPaterno?.invalid">Apellido Paterno*</label>
-                            <input type="text" class="form-control" formControlName="apPaterno" placeholder="INGRESA APELLIDO PATERNO">
+                            <input type="text" style="text-transform: uppercase;" class="form-control" formControlName="apPaterno" placeholder="INGRESA APELLIDO PATERNO">
                         </div>    
                         <div class="mb-2 col-md-6">
                             <label class="form-label" [class.error]="enviadoEst() && apMaterno?.invalid">Apellido Materno*</label>
-                            <input type="text" class="form-control"formControlName="apMaterno" placeholder="INGRESA APELLIDO MATERNO">
+                            <input type="text" style="text-transform: uppercase;" class="form-control"formControlName="apMaterno" placeholder="INGRESA APELLIDO MATERNO">
                         </div>
                         <div class="mb-2 col-md-8">
                             <label class="form-label" [class.error]="enviadoEst() && colegio?.invalid">Colegio*</label>
-                            <input type="text" class="form-control" formControlName="colegio" placeholder="INGRESA COLEGIO">
+                            <input type="text" style="text-transform: uppercase;" class="form-control" formControlName="colegio" placeholder="INGRESA COLEGIO">
                         </div>
                         <div class="mb-2 col-md-4">
                             <label class="form-label" [class.error]="enviadoEst() && curso?.invalid">Curso*</label>
@@ -66,7 +66,7 @@
                         </div>
                         <div class="mb-2 col-md-6">
                             <label class="form-label" [class.error]="enviadoEst() && celular?.invalid">Celular*</label>
-                            <input type="text" class="form-control" formControlName="celular" placeholder="77265981">
+                            <input type="text" style="text-transform: uppercase;" class="form-control" formControlName="celular" placeholder="77265981">
                         </div>
                         <div class="mb-2 col-md-6">
                             <label class="form-label" [class.error]="enviadoEst() && provincia?.invalid">Provincia</label>
@@ -99,6 +99,7 @@
         <div class="container" [hidden]="chasideActivated">
             <div class="card mb-3">
                 <h5 class="text-primary mx-3">Test Chaside</h5>
+                <h5 class="text-danger mx-3">Primera parte: INTERÉS</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
@@ -139,6 +140,7 @@
         <div class="container" [hidden]="chasideActivatedDos">
             <div class="card mb-3">
                 <h5 class="text-primary mx-3">Test Chaside</h5>
+                <h5 class="text-danger mx-3">Segunda parte: INTERÉS</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
@@ -179,6 +181,7 @@
         <div class="container" [hidden]="chasideActivatedTres">
             <div class="card mb-3">
                 <h5 class="text-primary mx-3">Test Chaside</h5>
+                <h5 class="text-danger mx-3">Tercera parte: INTERÉS</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
@@ -219,6 +222,7 @@
         <div class="container" [hidden]="chasideActivatedCuatro">
             <div class="card mb-3">
                 <h5 class="text-primary mx-3">Test Chaside</h5>
+                <h5 class="text-danger mx-3">Cuarta parte: INTERÉS</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
@@ -259,6 +263,7 @@
         <div class="container" [hidden]="chasideActivatedCinco">
             <div class="card mb-3">
                 <h5 class="text-primary mx-3">Test Chaside</h5>
+                <h5 class="text-danger mx-3">Primera parte: APTITUD</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
@@ -299,6 +304,7 @@
         <div class="container" [hidden]="chasideActivatedSeis">
             <div class="card mb-3">
                 <h5 class="text-primary mx-3">Test Chaside</h5>
+                <h5 class="text-danger mx-3">Segunda parte: APTITUD</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
@@ -341,7 +347,7 @@
                 <h5 class="text-primary mx-3">Test de Holland</h5>
                 <h5 class="text-danger mx-3">Primera parte: ACTIVIDADES</h5>
                 <span class="text-danger mx-3">1. Lee atentamente cada pregunta</span>
-                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que te gusta realizar</span>
+                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que le agrada realizar</span>
             </div> 
             <div class="card">
                 <div class="card-body form-check-inline">
@@ -367,7 +373,7 @@
                 <h5 class="text-primary mx-3">Test de Holland</h5>
                 <h5 class="text-danger mx-3">Segunda parte: HABILIDADES</h5>
                 <span class="text-danger mx-3">1. Lee atentamente cada pregunta</span>
-                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que te gusta realizar</span>
+                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que puede realizar bien</span>
             </div> 
             <div class="card">
                 <div class="card-body form-check-inline">
@@ -393,7 +399,7 @@
                 <h5 class="text-primary mx-3">Test de Holland</h5>
                 <h5 class="text-danger mx-3">Tercera parte: OCUPACIONES</h5>
                 <span class="text-danger mx-3">1. Lee atentamente cada pregunta</span>
-                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que te gusta realizar</span>
+                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que te interesen o agraden</span>
             </div> 
             <div class="card">
                 <div class="card-body form-check-inline">
@@ -420,7 +426,7 @@
                 <h5 class="text-primary mx-3">Test de Holland</h5>
                 <h5 class="text-danger mx-3">Cuarta parte: AUTOEVALUACION</h5>
                 <span class="text-danger mx-3">1. Lee atentamente cada pregunta</span>
-                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que te gusta realizar</span>
+                <span class="text-danger mx-3 mb-4">2. Califica de un 1 al 7 (siendo 7 la nota máxima) tus habilidades en comparación de otras personas de tu edad</span>
             </div>
             <div class="card">
                 <div class="card-body form-check-inline">
@@ -444,7 +450,7 @@
             </div>
             <br>
             <div class="card align-items-center">
-                <button type="submit" class="btn btn-primary mt-3 mb-3" [disabled]="form.invalid">Completar Registro</button>
+                <button type="submit" class="btn btn-primary mt-3 mb-3">Completar Registro</button>
             </div> 
         </div>
         

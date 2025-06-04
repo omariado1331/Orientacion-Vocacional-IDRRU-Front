@@ -1,5 +1,5 @@
 .header-card {
-    background: linear-gradient(135deg, #5e74da 0%, #4a79c0 100%);
+    background: var(--umsa-blue);
     color: white;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -8,7 +8,7 @@
 .profile-avatar {
     width: 120px;
     height: 120px;
-    background: linear-gradient(135deg, #ff2929 0%, #ff4f67 100%);
+    background: linear-gradient(135deg, #5c373b 0%, #aa2647 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -38,7 +38,7 @@
 }
 
 .progress-bar-custom {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #5c373b 0%, #aa2647 100%);
     border-radius: 15px;
 }
 
@@ -46,6 +46,10 @@
     font-size: 0.9rem;
     padding: 8px 15px;
     border-radius: 20px;
+}
+
+.badge{
+    background: linear-gradient(135deg, #5c373b 0%, #aa2647 100%);
 }
 
 .holland-code {
@@ -69,12 +73,12 @@
     margin: 2px;
 }
 
-.holland-R { background-color: #e74c3c; }
-.holland-I { background-color: #3498db; }
-.holland-A { background-color: #f39c12; }
-.holland-S { background-color: #2ecc71; }
-.holland-E { background-color: #9b59b6; }
-.holland-C { background-color: #34495e; }
+.holland-R { background-color: #4a4a4a; }
+.holland-I { background-color: #556b2f ; }
+.holland-A { background-color: #2f4f4f ; }
+.holland-S { background-color: #a08a56 ; }
+.holland-E { background-color: #b8860b ; }
+.holland-C { background-color: #4b0082; }
 
 .section-title {
     color: #2c3e50;
@@ -99,12 +103,13 @@
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+    
 }
 
 .info-item i {
     width: 20px;
     margin-right: 10px;
-    color: #667eea;
+    color: #800020;
 }
 
 .option-card {

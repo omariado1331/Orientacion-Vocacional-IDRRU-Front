@@ -1,8 +1,8 @@
 <div class="row mb-4">
     <div class="col-12">
-        <h4 class="text-dark text-center mb-4">
+        <h3 class="text-dark text-center mb-4">
             <i class="fas fa-compass me-2"></i> Tus mejores opciones vocacionales son:
-        </h4>
+        </h3>
     </div>
 </div>
 <div class="row">
@@ -11,19 +11,24 @@
             <!-- FACULTAD DE INGENIERIA -->
             <div class="col-lg-4 mb-4">
                 <div class="card card-custom option-card">
-                    <div class="option-number">{{i+1}}</div>
+                    <div class="option-number mt-3 mx-3">{{i+1}}</div>
                     <div class="card-body">
                         <div class="text-center mb-3">
                             <img src="./assets/logos-facultades/FI.png" alt="Logo FI" class="faculty-logo mb-2">
-                            <h5 class="text-primary mb-1">{{FI.nombre}}</h5>
-                            <span class="badge bg-primary">{{FI.codigo}}</span>
+                            <h5 class="text-dark mb-1">{{FI.nombre}}</h5>
+                            <span class="badge ">{{FI.codigo}}</span>
                         </div>
     
     
                         <div class="text-center mb-3">
-                            <h6 class="text-muted mb-2">Personalidades de test Holland que coinciden</h6>
+                            <h6 class="text-muted mb-2">Personalidades de test Holland</h6>
                             @for(personalidad of hollandFIArray; track personalidad){
-                            <span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>
+                                @if (personalidad[0] == 'R') {<span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>}
+                                @else if (personalidad[0] == 'I') {<span class="holland-code holland-I holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'A') {<span class="holland-code holland-A holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'S') {<span class="holland-code holland-S holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'E') {<span class="holland-code holland-E holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'C') {<span class="holland-code holland-C holland-code-small">{{personalidad[0]}}</span> } 
                             }
     
                         </div>
@@ -37,7 +42,7 @@
                         </div>
     
                         <div class="text-center">
-                            <a href="http://agro.umsa.bo/" target="_blank" class="btn btn-primary btn-sm">
+                            <a href="https://miing.umsa.edu.bo/" target="_blank" class="btn btn-danger btn-sm">
                                 <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
                             </a>
                         </div>
@@ -50,19 +55,24 @@
             <!-- FACULTAD DE TECNOLOGIA -->
             <div class="col-lg-4 mb-4">
                 <div class="card card-custom option-card">
-                    <div class="option-number">{{i+1}}</div>
+                    <div class="option-number mt-3 mx-3">{{i+1}}</div>
                     <div class="card-body">
                         <div class="text-center mb-3">
                             <img src="./assets/logos-facultades/FT.png" alt="Logo FT" class="faculty-logo mb-2">
-                            <h5 class="text-primary mb-1">{{FT.nombre}}</h5>
-                            <span class="badge bg-primary">{{FT.codigo}}</span>
+                            <h5 class="text-dark mb-1">{{FT.nombre}}</h5>
+                            <span class="badge">{{FT.codigo}}</span>
                         </div>
     
     
                         <div class="text-center mb-3">
-                            <h6 class="text-muted mb-2">Personalidades de test Holland que coinciden</h6>
+                            <h6 class="text-muted mb-2">Personalidades de test Holland</h6>
                             @for(personalidad of hollandFTArray; track personalidad){
-                            <span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>
+                                @if (personalidad[0] == 'R') {<span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>}
+                                @else if (personalidad[0] == 'I') {<span class="holland-code holland-I holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'A') {<span class="holland-code holland-A holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'S') {<span class="holland-code holland-S holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'E') {<span class="holland-code holland-E holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'C') {<span class="holland-code holland-C holland-code-small">{{personalidad[0]}}</span> } 
                             }
     
                         </div>
@@ -76,33 +86,37 @@
                         </div>
     
                         <div class="text-center">
-                            <a href="http://agro.umsa.bo/" target="_blank" class="btn btn-primary btn-sm">
+                            <a href="https://ft.umsa.bo/" target="_blank" class="btn btn-danger btn-sm">
                                 <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-        
     }
     @if (facultad[0] == 'FCG') {
         
-            <!-- FACULTAD DE CIENCIAS FARMACEUTICAS Y BIOQUIMICAS -->
+            <!-- FACULTAD DE CIENCIAS GEOLOGICAS -->
             <div class="col-lg-4 mb-4">
                 <div class="card card-custom option-card">
-                    <div class="option-number">{{i+1}}</div>
+                    <div class="option-number mt-3 mx-3">{{i+1}}</div>
                     <div class="card-body">
                         <div class="text-center mb-3">
                             <img src="./assets/logos-facultades/FCG.png" alt="Logo FCG" class="faculty-logo mb-2">
-                            <h5 class="text-primary mb-1">{{FCG.nombre}}</h5>
-                            <span class="badge bg-primary">{{FCG.codigo}}</span>
+                            <h5 class="text-dark mb-1">{{FCG.nombre}}</h5>
+                            <span class="badge ">{{FCG.codigo}}</span>
                         </div>
     
     
                         <div class="text-center mb-3">
-                            <h6 class="text-muted mb-2">Personalidades de test Holland que coinciden</h6>
+                            <h6 class="text-muted mb-2">Personalidades de test Holland</h6>
                             @for(personalidad of hollandFCGArray; track personalidad){
-                            <span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>
+                                @if (personalidad[0] == 'R') {<span class="holland-code holland-R holland-code-small">{{personalidad[0]}}</span>}
+                                @else if (personalidad[0] == 'I') {<span class="holland-code holland-I holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'A') {<span class="holland-code holland-A holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'S') {<span class="holland-code holland-S holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'E') {<span class="holland-code holland-E holland-code-small">{{personalidad[0]}}</span> }
+                                @else if (personalidad[0] == 'C') {<span class="holland-code holland-C holland-code-small">{{personalidad[0]}}</span> } 
                             }
     
                         </div>
@@ -116,7 +130,7 @@
                         </div>
     
                         <div class="text-center">
-                            <a href="http://agro.umsa.bo/" target="_blank" class="btn btn-primary btn-sm">
+                            <a href="https://fcg.umsa.bo/" target="_blank" class="btn btn-danger btn-sm">
                                 <i class="fas fa-external-link-alt me-1"></i>Visitar Sitio Web
                             </a>
                         </div>

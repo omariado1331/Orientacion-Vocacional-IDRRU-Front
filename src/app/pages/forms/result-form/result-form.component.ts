@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, ElementRef, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { TablaCComponent } from "../../../components/tabla-c/tabla-c.component";
 import { TablaHComponent } from "../../../components/tabla-h/tabla-h.component";
@@ -9,7 +9,6 @@ import { TablaIComponent } from "../../../components/tabla-i/tabla-i.component";
 import { TablaDComponent } from "../../../components/tabla-d/tabla-d.component";
 import { TablaEComponent } from "../../../components/tabla-e/tabla-e.component";
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-result-form',
@@ -29,15 +28,17 @@ export class ResultFormComponent {
   chaside: string = '';
   celular: string = '';
   curso: string = '';
+  provincia: string = '';
+  municipio: string = '';
   edad: number = 0;
-  hollandPerfil = { R: 'Realista', I: 'Investigador', A: 'Artístco', S: 'Social', E: 'Emprendedor', C: 'Convencional' };
+  hollandPerfil = { R: 'Realista', I: 'Investigador', A: 'Artístico', S: 'Social', E: 'Emprendedor', C: 'Convencional' };
   chasideDesc = {
     C: 'Ciencias Económicas y Financieras',
     H: 'Humanidades y Ciencias Sociales y Políticas',
     A: 'Artes, arquitectura y diseño',
     S: 'Salud, Enfermería, Medicina',
     I: 'Investigación, Ingeniería, Tecnología',
-    D: 'Defensa',
+    D: 'Defensa y Seguridad',
     E: 'Exactas, Ciencias Puras'
   };
   chasideTabla = {
@@ -86,6 +87,8 @@ export class ResultFormComponent {
         celular: string,
         curso: string,
         edad: number,
+        provincia: string,
+        municipio: string
       }
       if (!state || !state.nombre) {
         this.router.navigate(['/']);
@@ -102,6 +105,8 @@ export class ResultFormComponent {
       this.celular = state.celular!;
       this.curso = state.curso!;
       this.edad = state.edad!;
+      this.provincia = state.provincia!;
+      this.municipio = state.municipio!;
       this.personalidadP = this.hollandPerfil[this.holland[0] as keyof typeof this.hollandPerfil];
       this.personalidadS = this.hollandPerfil[this.holland[1] as keyof typeof this.hollandPerfil];
       this.personalidadT = this.hollandPerfil[this.holland[2] as keyof typeof this.hollandPerfil];
@@ -116,12 +121,12 @@ export class ResultFormComponent {
   fechaStr = this.fecha.toLocaleDateString('es-ES');
   
   async generarPdf(){
-    const titulostyle = {
-      fontSize: 14,
-      fontStyle: 'bold',
-      textAlign: 'center',
-      marginBottom: 5
-    }
+    const colorAzulUMSA: [number, number, number] = [0, 51, 153];
+    const colorVinoUMSA: [number, number, number] = [128, 0, 32];
+    const colorAzulClaro: [number, number, number] = [235, 245, 255];
+    const colorGrisClaro: [number, number, number] = [240, 240, 240];
+    const colorVerdeClaro: [number, number, number] = [230, 255, 230];
+    const dark: [number, number, number] = [0, 0, 0];
     if(isPlatformBrowser(this.platformId)){
       const doc = new jsPDF('portrait', 'mm', 'letter');
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -141,11 +146,15 @@ export class ResultFormComponent {
       }
       const yPos = 10;
       doc.setFontSize(14)
-      doc.setFont('times')
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(...colorAzulUMSA)
       doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth/2, yPos+10, {align: 'center'})
+      doc.setFontSize(9)
       doc.text('Instituto de Desarrollo Regional', pageWidth/2, yPos+20, {align: 'center'})
       doc.text('y Desconcentración Universitaria', pageWidth/2, yPos+25, {align: 'center'})
-      doc.setFont('times', 'bold')
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(...colorVinoUMSA)
+      doc.setFontSize(12)
       doc.text('RESULTADOS DEL TEST VOCACIONAL', pageWidth/2, yPos+35, {align: 'center'})
       doc.line(10, yPos+40, pageWidth-10, yPos+40)
       doc.text('TUS MEJORES OPCIONES SON:', pageWidth/2 , yPos+100, {align: 'center'})
@@ -153,19 +162,31 @@ export class ResultFormComponent {
       doc.text('INTERPRETACIÓN DE RESULTADOS DE TEST HOLLAND: ', 10, yPos+220, {align: 'left'})
       doc.text('DATOS DEL ESTUDIANTE', 10, yPos+50, {align: 'left'})
       doc.text('TEST CHASIDE', pageWidth/2, yPos+50, {align: 'left'})
-      doc.text('TEST DE HOLLAND', pageWidth/2, yPos+70, {align: 'left'})
-      doc.setFont('times', 'normal')
-      doc.text(`Nombre: ${this.nombre}`, 10, yPos+55, {align: 'left'})
-      doc.text(`Carnet: ${this.carnet}`, 10, yPos+60, {align: 'left'})
-      doc.text(`Curso: ${this.curso}`, 10, yPos+65, {align: 'left'})
-      doc.text(`Colegio: ${this.colegio}`, 10, yPos+70, {align: 'left'})
-      doc.text(`Edad: ${this.edad}`, 10, yPos+75, {align: 'left'})
-      doc.text(`Fecha de Evaluación: ${this.fechaStr}`, 10, yPos+80, {align: 'left'})
+      doc.text('TEST DE HOLLAND', pageWidth/2, yPos+75, {align: 'left'})
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(...colorAzulUMSA)
+      doc.text('Nombre:', 10, yPos+55, {align: 'left'})
+      doc.text('Carnet:', 10, yPos+60, {align: 'left'})
+      doc.text('Curso:', 10, yPos+65, {align: 'left'})
+      doc.text('Colegio:', 10, yPos+70, {align: 'left'})
+      doc.text('Edad:', 10, yPos+75, {align: 'left'})
+      doc.text('Municipio:', 10, yPos+80, {align: 'left'})
+      doc.text('Provincia:', 10, yPos+85, {align: 'left'})
+      doc.text('Fecha de Evaluación:', 10, yPos+90, {align: 'left'})
       doc.text(`Mejor Puntaje Obtenido: ${this.interes+this.aptitud}`, pageWidth/2, yPos+55, {align: 'left'})
       doc.text('Mejor Opción Vocacional:', pageWidth/2, yPos+60, {align: 'left'})
-      doc.text(`${this.ramaChaside}`, pageWidth* 3/4 , yPos+65, {align: 'center'})
-      doc.text('Personalidades Dominantes: ', pageWidth/2, yPos+75, {align: 'left'})
-      doc.text(`${this.personalidadP}, ${this.personalidadS}, ${this.personalidadT}`, pageWidth * 3/4 , yPos+80, {align: 'center'})
+      doc.text('Personalidades Dominantes: ', pageWidth/2, yPos+80, {align: 'left'})
+      doc.setTextColor(...dark);
+      doc.text(this.nombre, 35, yPos+55, {align: 'left'})
+      doc.text(this.carnet, 35, yPos+60, {align: 'left'})
+      doc.text(this.curso, 35, yPos+65, {align: 'left'})
+      doc.text(this.colegio, 35, yPos+70, {align: 'left'})
+      doc.text(`${this.edad} años`, 35, yPos+75, {align: 'left'})
+      doc.text(this.municipio, 35, yPos+80, {align: 'left'})
+      doc.text(this.provincia, 35, yPos+85, {align: 'left'})
+      doc.text(this.fechaStr, 50, yPos+90, {align: 'left'})
+      doc.text(`${this.ramaChaside}`, pageWidth* 3/4 -40, yPos+65, {align: 'left'})
+      doc.text(`${this.personalidadP}, ${this.personalidadS}, ${this.personalidadT}`, pageWidth * 3/4 -40, yPos+85, {align: 'left'})
       if(this.chaside == 'C'){
         try {
           const logoFCEF = await this.cargarImagen('assets/logos-facultades/FCEF.png');
@@ -175,11 +196,14 @@ export class ResultFormComponent {
         } catch (error) {
           console.warn('No se pudieron cargar las imágenes para el PDF', error);
         }
-        doc.setFont('times', 'bold')
+        doc.setTextColor(...colorAzulUMSA)
+        doc.setFont('helvetica', 'bold')
         doc.text('Facultad de Ciencias Económicas', pageWidth/2, yPos+150, {align: 'center'});
         doc.text('y Fincieras', pageWidth/2, yPos+155, {align: 'center'});
-        doc.setFont('times', 'normal')
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(...colorVinoUMSA)
         doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
+        doc.setTextColor(...dark)
         doc.text('ADMINISTRACIÓN DE EMPRESAS', pageWidth/2 -29, yPos+170, {align: 'left'});
         doc.text('CONTADURÍA PÚBLICA', pageWidth/2 -29, yPos+175, {align: 'left'});
         doc.text('ECONOMÍA', pageWidth/2 -29, yPos+180, {align: 'left'});
@@ -201,7 +225,8 @@ export class ResultFormComponent {
         } catch (error) {
           console.warn('No se pudieron cargar las imágenes para el PDF', error);
         }
-        doc.setFont('times', 'bold')
+        doc.setTextColor(...colorAzulUMSA)
+        doc.setFont('helvetica', 'bold')
         doc.text('Facultad de Ciencias Sociales', pageWidth/4 -15, yPos+155, {align: 'center'});
         //doc.text('Ciencias Políticas', pageWidth/4 -35, yPos+155, {align: 'center'});
         doc.text('Facultad de Derecho y', pageWidth/2, yPos+150, {align: 'center'});
@@ -209,19 +234,23 @@ export class ResultFormComponent {
         doc.text('Facultad Humanidades y', pageWidth* 3/4 +15, yPos+150, {align: 'center'});
         doc.text('Ciecias de la Educación', pageWidth* 3/4 +15, yPos+155, {align: 'center'});
 
-        doc.setFont('times', 'normal')
+        doc.setFont('helvetica', 'normal')
+
+        doc.setTextColor(...colorVinoUMSA)
         doc.text('Carreras Disponibles:', pageWidth/4 -15, yPos+165, {align: 'center'});
+        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
+        doc.text('Carreras Disponibles:', pageWidth* 3/4 +15, yPos+165, {align: 'center'});
+
+        doc.setTextColor(...dark)
         doc.text('- ANTROPOLOGÍA Y', pageWidth/4 -44, yPos+170, {align: 'left'});
         doc.text('  ARQUEOLOGÍA', pageWidth/4 -44, yPos+175, {align: 'left'});
         doc.text('- COMUNICACIÓN SOCIAL', pageWidth/4 -44, yPos+180, {align: 'left'});
         doc.text('- SOCIOLOGÍA', pageWidth/4 -44, yPos+185, {align: 'left'});
         doc.text('- TRABAJO SOCIAL', pageWidth/4 -44, yPos+190, {align: 'left'});
 
-        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
         doc.text('- DERECHO', pageWidth/2 -29, yPos+170, {align: 'left'});
         doc.text('- CIENCIAS POLÍTICAS', pageWidth/2 -29, yPos+175, {align: 'left'});
-
-        doc.text('Carreras Disponibles:', pageWidth* 3/4 +15, yPos+165, {align: 'center'});
+        
         doc.text('- BIBLIOTECOLOGÍA Y CIENCIAS', pageWidth* 3/4 -14, yPos+170, {align: 'left'});
         doc.text('  DE LA EDUCACIÓN', pageWidth* 3/4 -14, yPos+175, {align: 'left'});
         doc.text('- FILOSOFÍA', pageWidth* 3/4 -14, yPos+180, {align: 'left'});
@@ -240,11 +269,16 @@ export class ResultFormComponent {
         } catch (error) {
           console.warn('No se pudieron cargar las imágenes para el PDF', error);
         }
-        doc.setFont('times', 'bold')
+        doc.setTextColor(...colorAzulUMSA)
+        doc.setFont('helvetica', 'bold')
         doc.text('Facultad de Arquitectura, Artes', pageWidth/2, yPos+165, {align: 'center'});
         doc.text('Diseño y Urbanismo', pageWidth/2, yPos+170, {align: 'center'});
-        doc.setFont('times', 'normal')
+        doc.setFont('helvetica', 'normal')
+
+        doc.setTextColor(...colorVinoUMSA)
         doc.text('Carreras Disponibles:', pageWidth/2, yPos+180, {align: 'center'});
+
+        doc.setTextColor(...dark)
         doc.text('ARQUITECTURA', pageWidth/2 -29, yPos+185, {align: 'left'});
         doc.text('ARTES', pageWidth/2 -29, yPos+190, {align: 'left'});
         doc.text('DISEÑO', pageWidth/2 -29, yPos+195, {align: 'left'});
@@ -267,7 +301,8 @@ export class ResultFormComponent {
         } catch (error) {
           console.warn('No se pudieron cargar las imágenes para el PDF', error);
         }
-        doc.setFont('times', 'bold')
+        doc.setTextColor(...colorAzulUMSA)
+        doc.setFont('helvetica', 'bold')
         doc.text('Facultad de Medicina, Enfermería,', pageWidth/4 -15, yPos+150, {align: 'center'});
         doc.text('Nutrición y Tecnología Médica', pageWidth/4 -15, yPos+155, {align: 'center'});
         doc.text('Facultad de Odontología', pageWidth/2, yPos+155, {align: 'center'});
@@ -275,17 +310,20 @@ export class ResultFormComponent {
         doc.text('Facultad de Ciencias', pageWidth* 3/4 +15, yPos+150, {align: 'center'});
         doc.text('Farmacéuticas y Bioquímicas', pageWidth* 3/4 +15, yPos+155, {align: 'center'});
 
-        doc.setFont('times', 'normal')
+        doc.setTextColor(...colorVinoUMSA)
+        doc.setFont('helvetica', 'normal')
         doc.text('Carreras Disponibles:', pageWidth/4 -15, yPos+165, {align: 'center'});
+        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
+        doc.text('Carreras Disponibles:', pageWidth* 3/4 +15, yPos+165, {align: 'center'});
+
+        doc.setTextColor(...dark)
         doc.text('- MEDICINA', pageWidth/4 -44, yPos+170, {align: 'left'});
         doc.text('- ENFERMERÍA', pageWidth/4 -44, yPos+175, {align: 'left'});
         doc.text('- NUTRICIÓN Y DIETÉTICA', pageWidth/4 -44, yPos+180, {align: 'left'});
         doc.text('- TECNOLOGÍA MÉDICA', pageWidth/4 -44, yPos+185, {align: 'left'});
-
-        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
+        
         doc.text('- ODONTOLOGÍA', pageWidth/2 -29, yPos+170, {align: 'left'});
 
-        doc.text('Carreras Disponibles:', pageWidth* 3/4 +15, yPos+165, {align: 'center'});
         doc.text('- BIOQUÍMICA', pageWidth* 3/4 -14, yPos+170, {align: 'left'});
         doc.text('- QUÍMICA FARMACÉUTICA', pageWidth* 3/4 -14, yPos+175, {align: 'left'});
       }
@@ -307,7 +345,9 @@ export class ResultFormComponent {
         } catch (error) {
           console.warn('No se pudieron cargar las imágenes para el PDF', error);
         }
-        doc.setFont('times', 'bold')
+        
+        doc.setTextColor(...colorAzulUMSA)
+        doc.setFont('helvetica', 'bold')
         //doc.text('Facultad de Medicina, Enfermería,', pageWidth/4 -15, yPos+150, {align: 'center'});
         doc.text('Facultad de Tecnología', pageWidth/4 -15, yPos+155, {align: 'center'});
         doc.text('Facultad de Ingeniería', pageWidth/2, yPos+155, {align: 'center'});
@@ -315,8 +355,13 @@ export class ResultFormComponent {
         doc.text('Facultad de Ciencias', pageWidth* 3/4 +15, yPos+150, {align: 'center'});
         doc.text('Geológicas', pageWidth* 3/4 +15, yPos+155, {align: 'center'});
 
-        doc.setFont('times', 'normal')
+        doc.setTextColor(...colorVinoUMSA)
+        doc.setFont('helvetica', 'normal')
         doc.text('Carreras Disponibles:', pageWidth/4 -15, yPos+165, {align: 'center'});
+        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});  
+        doc.text('Carreras Disponibles:', pageWidth* 3/4 +15, yPos+165, {align: 'center'});
+
+        doc.setTextColor(...dark)
         doc.text('- CONSTRUCCIONES CIVILES', pageWidth/4 -44, yPos+170, {align: 'left'});
         doc.text('- QUÍMICA INDUSTRIAL', pageWidth/4 -44, yPos+175, {align: 'left'});
         doc.text('- TOPOGRAFÍA Y GEODESIA', pageWidth/4 -44, yPos+180, {align: 'left'});
@@ -326,7 +371,6 @@ export class ResultFormComponent {
         doc.text('- MECÁNICA AUTOMOTRIZ', pageWidth/4 -44, yPos+200, {align: 'left'});
         doc.text('- MECÁNICA INDUSTRIAL', pageWidth/4 -44, yPos+205, {align: 'left'});
 
-        doc.text('Carreras Disponibles:', pageWidth/2, yPos+165, {align: 'center'});
         doc.text('- INGENIERÍA CIVIL', pageWidth/2 -29, yPos+170, {align: 'left'});
         doc.text('- INGENIERÍA ELÉCTRICA', pageWidth/2 -29, yPos+175, {align: 'left'});
         doc.text('- INGENIERÍA ELECTRÓNICA', pageWidth/2 -29, yPos+180, {align: 'left'});
@@ -337,7 +381,6 @@ export class ResultFormComponent {
         doc.text('- INGENIERÍA PETROLERA', pageWidth/2 -29, yPos+205, {align: 'left'});
         doc.text('- INGENIERÍA METALÚRGICA', pageWidth/2 -29, yPos+210, {align: 'left'});
 
-        doc.text('Carreras Disponibles:', pageWidth* 3/4 +15, yPos+165, {align: 'center'});
         doc.text('- INGENIERÍA GEOLÓGICA', pageWidth* 3/4 -14, yPos+170, {align: 'left'});
         doc.text('- INGENIERÍA GEOGRÁFICA', pageWidth* 3/4 -14, yPos+175, {align: 'left'});
       }
@@ -356,21 +399,25 @@ export class ResultFormComponent {
         } catch (error) {
           console.warn('No se pudieron cargar las imágenes para el PDF', error);
         }
-        doc.setFont('times', 'bold')
+        doc.setTextColor(...colorAzulUMSA)
+        doc.setFont('helvetica', 'bold')
         doc.text('Academía Nacional de', pageWidth/3, yPos+150, {align: 'center'});
         doc.text('Policias', pageWidth/3, yPos+155, {align: 'center'});
         //doc.text('Facultad de Ingeniería', pageWidth* 2/3, yPos+150, {align: 'center'});
         doc.text('Colegio Militar', pageWidth* 2/3, yPos+155, {align: 'center'});
 
-        doc.setFont('times', 'normal')
+        doc.setTextColor(...colorVinoUMSA)
+        doc.setFont('helvetica', 'normal')
         doc.text('Carreras Disponibles:', pageWidth/3 , yPos+165, {align: 'center'});
+        doc.text('Carreras Disponibles:', pageWidth* 2/3 , yPos+165, {align: 'center'});
+
+        doc.setTextColor(...dark)
         doc.text('- INGENIERÍA DE TRÁNSITO Y', pageWidth/3 -30, yPos+170, {align: 'left'});
         doc.text('  VIABILIDAD', pageWidth/3 -30, yPos+175, {align: 'left'});
         doc.text('- INVESTIGACIÓN CRIMINAL', pageWidth/3 -30, yPos+180, {align: 'left'});
         doc.text('- ORDEN Y SEGURIDAD', pageWidth/3 -30, yPos+185, {align: 'left'});
         doc.text('- ADMINISTRACIÓN POLICIAL', pageWidth/3 -30, yPos+190, {align: 'left'});
 
-        doc.text('Carreras Disponibles:', pageWidth* 2/3 , yPos+165, {align: 'center'});
         doc.text('- INFANTERÍA', pageWidth* 2/3 -20, yPos+170, {align: 'left'});
         doc.text('- ARTILLERÍA', pageWidth* 2/3 -20, yPos+175, {align: 'left'});
         doc.text('- CABALLERÍA', pageWidth* 2/3 -20, yPos+180, {align: 'left'});
@@ -393,22 +440,26 @@ export class ResultFormComponent {
         } catch (error) {
           console.warn('No se pudieron cargar las imágenes para el PDF', error);
         }
-        doc.setFont('times', 'bold')
+        doc.setTextColor(...colorAzulUMSA)
+        doc.setFont('helvetica', 'bold')
         doc.text('Facultad de Ciencias Puras', pageWidth/3, yPos+150, {align: 'center'});
         doc.text('y Naturales', pageWidth/3, yPos+155, {align: 'center'});
         //doc.text('Facultad de Ingeniería', pageWidth* 2/3, yPos+150, {align: 'center'});
         doc.text('Facultad de Agronomía', pageWidth* 2/3, yPos+155, {align: 'center'});
 
-        doc.setFont('times', 'normal')
+        doc.setTextColor(...colorVinoUMSA)
+        doc.setFont('helvetica', 'normal')
         doc.text('Carreras Disponibles:', pageWidth/3 , yPos+165, {align: 'center'});
+        doc.text('Carreras Disponibles:', pageWidth* 2/3 , yPos+165, {align: 'center'});
+
+        doc.setTextColor(...dark)
         doc.text('- BIOLOGÍA', pageWidth/3 -20, yPos+170, {align: 'left'});
         doc.text('- ESTADÍSTICA', pageWidth/3 -20, yPos+175, {align: 'left'});
         doc.text('- FÍSICA', pageWidth/3 -20, yPos+180, {align: 'left'});
         doc.text('- INFORMÁTICA', pageWidth/3 -20, yPos+185, {align: 'left'});
         doc.text('- MATEMÁTICAS', pageWidth/3 -20, yPos+190, {align: 'left'});
         doc.text('- CIENCIAS QUÍMICAS', pageWidth/3 -20, yPos+195, {align: 'left'});
-
-        doc.text('Carreras Disponibles:', pageWidth* 2/3 , yPos+165, {align: 'center'});
+ 
         doc.text('- INGENIERÍA AGRONÓMICA', pageWidth* 2/3 -25, yPos+170, {align: 'left'});
         doc.text('- INGENIERÍA DE PRODUCCIÓN', pageWidth* 2/3 -25, yPos+175, {align: 'left'});
         doc.text('  Y COMERCIALIZACIÓN', pageWidth* 2/3 -25, yPos+180, {align: 'left'});
@@ -417,17 +468,18 @@ export class ResultFormComponent {
         doc.text('  Y ZOOTECNIA', pageWidth* 2/3 -25, yPos+195, {align: 'left'});
 
       }
-      
-      doc.text(`${this.personalidadP}`, 10, yPos+225, {align: 'left'})
-      doc.text(`${this.personalidadS}`, 10, yPos+235, {align: 'left'})
-      doc.text(`${this.personalidadT}`, 10, yPos+245, {align: 'left'})
-      doc.setFont('times', 'italic')
+      doc.setTextColor(...colorAzulUMSA)
+      doc.text(`${this.personalidadP} :`, 10, yPos+225, {align: 'left'})
+      doc.text(`${this.personalidadS} :`, 10, yPos+235, {align: 'left'})
+      doc.text(`${this.personalidadT} :`, 10, yPos+245, {align: 'left'})
+      doc.setFont('helvetica', 'italic')
+      doc.setTextColor(...dark)
       doc.text(`${this.descripcionP}`, pageWidth/2, yPos+230, {align: 'center'})
       doc.text(`${this.descripcionS}`, pageWidth/2, yPos+240, {align: 'center'})
       doc.text(`${this.descripcionT}`, pageWidth/2, yPos+250, {align: 'center'})
       doc.line(10, yPos+255, pageWidth-10, yPos+255)
       doc.setFontSize(8)
-      doc.setFont('times', 'italic')
+      doc.setFont('helvetica', 'italic')
       doc.text('Instituto de Desarrollo Regional y Desconcentración Universitaria', pageWidth/2, yPos+258, {align: 'center'})
       doc.text('Universidad Mayor de San Andrés', pageWidth/2, yPos+261, {align: 'center'})
       doc.text(`Test de Orientación Vocacional ${this.fecha.getFullYear()}`, pageWidth/2, yPos+264, {align: 'center'})
