@@ -1,57 +1,106 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f2f2f216;
+/* Fondo con logo transparente y animación */
+
+.vocacional-container {
+  background-image: url('/assets/umsac.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 240px;
+  background-color: #f4f6f90a;
+  background-blend-mode: soft-light;
+  animation: fadeInBackground 1.2s ease-out;
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
 }
 
-.responsive-box {
-  background-color: #19436f20;
+/* Caja de contenido */
+.vocacional-content {
+  background: rgba(255, 255, 255, 0.728);
   border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  width: 90%;
-  max-width: 1000px;
-  padding: 3rem;
-  margin: 50px auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 50px 45px;
+  max-width: 760px;
+  width: 100%;
   text-align: center;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  animation: fadeInContent 1.5s ease;
 }
 
-.responsive-box h1 {
-  font-size: 2.8rem;
-  margin-bottom: 1rem;
-  color: #082c4f;
+/* Título */
+.vocacional-title {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  font-weight: 700;
+  margin-bottom: 25px;
 }
 
-.responsive-box p {
-  font-size: 1.4rem;
-  color: #555;
-  margin-bottom: 1.5rem;
-}
-
-.responsive-box button, button {
-  padding: 1rem 2rem;
+/* Texto */
+.vocacional-text {
   font-size: 1.1rem;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.responsive-box button {
-  background-color: #095bb3;
-  color: white;
-}
-
-button {
-  background-color: #007BFF;
-  font-size: 1rem;
-  border-radius: 15px;
-}
-
-button:hover, .responsive-box button:hover {
-  background-color: #0056b3;
-}
-
-.text {
+  color: #444;
+  line-height: 1.7;
+  margin-bottom: 35px;
   text-align: justify;
+}
+
+/* Botón elegante */
+.vocacional-button {
+  display: inline-block;
+  padding: 14px 30px;
+  background-color: #003f63;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 18px rgba(0, 63, 99, 0.25);
+}
+
+.vocacional-button:hover {
+  background-color: #005a8a;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 90, 138, 0.35);
+}
+
+/* Animaciones */
+@keyframes fadeInBackground {
+  0% {
+    opacity: 0;
+    background-size: 120px;
+  }
+  100% {
+    opacity: 1;
+    background-size: 220px;
+  }
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vocacional-title {
+    font-size: 2rem;
+  }
+
+  .vocacional-text {
+    font-size: 1rem;
+  }
+
+  .vocacional-button {
+    width: 100%;
+    padding: 14px 0;
+  }
 }
