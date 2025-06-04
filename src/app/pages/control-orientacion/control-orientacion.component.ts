@@ -854,6 +854,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     this.estudianteService.getById(id).subscribe({
       next: (estudiante) => {
         this.estudianteSeleccionado = estudiante;
+        console.log('Estudiante seleccionado:', this.estudianteSeleccionado);
         this.resultadoService.getByEstudianteId(id).subscribe({
           next: (resultados) => {
             if (resultados.length === 0) {
@@ -862,6 +863,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
               this.loading = false;
               return;
             }
+            console.log('Resultados obtenidos:', resultados);
             const resultadosCompletos = resultados.map((resultado: ResultadoDto) => {
               const resultadoPromesas = [];
               if (resultado.idFacultad) {
