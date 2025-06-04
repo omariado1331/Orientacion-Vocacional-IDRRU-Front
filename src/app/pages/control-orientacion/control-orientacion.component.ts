@@ -199,6 +199,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     this.cargarEstudiantes();
     this.cargarProvincias();
     this.cargarMunicipios();
+    this.cargarfacultades();
   }
 
   // AUTENTICACIÓN
@@ -352,6 +353,15 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         console.error('Error al cargar opciones para resultados', err);
         this.mostrarNotificacion('Error al cargar datos necesarios para resultados', 'error');
       }
+    });
+  }
+
+  cargarfacultades() {
+    this.facultadService.getAll().subscribe(facultades => {
+      this.todasLasFacultades = facultades.map(f => ({
+        ...f,
+        carreras: typeof f.carreras === 'string' ? JSON.parse(f.carreras) : f.carreras
+      }));
     });
   }
 
@@ -667,7 +677,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       provinciaEstudiante = this.getProvinciaByMunicipio(estudiante.id_municipio);
     }
 
-    // Patch del formulario
     this.editarForm.patchValue({
       ciEstudiante: estudiante.ciEstudiante,
       nombre: estudiante.nombre,
@@ -680,14 +689,10 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       idProvincia: provinciaEstudiante ? provinciaEstudiante.idProvincia : null,
       id_municipio: estudiante.id_municipio
     });
-
-    // Filtrar municipios
     if (provinciaEstudiante) {
       this.municipiosFiltrados = this.municipiosPorProvincia[provinciaEstudiante.idProvincia] || [];
-      console.log('Municipios filtrados:', this.municipiosFiltrados);
     } else {
       this.municipiosFiltrados = [];
-      console.log('No se encontró provincia, municipios filtrados vacío');
     }
     this.resultadoService.getByEstudianteId(estudiante.idEstudiante).subscribe({
       next: (resultados: ResultadoDto[]) => {
@@ -1284,8 +1289,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  exportarPerfilPDF(): void {
-    const doc = new jsPDF();
+  async exportarPerfilPDF(): Promise<void> {
+    const doc = new jsPDF('portrait', 'mm', 'letter');
     const colorAzulUMSA: [number, number, number] = [0, 51, 153];
     const colorVinoUMSA: [number, number, number] = [128, 0, 32];
     const colorAzulClaro: [number, number, number] = [235, 245, 255];
@@ -1295,40 +1300,60 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     const margenDerecho = 15;
     const anchoUtil = doc.internal.pageSize.width - margenIzquierdo - margenDerecho;
     let y = 15;
-    this.facultadService.getAll().subscribe(facultades => {
-      this.todasLasFacultades = facultades;
-    });
     const estudiante = this.estudianteSeleccionado;
     if (!this.resultadoEstudiante || this.resultadoEstudiante.length === 0) {
       this.mostrarNotificacion('No hay resultados disponibles para exportar', 'warning');
       return;
     }
+    const logoUMSA = await this.cargarImagen(this.logoUrlc);
+    const logoIDRDU = await this.cargarImagen(this.logoIDRU);
 
-    const agregarEncabezado = () => {
+    const agregarEncabezado = (logoUMSA: string | null, logoIDRDU: string | null) => {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 10;
+      y = margin + 15;
+
+      if (logoUMSA) doc.addImage(logoUMSA, 'PNG', margin, margin, 30, 30);
+      if (logoIDRDU) doc.addImage(logoIDRDU, 'PNG', pageWidth - margin - 30, margin, 30, 30);
+
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...colorAzulUMSA);
-      doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', doc.internal.pageSize.width / 2, y, { align: 'center' });
+      doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth / 2, y, { align: 'center' });
       y += 6;
 
       doc.setFontSize(9);
-      doc.text('INSTITUTO DE DESARROLLO REGIONAL', doc.internal.pageSize.width / 2, y, { align: 'center' });
+      doc.setTextColor(0, 0, 0);
+      doc.text('INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA', pageWidth / 2, y, { align: 'center' });
       y += 4;
 
       doc.setFontSize(10);
       doc.setTextColor(...colorVinoUMSA);
-      doc.text('PERFIL DE ORIENTACIÓN VOCACIONAL', doc.internal.pageSize.width / 2, y, { align: 'center' });
+      doc.text('SISTEMA DE ORIENTACIÓN VOCACIONAL', pageWidth / 2, y, { align: 'center' });
       y += 8;
-    };
 
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(0, 0, 0);
+      doc.text('Perfil del Estudiante', pageWidth / 2, y, { align: 'center' });
+      y += 10;
+    };
     const agregarPiePagina = () => {
-      const pageHeight = doc.internal.pageSize.height;
-      doc.setFontSize(7);
-      doc.setTextColor(100, 100, 100);
-      doc.text('Universidad Mayor de San Andrés - Instituto de Desarrollo Regional', doc.internal.pageSize.width / 2, pageHeight - 10, { align: 'center' });
-      doc.text(`Fecha de emisión: ${this.datePipe.transform(new Date(), 'dd/MM/yyyy')}`, doc.internal.pageSize.width / 2, pageHeight - 7, { align: 'center' });
-    };
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'italic');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const fechaGeneracion = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
 
+      doc.setFontSize(9);
+      doc.text(`Fecha de emisión: ${fechaGeneracion}`, 15, pageHeight - 20);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'italic');
+      doc.text('UMSA: Teléfono: (591-2) 2612298 | E-mail: informate@umsa.bo', pageWidth / 2, pageHeight - 15, { align: 'center' });
+      doc.text('Av. Villazón N° 1995, Plaza del Bicentenario - Zona Central, La Paz, Bolivia', pageWidth / 2, pageHeight - 11, { align: 'center' });
+      doc.text('IDRDU: Av. 6 de Agosto, Edificio HOY Nro. 2170 Piso 12', pageWidth / 2, pageHeight - 7, { align: 'center' });
+    };
     const crearTitulo = (texto: string, color: [number, number, number] = colorAzulUMSA): void => {
       doc.setDrawColor(...color);
       doc.setLineWidth(0.5);
@@ -1353,6 +1378,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       return areas[codigo as keyof typeof areas] || '';
     };
     const correspondeACodigoChaside = (facultad: any, codigoChaside: string): boolean => {
+      console.log('Facultad:', facultad, 'CodigoChaside:', codigoChaside);
       const mapeoCodigoANumero = {
         'C': 1, // Administrativas, Contables y Económicas
         'H': 2, // Humanísticas y Sociales
@@ -1362,7 +1388,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         'D': 6, // Defensa y Seguridad
         'E': 7  // Ciencias Exactas y Agrarias
       };
-      return facultad.chaside === mapeoCodigoANumero[codigoChaside as keyof typeof mapeoCodigoANumero];
+      return facultad.idChaside === mapeoCodigoANumero[codigoChaside as keyof typeof mapeoCodigoANumero];
     };
 
     const obtenerDescripcionHolland = (codigo: 'R' | 'I' | 'A' | 'S' | 'E' | 'C'): string => {
@@ -1377,23 +1403,10 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       return descripciones[codigo];
     };
     const procesarAreasCHASIDE = (chasideData: any) => {
-      // if (!chasideData?.codigo) {
-      //   return { intereses: [], aptitudes: [] };
-      // }
-      // const partes = chasideData.codigo.replace('Tabla 1', '').split('-');
-      // return {
-      //   intereses: partes[0]?.split('') || [],
-      //   aptitudes: partes[1]?.split('') || []
-      // };
       if (!chasideData?.codigo) {
         return { intereses: [], aptitudes: [] };
       }
-
-      // Suponiendo que el código CHASIDE viene como una sola letra
-      // Si necesitas procesar códigos más complejos, ajusta esta lógica
       const codigo = chasideData.codigo.toString().toUpperCase();
-
-      // Si el código contiene guiones o es un formato específico, procesarlo aquí
       if (codigo.includes('-')) {
         const partes = codigo.split('-');
         return {
@@ -1401,8 +1414,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           aptitudes: partes[1]?.split('') || []
         };
       }
-
-      // Si es un código simple, asumimos que representa tanto interés como aptitud
       return {
         intereses: [codigo],
         aptitudes: [codigo]
@@ -1410,17 +1421,20 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     };
 
     const verificarEspacioDisponible = (espacioNecesario: number): boolean => {
-      const espacioDisponible = doc.internal.pageSize.height - y - 20; // 20px de margen inferior
+      const espacioDisponible = doc.internal.pageSize.height - y - 20;
       if (espacioDisponible < espacioNecesario) {
         doc.addPage();
         y = 15;
-        agregarEncabezado();
+        agregarEncabezado(logoUMSA, logoIDRDU);
         return true;
+      }
+      else {
+        agregarPiePagina();
       }
       return false;
     };
 
-    agregarEncabezado();
+    agregarEncabezado(logoUMSA, logoIDRDU);
     doc.setDrawColor(...colorAzulUMSA);
     doc.setFillColor(...colorAzulClaro);
     doc.setLineWidth(0.3);
@@ -1614,15 +1628,25 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       todasFacultades.forEach((facultadItem, idx) => {
         verificarEspacioDisponible(40);
         const facultad = facultadItem.data;
-        doc.setFillColor(...colorVerdeClaro);
-        doc.setDrawColor(0, 100, 0);
-        doc.roundedRect(margenIzquierdo, y, anchoUtil, 10, 2, 2, 'FD');
+
+        const imgWidth = 30;
+        const imgHeight = 30;
+        const imgX = margenIzquierdo + anchoUtil - imgWidth - 5;
+        const imgY = y + 5;
+
+        // doc.setFillColor(220, 240, 220);
+        // doc.rect(margenIzquierdo, y - 4, anchoUtil, 14, 'F');
+
+        doc.addImage(facultad.imgLogo, 'PNG', imgX, imgY, imgWidth, imgHeight);
+
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8);
-        doc.setTextColor(0, 80, 0);
+        doc.setFontSize(10);
+        doc.setTextColor(0, 100, 0);
         doc.text(`${facultadItem.orden}. ${facultad.nombre}`, margenIzquierdo + 5, y + 6);
+
         doc.setTextColor(0, 0, 0);
-        y += 13;
+        y += 14;
+
 
         if (facultadItem.codigosChaside && facultadItem.codigosChaside.length > 0) {
           doc.setFontSize(7);
@@ -1682,7 +1706,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     }
     verificarEspacioDisponible(30);
     crearTitulo('CONSIDERACIONES IMPORTANTES', colorVinoUMSA);
-    doc.setFontSize(6);
+    doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
 
     const textoConsejos = [
