@@ -291,7 +291,8 @@ private generarGrafico(): void {
           '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'
         ]
       }
-    ]
+    ],
+
   };
 
   // Actualizar la leyenda personalizada con un nuevo objeto para que Angular refresque la vista
@@ -595,14 +596,8 @@ const leyenda = this.chartData.labels.map((label, index) => {
     doc.setFontSize(8);
   }
 
-
-
   doc.save('reporte-con-grafico.pdf');
 
-
-
 }
-
-
 
 }
