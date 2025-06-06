@@ -369,7 +369,7 @@
                                     <label class="d-block text-uppercase small text-muted mb-1">CODIGO:</label>
                                     <div class="chaside-code">
                                       <span class="text-uppercase me-1 fs-5">
-                                        {{ resultado.chaside.codigo }}
+                                        {{ resultado.chaside.codigo | slice: -1 }}
                                       </span>
                                     </div>
                                     <label class="d-block text-uppercase small text-muted mb-1 mt-2">AREA DE
@@ -773,7 +773,7 @@
       </div>
     </div>
     <!-- Tabla de estudiantes -->
-    <div class="card shadow mb-4">
+    <div class="card shadow mb-4 border-0 rounded-4">
       <div class="card-header"
         style="background: linear-gradient(135deg, var(--umsa-blue),  var(--umsa-blue-dark)); border-radius: 12px 12px 0 0; color: white;">
         <h5 class="mb-0"><i class="bi bi-table me-2"></i>Listado de Estudiantes</h5>
