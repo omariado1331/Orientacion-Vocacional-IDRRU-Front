@@ -293,7 +293,8 @@
                       <button class="nav-link" [ngClass]="{'active': i === 0}" data-bs-toggle="tab"
                         [attr.data-bs-target]="'#resultado-' + i">
                         Resultado {{ i + 1 }}
-                        <small class="ms-2 text-muted">{{ estudianteSeleccionado.createdAt | date:'dd/MM/yyyy' }}</small>
+                        <small class="ms-2 text-muted">{{ estudianteSeleccionado.createdAt | date:'dd/MM/yyyy'
+                          }}</small>
                       </button>
                     </li>
                   </ul>
@@ -419,17 +420,17 @@
                                 Basado en los resultados de los tests:
                               </p>
                               <ul class="mb-0">
-                                <li *ngIf="resultado.chaside">
-                                  <strong>CHASIDE ({{ resultado.chaside.codigo }}):</strong>
-                                  {{ resultado?.chaside?.descripcion }}
-                                </li>
-                                <li *ngIf="resultado.holland">
-                                  <strong>Holland ({{ resultado.puntajeHolland }}):</strong>
-                                  Perfil {{ resultado.holland.nombre }} - {{ resultado?.holland?.descripcion }}
-                                </li>
-                                <li *ngIf="resultado.facultad">
-                                  <strong>Facultad recomendada:</strong>
-                                  {{ resultado.facultad.nombre }}
+                                <li *ngIf="resultado.facultades && resultado.facultades.length > 0">
+                                  <strong>Facultades recomendadas:</strong>
+                                  <ul class="mt-1">
+                                    <li *ngFor="let facultad of resultado.facultades">
+                                      {{ facultad.nombre }}
+                                      <small class="text-muted"
+                                        *ngIf="facultad.carreras && facultad.carreras.length > 0">
+                                        ({{ facultad.carreras.length }} carreras)
+                                      </small>
+                                    </li>
+                                  </ul>
                                 </li>
                               </ul>
                               <p class="mt-2 mb-0 small text-muted">
@@ -492,12 +493,12 @@
                 </div>
               </div>
 
-              <form *ngIf="editarForm" [formGroup]="editarForm" >
-                <div class="row g-4 " >
+              <form *ngIf="editarForm" [formGroup]="editarForm">
+                <div class="row g-4 ">
                   <!-- CI y Nombre -->
                   <div class="col-md-6">
                     <div class="form-floating">
-                      <input type="text" class="form-control border-2 rounded-3" id="ciEstudiante" 
+                      <input type="text" class="form-control border-2 rounded-3" id="ciEstudiante"
                         formControlName="ciEstudiante" placeholder="CI"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['ciEstudiante'].invalid && editarForm.controls['ciEstudiante'].touched}">
                       <label for="ciEstudiante" class="text-muted" style="font-size: var(--tx-base) !important;">
@@ -516,7 +517,7 @@
                       <input type="text" class="form-control border-2 rounded-3" id="nombre" formControlName="nombre"
                         placeholder="Nombre"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['nombre'].invalid && editarForm.controls['nombre'].touched}">
-                      <label for="nombre" class="text-muted" style="font-size: var(--tx-base) !important;" >
+                      <label for="nombre" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-person me-2"></i>Nombre *
                       </label>
                       <div class="invalid-feedback fw-semibold"
