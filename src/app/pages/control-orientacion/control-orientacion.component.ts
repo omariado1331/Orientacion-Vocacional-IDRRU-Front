@@ -1092,6 +1092,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   private async exportarPDF(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
+
       try {
         this.exportando = true;
         await import('jspdf-autotable');
@@ -1099,51 +1100,115 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
         const margin = 10;
+        let y = 15;
+        const logoUmsaColor = 'assets/umsac.png';
+        const logoIDRUColor = 'assets/idrdu.png';
+        const logoUMSA = await this.cargarImagen(logoUmsaColor);
+        const logoIDRDU = await this.cargarImagen(logoIDRUColor);
+        const agregarEncabezado = (logoUMSA: string | null, logoIDRDU: string | null) => {
+          // === ===
+          const anchoPagina = doc.internal.pageSize.getWidth();
+          const margen = 10;
+          const anchoLogo = 16;
+          const altoLogo = 16;
 
-        try {
-          const logoUMSA = await this.cargarImagen(this.logoUrlc);
-          const logoIDRDU = await this.cargarImagen(this.logoIDRU);
-          if (logoUMSA) doc.addImage(logoUMSA, 'PNG', margin, margin, 30, 30);
-          if (logoIDRDU) doc.addImage(logoIDRDU, 'PNG', pageWidth - margin - 30, margin, 30, 30);
-        } catch (error) {
-          console.warn('No se pudieron cargar las imágenes para el PDF', error);
-        }
+          // === Estilos ===
+          const fuenteNormal = 'helvetica';
+          const fuenteNegrita = 'helvetica';
+          const estiloNormal = 'normal';
+          const estiloNegrita = 'bold';
 
-        let yPos = margin + 15;
+          const tamTitulo = 10;
+          const tamSubtitulo = 10;
+          const colorTitulo: [number, number, number] = [0, 54, 107];
+          const colorTexto: [number, number, number] = [0, 54, 107];
 
+          // === Textos ===
+          const textoUMSA = 'UNIVERSIDAD MAYOR DE SAN ANDRÉS';
+          const textoVicerrectorado = 'VICERRECTORADO';
+          const textoInstituto = 'INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA';
+
+          // === posicionamiento ===
+          y = margen + 5;
+
+          // === logos ===
+          if (logoUMSA) doc.addImage(logoUMSA, 'PNG', margen, margen, anchoLogo, altoLogo);
+          if (logoIDRDU) doc.addImage(logoIDRDU, 'PNG', anchoPagina - margen - anchoLogo - 5, margen, anchoLogo, altoLogo);
+
+          // === umsa ===
+          doc.setFont(fuenteNormal, estiloNormal);
+          doc.setFontSize(tamTitulo);
+          doc.setTextColor(...colorTitulo);
+          doc.text(textoUMSA, anchoPagina / 2, y, { align: 'center' });
+
+          // === vicerectorado ===
+          y += 4;
+          doc.setFontSize(tamSubtitulo);
+          doc.setTextColor(...colorTexto);
+          doc.text(textoVicerrectorado, anchoPagina / 2, y, { align: 'center' });
+
+          // === Lineas ===
+          y += 1;
+          const anchoTexto = doc.getTextWidth(textoInstituto) + 3;
+          const inicioLinea = (anchoPagina - anchoTexto) / 2;
+          const finLinea = inicioLinea + anchoTexto;
+          doc.setDrawColor(...colorTitulo)
+          doc.setLineWidth(0.3);
+          doc.line(inicioLinea, y, finLinea, y);
+          doc.line(inicioLinea, y + 0.75, finLinea, y + 0.75);
+
+          // === instituto ===
+          y += 4.5;
+          doc.setFont(fuenteNegrita, estiloNegrita);
+          doc.setTextColor(...colorTexto);
+          doc.text(textoInstituto, anchoPagina / 2, y, { align: 'center' });
+
+          y += 10;
+        };
+        const agregarPiePagina = () => {
+          // === tamano pagina ===
+          const anchoPagina = doc.internal.pageSize.getWidth();
+          const altoPagina = doc.internal.pageSize.getHeight();
+
+          // ===estilo ===
+          const fuente = 'helvetica';
+          const estilo = 'normal';
+          const tamañoFuente = 8;
+          const colorTexto: [number, number, number] = [0, 54, 107];
+
+          // === texto ===
+          const textoLinea1 = 'Av. 6 de Agosto 2170 · Edificio Hoy Piso 12 · Teléfono - Fax (591) 2-2118556 · IP (591) 2-2612211';
+          const textoLinea2 = 'e-mail: idrdu@umsa.bo · https://www.facebook.com/IDR.DU.UMSA';
+          const fechaGeneracion = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
+
+          // === estilos ===
+          doc.setTextColor(...colorTexto);
+          doc.setFont(fuente, estilo);
+          doc.setFontSize(tamañoFuente);
+
+          // === texto ===
+          doc.text(textoLinea1, anchoPagina / 2, altoPagina - 12, { align: 'center' });
+          doc.text(textoLinea2, anchoPagina / 2, altoPagina - 8, { align: 'center' });
+        };
         // Encabezado
         const colorAzulUMSA: [number, number, number] = [0, 51, 153];
         const colorVinoUMSA: [number, number, number] = [128, 0, 32];
         const colorAzulClaro: [number, number, number] = [235, 245, 255];
         const colorGrisClaro: [number, number, number] = [240, 240, 240];
         const colorVerdeClaro: [number, number, number] = [230, 255, 230];
+        let yPos = margin + 25;
 
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...colorAzulUMSA);
-        doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 6;
-
-        doc.setFontSize(9);
-        doc.setTextColor(0, 0, 0);
-        doc.text('INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 4;
-
-        doc.setFontSize(10);
-        doc.setTextColor(...colorVinoUMSA);
-        doc.text('SISTEMA DE ORIENTACIÓN VOCACIONAL', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 8;
-
+        agregarEncabezado(logoUMSA, logoIDRDU);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(0, 0, 0);
         doc.text('Listado de Estudiantes', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 10;
+        yPos += 5;
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
 
-        let filtrosAplicados = 'Filtros aplicados: ';
+        let filtrosAplicados = '';
         let hayFiltros = false;
 
         if (this.filtros.provincia) {
@@ -1176,7 +1241,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         if (hayFiltros) {
           doc.text(filtrosAplicados.slice(0, -2), margin, yPos);
         } else {
-          doc.text('Sin filtros aplicados', margin, yPos);
+          doc.text('', margin, yPos);
         }
         const headers = [
           { header: 'CI', dataKey: 'ci' },
@@ -1211,8 +1276,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
             fillColor: [240, 240, 240]
           },
           styles: {
-            fontSize: 9,
-            cellPadding: 2
+            fontSize: 7,
+            cellPadding: 1
           },
           columnStyles: {
             0: { cellWidth: 20 }, // CI
@@ -1226,17 +1291,13 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           margin: { left: margin, right: margin }
         });
         const finalY = (doc as any).lastAutoTable.finalY + 5;
-
         doc.setFontSize(9);
         doc.text(`Total registros: ${this.estudiantesFiltrados.length}`, margin, finalY);
         const fechaGeneracion = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
         doc.text(`Generado el: ${fechaGeneracion}`, margin, finalY + 5);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
-        const footerY = pageHeight - 20;
-        doc.text('UMSA: Teléfono: (591-2) 2612298 | E-mail: informate@umsa.bo', pageWidth / 2, footerY, { align: 'center' });
-        doc.text('Av. Villazón N° 1995, Plaza del Bicentenario - Zona Central, La Paz, Bolivia', pageWidth / 2, footerY + 4, { align: 'center' });
-        doc.text('IDRDU: Av. 6 de Agosto, Edificio HOY Nro. 2170 Piso 12', pageWidth / 2, footerY + 8, { align: 'center' });
+        agregarPiePagina();
         const totalPages = doc.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
           doc.setPage(i);
@@ -1484,7 +1545,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
-    doc.text('Perfil del Estudiante', pageWidth / 2, y, { align: 'center' });
+    doc.text('PERFIL DEL ESTUDIANTE', pageWidth / 2, y, { align: 'center' });
     y += 4;
     doc.setDrawColor(...colorAzulUMSA);
     doc.setFillColor(...colorAzulClaro);
@@ -1495,16 +1556,24 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     doc.setTextColor(0, 0, 0);
     doc.text('DATOS DEL ESTUDIANTE:', margenIzquierdo + 3, y + 5);
     doc.setFont('helvetica', 'normal');
-
+    let lugar = 'Lugar no disponible';
+    let municipio: any = null;
+    let provincia: any = null;
+    if (estudiante.id_municipio) {
+      municipio = this.municipios.find((m: any) => m.idMunicipio === estudiante.id_municipio);
+      if (municipio) {
+        provincia = this.provincias.find((p: any) => p.idProvincia === municipio.idProvincia);
+      }
+    }
     const nombreCompleto = `${estudiante.nombre} ${estudiante.apPaterno} ${estudiante.apMaterno || ''}`;
-    doc.text(`Nombre: ${nombreCompleto}`, margenIzquierdo + 5, y + 11);
-    doc.text(`C.I.: ${estudiante.ciEstudiante}`, margenIzquierdo + 5, y + 17);
-    doc.text(`Edad: ${estudiante.edad} años`, margenIzquierdo + 5, y + 23);
-
-    doc.text(`Colegio: ${estudiante.colegio}`, margenIzquierdo + anchoUtil / 2, y + 11);
-    doc.text(`Celular: ${estudiante.celular || 'No especificado'}`, margenIzquierdo + anchoUtil / 2, y + 17);
-    doc.text(`Curso: ${estudiante.curso}`, margenIzquierdo + anchoUtil / 2, y + 23);
-
+    doc.text(`Nombre: ${nombreCompleto}`, margenIzquierdo + 5, y + 10);
+    doc.text(`C.I.: ${estudiante.ciEstudiante}`, margenIzquierdo + 5, y + 15);
+    doc.text(`Edad: ${estudiante.edad} años`, margenIzquierdo + 5, y + 20);
+    doc.text(`Provincia: ${provincia ? provincia.nombre : 'Desconocida'}`, margenIzquierdo + 5, y + 25);
+    doc.text(`Colegio: ${estudiante.colegio}`, margenIzquierdo + anchoUtil / 2, y + 10);
+    doc.text(`Celular: ${estudiante.celular || 'No especificado'}`, margenIzquierdo + anchoUtil / 2, y + 15);
+    doc.text(`Curso: ${estudiante.curso}`, margenIzquierdo + anchoUtil / 2, y + 20);
+    doc.text(`Municipio: ${municipio ? municipio.nombre : 'Desconocido'}`, margenIzquierdo + anchoUtil / 2, y + 25);
     y += 30;
     const todosChaside = this.resultadoEstudiante
       .filter(r => r.chaside)
@@ -1613,11 +1682,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         doc.setFillColor(...colorBase);
         doc.rect(margenIzquierdo, y, anchoUtil, 10, 'F');
         doc.setFont('helvetica', 'bold');
-        doc.text(holland.codigo, margenIzquierdo + 8, y + 6);
+        doc.text(holland.codigo, margenIzquierdo + 8, y + 5);
 
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7);
-        doc.text(fechaStr || '', margenIzquierdo + anchoUtil - 25, y + 6);
+        doc.text(fechaStr || '', margenIzquierdo + anchoUtil - 25, y + 5);
 
         y += 8;
         doc.setTextColor(0, 0, 0);
@@ -1667,10 +1736,10 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       todasFacultades.forEach((facultadItem, idx) => {
         verificarEspacioDisponible(40);
         const facultad = facultadItem.data;
-        const imgWidth = 20;
-        const imgHeight = 20;
-        const imgX = margenIzquierdo + anchoUtil - imgWidth - 5;
-        const imgY = y + 5;
+        const imgWidth = 15;
+        const imgHeight = 15;
+        const imgX = margenIzquierdo + 2;
+        const imgY = y + 7;
 
         doc.addImage(facultad.imgLogo, 'PNG', imgX, imgY, imgWidth, imgHeight);
         doc.setFont('helvetica', 'bold');
@@ -1680,16 +1749,16 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         y += 7;
 
         if (facultad.carreras && facultad.carreras.length > 0) {
-          doc.setFontSize(7);
+          doc.setFontSize(8);
           doc.setFont('helvetica', 'bold');
-          doc.text('Carreras disponibles:', margenIzquierdo + 4, y);
+          doc.text('Carreras disponibles:', margenIzquierdo + 22, y);
           y += 4;
           const columnasCarreras = 1;
           const anchoColumna = anchoUtil / columnasCarreras;
           let columnaActual = 0;
           (facultad.carreras as string[]).slice(0, 10).forEach((carrera: string) => {
-            const xPos = margenIzquierdo + 4 + (columnaActual * anchoColumna);
-            doc.setFontSize(6);
+            const xPos = margenIzquierdo + 25 + (columnaActual * anchoColumna);
+            doc.setFontSize(8);
             doc.setFont('helvetica', 'normal');
             doc.text(`• ${carrera}`, xPos + 2, y);
             columnaActual++;
@@ -1698,19 +1767,18 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
               y += 4;
             }
           });
-          if (columnaActual > 0) y += 4;
+          if (columnaActual > 0) y += 8;
           y += 2;
         }
         if (facultad.url) {
+          y += 2;
           doc.setFontSize(6);
-          doc.setFont('helvetica', 'italic');
+          doc.setFont('helvetica', 'normal');
           doc.setTextColor(0, 0, 200);
           doc.text(`Más información: ${facultad.url}`, margenIzquierdo, y);
           doc.setTextColor(0, 0, 0);
-          y += 4;
         }
-
-        y += 5;
+        y += 4;
       });
     } else {
       verificarEspacioDisponible(30);

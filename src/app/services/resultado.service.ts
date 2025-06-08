@@ -39,23 +39,23 @@ export class ResultadoService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-  
-busquedaProvincia(
-  idProvincia?: number,
-  idMunicipio?: number,
-  year?: string
-): Observable<ResultadoDtoResponse[]> {
-  let params = new HttpParams();
 
-  if (typeof idProvincia === 'number' && !isNaN(idProvincia)) {
-    params = params.set('idProvincia', idProvincia.toString());
+  busquedaProvincia(
+    idProvincia?: number,
+    idMunicipio?: number,
+    year?: string
+  ): Observable<ResultadoDtoResponse[]> {
+    let params = new HttpParams();
+
+    if (typeof idProvincia === 'number' && !isNaN(idProvincia)) {
+      params = params.set('idProvincia', idProvincia.toString());
+    }
+    if (typeof idMunicipio === 'number' && !isNaN(idMunicipio)) {
+      params = params.set('idMunicipio', idMunicipio.toString());
+    }
+    if (year) {
+      params = params.set('year', year);
+    }
+    return this.http.get<ResultadoDtoResponse[]>(`${this.apiUrl}/busqueda-provincia`, { params });
   }
-  if (typeof idMunicipio === 'number' && !isNaN(idMunicipio)) {
-    params = params.set('idMunicipio', idMunicipio.toString());
-  }
-  if (year) {
-    params = params.set('year', year);
-  }
-  return this.http.get<ResultadoDtoResponse[]>(`${this.apiUrl}/busqueda-provincia`, { params });
-}
 }
