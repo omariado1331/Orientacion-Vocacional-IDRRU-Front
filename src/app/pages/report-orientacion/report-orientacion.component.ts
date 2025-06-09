@@ -7,13 +7,10 @@ import { NgChartsModule } from 'ng2-charts';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart, registerables } from 'chart.js';
 import jsPDF from 'jspdf';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
-import { saveAs } from 'file-saver';
 import { ProvinciaService } from '../../services/provincia.service';
 import { MunicipioService } from '../../services/municipio.service';
 import { Provincia } from '../../interfaces/provincia-interface';
 import { Municipio } from '../../interfaces/municipio-interface';
-import { DatePipe } from '@angular/common';
 
 Chart.register(...registerables);
 Chart.register(ChartDataLabels);
@@ -38,8 +35,6 @@ export class ReportOrientacionComponent implements OnInit {
 
   nombreProvinciaSeleccionada: string = '---';
   nombreMunicipioSeleccionado: string = '---';
-
-
 
   isBrowser: boolean = false;
   mostrarGrafico: boolean = false;
@@ -139,7 +134,7 @@ ngOnInit(): void {
   }
 }
 
-  cargarProvincias() {
+cargarProvincias() {
     this.provinciaService.getProvinciasAll().subscribe({
       next: (data) => this.provincias = data,
       error: (err) => console.error('Error cargando provincias', err)
@@ -153,7 +148,6 @@ cargarAniosDisponibles(): void {
       this.listaAnios = añosUnicos;
     });
 }
-
 
 onProvinciaChange(): void {
   if (this.idProvincia != null) {
@@ -176,16 +170,13 @@ onProvinciaChange(): void {
 }
 
 onMunicipioChange(): void {
-
   console.log('ID Municipio seleccionado:', this.idMunicipio);
   console.log('Lista municipios:', this.municipios);
   if (this.idMunicipio != null) {
 
     const municipio = this.municipios.find(m => m.idMunicipio === this.idMunicipio);
     this.nombreMunicipioSeleccionado = municipio ? municipio.nombre : '---';
-  
   } else {
-    
     this.nombreMunicipioSeleccionado = '---';
   }
 
@@ -201,10 +192,9 @@ cargarResultados(validarFiltros: boolean = true): void {
 
         // Validar si al menos uno de los filtros está aplicado (no nulo o vacío)
         const filtrosAplicados = 
-          (this.idProvincia !== null && this.idProvincia !== undefined) ||
-          (this.idMunicipio !== null && this.idMunicipio !== undefined) ||
+          (this.idProvincia !== null && this.idProvincia !== undefined) &&
+          (this.idMunicipio !== null && this.idMunicipio !== undefined) &&
           (!!this.year && this.year.trim() !== '');
-
 
         if(!filtrosAplicados){
           // Si no hay filtros, limpiar todo y ocultar todo.
@@ -216,8 +206,6 @@ cargarResultados(validarFiltros: boolean = true): void {
           return; // salir antes de hacer la petición
 
         }
-
-
 
         // Mostrar botones exportar sólo si filtros están aplicados y hay resultados
         this.mostrarBotonesExportar = validarFiltros && filtrosAplicados && data.length > 0;
@@ -247,18 +235,15 @@ limpiarFiltros(): void {
   this.idProvincia = undefined;
   this.idMunicipio = undefined;
   this.year = undefined;
-
   this.nombreProvinciaSeleccionada = '';
   this.nombreMunicipioSeleccionado = '';
 
   // Vaciar o resetear las listas de municipios y años
   this.municipios = [];
   this.listaAnios = [];
-
   this.resultados = [];
   this.mostrarGrafico = false;
   this.mostrarBotonesExportar = false;
-
   this.mostrarImagenNoResultados = true;  // mostrar imagen al limpiar
   // No llamar a cargarResultados para no recargar la tabla
 
@@ -310,7 +295,6 @@ private generarGrafico(): void {
     this.cd.detectChanges();
 }
 
-
 private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number): Promise<number> {
   const colorAzulUMSA: [number, number, number] = [0, 51, 153];
   const colorVinoUMSA: [number, number, number] = [128, 0, 32];
@@ -328,8 +312,6 @@ private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number): Pr
     this.convertirImagenABase64(logoIzquierdoUrl),
     this.convertirImagenABase64(logoDerechoUrl)
   ]);
-
-
 
   // 3. Usar las imágenes convertidas
   doc.addImage(logoIzqBase64, 'PNG', margin, yPos - 10, logoWidth, logoHeight);
@@ -360,7 +342,6 @@ private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number): Pr
   return yPos;
 }
 
-
 // Añade este nuevo método en tu clase
 private async convertirImagenABase64(url: string): Promise<string> {
   const response = await fetch(url);
@@ -384,7 +365,6 @@ async generarPDFconGraficoYTabla() {
   const margin1 = 10;  // declara e inicializa primero
 
   let yPos = await this.dibujarCabecera(doc, pageWidth, margin1);
-
 
   // Título centrado
   //const titulo = 'REPORTE DEL TEST VOCACIONAL';
@@ -419,8 +399,7 @@ async generarPDFconGraficoYTabla() {
     filtros.push({titulo: 'Año:', valor: this.year});
   }
 
-
-/*
+  /*
   const filtros = [
     `Provincia: ${this.nombreProvinciaSeleccionada}`,
     `Municipio: ${this.nombreMunicipioSeleccionado}`,
@@ -446,11 +425,8 @@ async generarPDFconGraficoYTabla() {
     
   });
 
-
   // justo debajo de filtros espacio botton
   const startYTable = filtroY + 58; 
-
-
 
   // TABLA DE RESULTADOS
   // Tabla centrada y angosta
@@ -461,7 +437,6 @@ async generarPDFconGraficoYTabla() {
   //.reduce() es como un for que acumula el 0 es valor inicial
   // Acumulador acc + r.cantidadEstudiantes
   const totalEstudiantes = this.resultados.reduce((acc, r) => acc + r.cantidadEstudiantes, 0);
-
   // MAP Sirve para recorrer un array y transformar cada elemento, devolviendo un nuevo array con los resultados.
   // this.resultados es
   /*
@@ -470,8 +445,6 @@ async generarPDFconGraficoYTabla() {
       { chaside: 'TABLA 2H', cantidadEstudiantes: 5 }
     ]
   */
-
-
   const rows = this.resultados.map(r => [
     // tabla 1C
     r.chaside,
@@ -482,35 +455,33 @@ async generarPDFconGraficoYTabla() {
     totalEstudiantes > 0 ? ((r.cantidadEstudiantes / totalEstudiantes) * 100).toFixed(2) + '%' : '0%'
   ]);
 
-
-
   const colCount = columns.length;
   const tableWidth = 520;
   const colWidth = tableWidth / colCount;
 
   // Aquí va el autoTable con los parámetros actualizados
   (doc as any).autoTable({
-  startY: startYTable,
-  // Centrar la pagina
-  margin: { left: (pageWidth - tableWidth) / 2 },
-  //Define el encabezado de las columnas
-  head: [columns],
-  //Datos de la tabla
-  body: rows,
-  //Define el ancho de las columnas
-  columnStyles: {
-    0: { cellWidth: colWidth },
-    1: { cellWidth: colWidth },
-    2: { cellWidth: colWidth },
-  },
-  //Estilo
-  //Define el ancho de cada columna 
-  styles: { fontSize: 10, cellPadding: 6, halign: 'center' },
-  //Estilo general fuente, espaciado, alinear horizontalmente
-  headStyles: { fillColor: [78, 121, 167], textColor: 255 },
-  // filas con rayas
-  theme: 'striped',
-});
+    startY: startYTable,
+    // Centrar la pagina
+    margin: { left: (pageWidth - tableWidth) / 2 },
+    //Define el encabezado de las columnas
+    head: [columns],
+    //Datos de la tabla
+    body: rows,
+    //Define el ancho de las columnas
+    columnStyles: {
+      0: { cellWidth: colWidth },
+      1: { cellWidth: colWidth },
+      2: { cellWidth: colWidth },
+    },
+    //Estilo
+    //Define el ancho de cada columna 
+    styles: { fontSize: 10, cellPadding: 6, halign: 'center' },
+    //Estilo general fuente, espaciado, alinear horizontalmente
+    headStyles: { fillColor: [78, 121, 167], textColor: 255 },
+    // filas con rayas
+    theme: 'striped',
+  });
 
 
   // Leyenda con colores a la izquierda con espacio
@@ -520,29 +491,29 @@ async generarPDFconGraficoYTabla() {
   const spacingY = 18;
 
   //PDF 
-const descripcionesFijas: {[key: string]: string} = {
-  'TABLA 1C': 'Ciencias Económicas, Ciencias Financieras',
-  'TABLA 2H': 'Humanidades, Ciencias Jurídicas, Ciencias Sociales',
-  'TABLA 3A': 'Artes, Arquitectura ,Diseño',
-  'TABLA 4S': 'Salud, Enfermería, Medicina',
-  'TABLA 5I': 'Investigación, Ingeniería, Tecnología',
-  'TABLA 6D': 'Defensa, Seguridad',
-  'TABLA 7E': 'Ciencias Exactas, Ciencias Puras, Biológicas'
-};
-
-const colores = [
-  '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
-  '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'
-];
-
-
-const leyenda = this.chartData.labels.map((label, index) => {
-  return {
-    label,
-    desc: descripcionesFijas[label] || 'Sin descripción',
-    color: colores[index] || '#000000'
+  const descripcionesFijas: {[key: string]: string} = {
+    'TABLA 1C': 'Ciencias Económicas, Ciencias Financieras',
+    'TABLA 2H': 'Humanidades, Ciencias Jurídicas, Ciencias Sociales',
+    'TABLA 3A': 'Artes, Arquitectura ,Diseño',
+    'TABLA 4S': 'Salud, Enfermería, Medicina',
+    'TABLA 5I': 'Investigación, Ingeniería, Tecnología',
+    'TABLA 6D': 'Defensa, Seguridad',
+    'TABLA 7E': 'Ciencias Exactas, Ciencias Puras, Biológicas'
   };
-});
+
+  const colores = [
+    '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
+    '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'
+  ];
+
+
+  const leyenda = this.chartData.labels.map((label, index) => {
+    return {
+      label,
+      desc: descripcionesFijas[label] || 'Sin descripción',
+      color: colores[index] || '#000000'
+    };
+  });
 
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
@@ -595,9 +566,6 @@ const leyenda = this.chartData.labels.map((label, index) => {
     doc.setPage(i);
     doc.setFontSize(8);
   }
-
-  doc.save('reporte-con-grafico.pdf');
-
+  doc.save('reporte-del-test-vocacional.pdf');
 }
-
 }

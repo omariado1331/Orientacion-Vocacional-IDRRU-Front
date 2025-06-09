@@ -1397,6 +1397,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       doc.text(textoLinea1, anchoPagina / 2, altoPagina - 12, { align: 'center' });
       doc.text(textoLinea2, anchoPagina / 2, altoPagina - 8, { align: 'center' });
     };
+    
     /*==================================
     * Encabezado y pie de pagina del PDF
     ====================================*/
