@@ -36,7 +36,9 @@
                             <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
                             <div class="career-list">
                                 @for( carrera of carrerasFI; track carrera){
-                                <div class="career-item">{{carrera}}</div>
+                                <div class="career-item d-flex justify-content-between">{{carrera}}
+                                    <button class="btn btn-primary btn-sm" (click)="mostrarInfo(carrera)">info</button>
+                                </div>
                                 }
                             </div>
                         </div>
@@ -80,7 +82,9 @@
                             <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
                             <div class="career-list">
                                 @for( carrera of carrerasFT; track carrera){
-                                <div class="career-item">{{carrera}}</div>
+                                <div class="career-item d-flex justify-content-between">{{carrera}}
+                                    <button class="btn btn-primary btn-sm" (click)="mostrarInfo(carrera)">info</button>
+                                </div>
                                 }
                             </div>
                         </div>
@@ -124,7 +128,9 @@
                             <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
                             <div class="career-list">
                                 @for( carrera of carrerasFCG; track carrera){
-                                <div class="career-item">{{carrera}}</div>
+                                <div class="career-item d-flex justify-content-between">{{carrera}}
+                                    <button class="btn btn-primary btn-sm" (click)="mostrarInfo(carrera)">info</button>
+                                </div>
                                 }
                             </div>
                         </div>
@@ -141,3 +147,14 @@
 }
 </div>
 
+<!-- modal -->
+@if (mostrarModal) {
+    <div class="modal-backdrop">
+       <div class="modal-contenido">
+           <h5 class="text-primary">Carrera de {{carrera}}</h5>
+           <img src="{{dirLogo}}" alt="{{carrera}}" class="carrer-logo">
+           <p>{{descripcionCarrera}}</p>
+           <button class="btn btn-danger" (click)="ocultarInfo()">cerrar</button>
+       </div>
+    </div>
+   }

@@ -24,6 +24,18 @@ export class TablaAComponent {
 
   facultadesArray = Object.entries(this.facultades);
 
+  descripcionCarreras = {
+    'Arquitectura': 'Se centra en el diseño, planificación y construcción de edificios, espacios habitables y otros entornos. Es una disciplina que combina creatividad, conocimiento técnico y una visión holística del entorno construido, abarcando desde el diseño de interiores hasta el diseño urbano y la planificación de ciudades.',
+    'Artes': 'Ofrece una formación integral en diversas disciplinas artísticas, preparando a los estudiantes para la gestión, ejecución y docencia en áreas como la música, fotografía, artes digitales, artes plásticas y artes escénicas. La carrera busca desarrollar habilidades creativas, el pensamiento crítico y la capacidad de expresarse a través de diferentes medios artísticos.',
+    'Diseño': 'Forma profesionales capaces de crear soluciones visuales, funcionales y estratégicas, adaptadas a las necesidades y contextos diversos. Se centra en la comunicación visual, la creatividad y la innovación, abarcando áreas como diseño gráfico, branding, diseño de interiores y más.'
+  }
+
+  logosCarreras = {
+    'Arquitectura': './assets/logos-carreras/carreras-A/arqui.png',
+    'Artes': './assets/logos-carreras/carreras-A/ARTES.jpg',
+    'Diseño': './assets/logos-carreras/carreras-A/arqui.png'
+  }
+
   ngOnInit(){
     //Primer facultad FAADU
     for(const key in this.hollandFAADU){
@@ -39,4 +51,21 @@ export class TablaAComponent {
 
     this.facultadesArray = Object.entries(this.facultades).sort((a,b)=> b[1] - a[1]);
   }
+
+  mostrarModal = false;
+  carrera : string = '';
+  descripcionCarrera:string = ''
+  dirLogo: string = '';
+
+
+  mostrarInfo(carrera: string){
+    this.carrera = carrera;
+    this.descripcionCarrera = this.descripcionCarreras[carrera as keyof typeof this.descripcionCarreras];
+    this.dirLogo = this.logosCarreras[carrera as keyof typeof this.logosCarreras];
+    this.mostrarModal = true;
+  }
+  ocultarInfo(){
+    this.mostrarModal = false;
+  }
+
 }

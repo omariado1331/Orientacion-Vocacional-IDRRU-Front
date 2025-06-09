@@ -37,7 +37,9 @@
                             <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
                             <div class="career-list">
                                 @for( carrera of carrerasFCS; track carrera){
-                                <div class="career-item">{{carrera}}</div>
+                                <div class="career-item d-flex justify-content-between">{{carrera}}
+                                    <button class="btn btn-primary btn-sm" (click)="mostrarInfo(carrera)">Info</button>
+                                </div>
                                 }
                             </div>
                         </div>
@@ -57,7 +59,7 @@
             <!-- FACULTAD DE DERECHO Y CIENCIAS POLITICAS -->
             <div class="col-lg-4 mb-4">
                 <div class="card card-custom option-card">
-                    <div class="option-number">{{i+1}}</div>
+                    <div class="option-number mt-3 mx-3">{{i+1}}</div>
                     <div class="card-body">
                         <div class="text-center mb-3">
                             <img src="./assets/logos-facultades/FDCP.png" alt="Logo FDCP" class="faculty-logo mb-2">
@@ -82,7 +84,9 @@
                             <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
                             <div class="career-list">
                                 @for( carrera of carrerasFDCP; track carrera){
-                                <div class="career-item">{{carrera}}</div>
+                                <div class="career-item d-flex justify-content-between">{{carrera}}
+                                    <button class="btn btn-primary btn-sm" (click)="mostrarInfo(carrera)">Info</button>
+                                </div>
                                 }
                             </div>
                         </div>
@@ -127,7 +131,9 @@
                             <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
                             <div class="career-list">
                                 @for( carrera of carrerasFHCE; track carrera){
-                                <div class="career-item">{{carrera}}</div>
+                                <div class="career-item d-flex justify-content-between">{{carrera}}
+                                    <button class="btn btn-primary btn-sm" (click)="mostrarInfo(carrera)">info</button>
+                                </div>
                                 }
                             </div>
                         </div>
@@ -143,3 +149,15 @@
     }
 }
 </div>
+
+<!-- modal -->
+@if (mostrarModal) {
+ <div class="modal-backdrop">
+    <div class="modal-contenido">
+        <h5 class="text-primary">Carrera de {{carrera}}</h5>
+        <img src="{{dirLogo}}" alt="{{carrera}}" class="carrer-logo">
+        <p>{{descripcionCarrera}}</p>
+        <button class="btn btn-danger" (click)="ocultarInfo()">cerrar</button>
+    </div>
+ </div>
+}
