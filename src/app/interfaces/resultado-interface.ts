@@ -20,6 +20,7 @@ export interface ResultadoDto {
     idHolland?: number;
     idFacultad?: number;
     facultad?: any;
+    facultades?: any[]; 
     chaside?: any;
     holland?: any;
   }

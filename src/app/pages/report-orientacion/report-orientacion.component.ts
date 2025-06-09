@@ -7,14 +7,11 @@ import { NgChartsModule } from 'ng2-charts';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart, registerables } from 'chart.js';
 import jsPDF from 'jspdf';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
-import { saveAs } from 'file-saver';
 import { ProvinciaService } from '../../services/provincia.service';
 import { MunicipioService } from '../../services/municipio.service';
 import { Provincia } from '../../interfaces/provincia-interface';
 import { Municipio } from '../../interfaces/municipio-interface';
 import { DatePipe } from '@angular/common';
-
 Chart.register(...registerables);
 Chart.register(ChartDataLabels);
 
@@ -23,7 +20,8 @@ Chart.register(ChartDataLabels);
   templateUrl: './report-orientacion.component.html',
   styleUrls: ['./report-orientacion.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, NgChartsModule]
+  imports: [CommonModule, FormsModule, NgChartsModule],
+  providers: [DatePipe]
 })
 export class ReportOrientacionComponent implements OnInit {
 
@@ -38,8 +36,6 @@ export class ReportOrientacionComponent implements OnInit {
 
   nombreProvinciaSeleccionada: string = '---';
   nombreMunicipioSeleccionado: string = '---';
-
-
 
   isBrowser: boolean = false;
   mostrarGrafico: boolean = false;
@@ -126,6 +122,7 @@ constructor(
   private resultadoService: ResultadoService,
   private provinciaService: ProvinciaService,
   private municipioService: MunicipioService,
+  private datePipe: DatePipe,
   @Inject(PLATFORM_ID) private platformId: Object,
   private cd: ChangeDetectorRef
 ) {}  
@@ -139,7 +136,7 @@ ngOnInit(): void {
   }
 }
 
-  cargarProvincias() {
+cargarProvincias() {
     this.provinciaService.getProvinciasAll().subscribe({
       next: (data) => this.provincias = data,
       error: (err) => console.error('Error cargando provincias', err)
@@ -153,7 +150,6 @@ cargarAniosDisponibles(): void {
       this.listaAnios = añosUnicos;
     });
 }
-
 
 onProvinciaChange(): void {
   if (this.idProvincia != null) {
@@ -176,16 +172,13 @@ onProvinciaChange(): void {
 }
 
 onMunicipioChange(): void {
-
   console.log('ID Municipio seleccionado:', this.idMunicipio);
   console.log('Lista municipios:', this.municipios);
   if (this.idMunicipio != null) {
 
     const municipio = this.municipios.find(m => m.idMunicipio === this.idMunicipio);
     this.nombreMunicipioSeleccionado = municipio ? municipio.nombre : '---';
-  
   } else {
-    
     this.nombreMunicipioSeleccionado = '---';
   }
 
@@ -201,10 +194,9 @@ cargarResultados(validarFiltros: boolean = true): void {
 
         // Validar si al menos uno de los filtros está aplicado (no nulo o vacío)
         const filtrosAplicados = 
-          (this.idProvincia !== null && this.idProvincia !== undefined) ||
-          (this.idMunicipio !== null && this.idMunicipio !== undefined) ||
+          (this.idProvincia !== null && this.idProvincia !== undefined) &&
+          (this.idMunicipio !== null && this.idMunicipio !== undefined) &&
           (!!this.year && this.year.trim() !== '');
-
 
         if(!filtrosAplicados){
           // Si no hay filtros, limpiar todo y ocultar todo.
@@ -216,8 +208,6 @@ cargarResultados(validarFiltros: boolean = true): void {
           return; // salir antes de hacer la petición
 
         }
-
-
 
         // Mostrar botones exportar sólo si filtros están aplicados y hay resultados
         this.mostrarBotonesExportar = validarFiltros && filtrosAplicados && data.length > 0;
@@ -247,18 +237,15 @@ limpiarFiltros(): void {
   this.idProvincia = undefined;
   this.idMunicipio = undefined;
   this.year = undefined;
-
   this.nombreProvinciaSeleccionada = '';
   this.nombreMunicipioSeleccionado = '';
 
   // Vaciar o resetear las listas de municipios y años
   this.municipios = [];
   this.listaAnios = [];
-
   this.resultados = [];
   this.mostrarGrafico = false;
   this.mostrarBotonesExportar = false;
-
   this.mostrarImagenNoResultados = true;  // mostrar imagen al limpiar
   // No llamar a cargarResultados para no recargar la tabla
 
@@ -291,7 +278,8 @@ private generarGrafico(): void {
           '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'
         ]
       }
-    ]
+    ],
+
   };
 
   // Actualizar la leyenda personalizada con un nuevo objeto para que Angular refresque la vista
@@ -309,14 +297,14 @@ private generarGrafico(): void {
     this.cd.detectChanges();
 }
 
-
-private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number): Promise<number> {
-  const colorAzulUMSA: [number, number, number] = [0, 51, 153];
-  const colorVinoUMSA: [number, number, number] = [128, 0, 32];
-  const logoWidth = 70; // Ancho del logo
-  const logoHeight = 70; // Alto del logo
+private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number, dezplazamiento: number): Promise<number> {
+  const colorTitulo: [number, number, number] = [0, 54, 107];
+  const colorTexto: [number, number, number] = [0, 54, 107];
+  const logoWidth = 45; // Ancho del logo
+  const logoHeight = 45; // Alto del logo
 
   let yPos = margin + 25;
+  const anchoPagina = doc.internal.pageSize.getWidth(); 
 
   // 1. Cambiar rutas (usar assets/ en lugar de src/assets/)
   const logoIzquierdoUrl = "assets/umsac.png"; // Ruta corregida
@@ -328,37 +316,77 @@ private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number): Pr
     this.convertirImagenABase64(logoDerechoUrl)
   ]);
 
-
+    // variables
+    const textoUmsa = 'UNIVERSIDAD MAYOR DE SAN ANDRÉS';
+    const textoVicerrectorado = 'VICERRECTORADO'
+    const textoInstituto = 'INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA'
+    const tituloPdf = 'Reporte de Resultados del Test'
 
   // 3. Usar las imágenes convertidas
-  doc.addImage(logoIzqBase64, 'PNG', margin, yPos - 10, logoWidth, logoHeight);
-  doc.addImage(logoDerBase64, 'PNG', pageWidth - margin - logoWidth, yPos - 10, logoWidth, logoHeight);
-
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colorAzulUMSA);
-  doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth / 2, yPos, { align: 'center' });
-  yPos += 16;
-
-  doc.setFontSize(9);
-  doc.setTextColor(0, 0, 0);
-  doc.text('INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA', pageWidth / 2, yPos, { align: 'center' });
-  yPos += 15;
+  doc.addImage(logoIzqBase64, 'PNG', margin + dezplazamiento - 5, yPos - 10, logoWidth, logoHeight);
+  doc.addImage(logoDerBase64, 'PNG', pageWidth - margin - logoWidth - dezplazamiento, yPos - 10, logoWidth, logoHeight);
 
   doc.setFontSize(10);
-  doc.setTextColor(...colorVinoUMSA);
-  doc.text('SISTEMA DE ORIENTACIÓN VOCACIONAL', pageWidth / 2, yPos, { align: 'center' });
-  yPos += 25;
-
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(0, 0, 0);
-  doc.text('Reporte de Resultados', pageWidth / 2, yPos, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...colorTitulo);
+  doc.text(textoUmsa, pageWidth / 2, yPos, { align: 'center' });
   yPos += 14;
+
+  doc.setFontSize(10);
+  doc.setTextColor(...colorTexto);
+  doc.text(textoVicerrectorado, pageWidth / 2, yPos, { align: 'center' });
+  yPos += 14;
+
+  
+  const anchoTexto =  doc.getTextWidth(textoInstituto) + 8;
+  const centroPagina = pageWidth/2;
+  const inicioLinea = centroPagina - (anchoTexto/2)
+  const finLinea = centroPagina  + (anchoTexto/2);
+  doc.setDrawColor(...colorTitulo)
+  doc.setLineWidth(0.8)
+  doc.line(inicioLinea, yPos - 10, finLinea, yPos - 10)
+  doc.line(inicioLinea, (yPos - 10) + 2.75, finLinea, (yPos - 10) + 2.75)
+  yPos += 4;
+  
+  doc.setFontSize(10);  
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colorTexto);
+  doc.text(textoInstituto, centroPagina, yPos, { align: 'center' });
+  yPos += 30;
+
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(0, 0, 0);
+  doc.text(tituloPdf, pageWidth / 2, yPos, { align: 'center' });
 
   return yPos;
 }
 
+private async dibujarPiePagina(doc: jsPDF) {
+  // === tamano pagina ===
+  const anchoPagina = doc.internal.pageSize.getWidth();
+  const altoPagina = doc.internal.pageSize.getHeight();
+
+  // ===estilo ===
+  const fuente = 'helvetica';
+  const estilo = 'normal';
+  const tamañoFuente = 8;
+  const colorTexto: [number, number, number] = [0, 54, 107];
+
+  // === texto ===
+  const textoLinea1 = 'Av. 6 de Agosto 2170 · Edificio Hoy Piso 12 · Teléfono - Fax (591) 2-2118556 · IP (591) 2-2612211';
+  const textoLinea2 = 'e-mail: idrdu@umsa.bo · https://www.facebook.com/IDR.DU.UMSA';
+  const fechaGeneracion = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
+
+  // === estilos ===
+  doc.setTextColor(...colorTexto);
+  doc.setFont(fuente, estilo);
+  doc.setFontSize(tamañoFuente);
+
+  // === texto ===
+  doc.text(textoLinea1, anchoPagina / 2, altoPagina - 30, { align: 'center' });
+  doc.text(textoLinea2, anchoPagina / 2, altoPagina - 20, { align: 'center' });
+}
 
 // Añade este nuevo método en tu clase
 private async convertirImagenABase64(url: string): Promise<string> {
@@ -381,8 +409,9 @@ async generarPDFconGraficoYTabla() {
   const pageHeight = doc.internal.pageSize.getHeight();
 
   const margin1 = 10;  // declara e inicializa primero
-
-  let yPos = await this.dibujarCabecera(doc, pageWidth, margin1);
+  const dezplazamiento = 25;
+  //let yPos 
+  await this.dibujarCabecera(doc, pageWidth, margin1, dezplazamiento);
 
 
   // Título centrado
@@ -418,8 +447,7 @@ async generarPDFconGraficoYTabla() {
     filtros.push({titulo: 'Año:', valor: this.year});
   }
 
-
-/*
+  /*
   const filtros = [
     `Provincia: ${this.nombreProvinciaSeleccionada}`,
     `Municipio: ${this.nombreMunicipioSeleccionado}`,
@@ -445,11 +473,8 @@ async generarPDFconGraficoYTabla() {
     
   });
 
-
   // justo debajo de filtros espacio botton
   const startYTable = filtroY + 58; 
-
-
 
   // TABLA DE RESULTADOS
   // Tabla centrada y angosta
@@ -470,7 +495,6 @@ async generarPDFconGraficoYTabla() {
     ]
   */
 
-
   const rows = this.resultados.map(r => [
     // tabla 1C
     r.chaside,
@@ -481,35 +505,33 @@ async generarPDFconGraficoYTabla() {
     totalEstudiantes > 0 ? ((r.cantidadEstudiantes / totalEstudiantes) * 100).toFixed(2) + '%' : '0%'
   ]);
 
-
-
   const colCount = columns.length;
   const tableWidth = 520;
   const colWidth = tableWidth / colCount;
 
   // Aquí va el autoTable con los parámetros actualizados
   (doc as any).autoTable({
-  startY: startYTable,
-  // Centrar la pagina
-  margin: { left: (pageWidth - tableWidth) / 2 },
-  //Define el encabezado de las columnas
-  head: [columns],
-  //Datos de la tabla
-  body: rows,
-  //Define el ancho de las columnas
-  columnStyles: {
-    0: { cellWidth: colWidth },
-    1: { cellWidth: colWidth },
-    2: { cellWidth: colWidth },
-  },
-  //Estilo
-  //Define el ancho de cada columna 
-  styles: { fontSize: 10, cellPadding: 6, halign: 'center' },
-  //Estilo general fuente, espaciado, alinear horizontalmente
-  headStyles: { fillColor: [78, 121, 167], textColor: 255 },
-  // filas con rayas
-  theme: 'striped',
-});
+    startY: startYTable,
+    // Centrar la pagina
+    margin: { left: (pageWidth - tableWidth) / 2 },
+    //Define el encabezado de las columnas
+    head: [columns],
+    //Datos de la tabla
+    body: rows,
+    //Define el ancho de las columnas
+    columnStyles: {
+      0: { cellWidth: colWidth },
+      1: { cellWidth: colWidth },
+      2: { cellWidth: colWidth },
+    },
+    //Estilo
+    //Define el ancho de cada columna 
+    styles: { fontSize: 10, cellPadding: 6, halign: 'center' },
+    //Estilo general fuente, espaciado, alinear horizontalmente
+    headStyles: { fillColor: [78, 121, 167], textColor: 255 },
+    // filas con rayas
+    theme: 'striped',
+  });
 
 
   // Leyenda con colores a la izquierda con espacio
@@ -519,29 +541,29 @@ async generarPDFconGraficoYTabla() {
   const spacingY = 18;
 
   //PDF 
-const descripcionesFijas: {[key: string]: string} = {
-  'TABLA 1C': 'Ciencias Económicas, Ciencias Financieras',
-  'TABLA 2H': 'Humanidades, Ciencias Jurídicas, Ciencias Sociales',
-  'TABLA 3A': 'Artes, Arquitectura ,Diseño',
-  'TABLA 4S': 'Salud, Enfermería, Medicina',
-  'TABLA 5I': 'Investigación, Ingeniería, Tecnología',
-  'TABLA 6D': 'Defensa, Seguridad',
-  'TABLA 7E': 'Ciencias Exactas, Ciencias Puras, Biológicas'
-};
-
-const colores = [
-  '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
-  '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'
-];
-
-
-const leyenda = this.chartData.labels.map((label, index) => {
-  return {
-    label,
-    desc: descripcionesFijas[label] || 'Sin descripción',
-    color: colores[index] || '#000000'
+  const descripcionesFijas: {[key: string]: string} = {
+    'TABLA 1C': 'Ciencias Económicas, Ciencias Financieras',
+    'TABLA 2H': 'Humanidades, Ciencias Jurídicas, Ciencias Sociales',
+    'TABLA 3A': 'Artes, Arquitectura ,Diseño',
+    'TABLA 4S': 'Salud, Enfermería, Medicina',
+    'TABLA 5I': 'Investigación, Ingeniería, Tecnología',
+    'TABLA 6D': 'Defensa, Seguridad',
+    'TABLA 7E': 'Ciencias Exactas, Ciencias Puras, Biológicas'
   };
-});
+
+  const colores = [
+    '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
+    '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'
+  ];
+
+
+  const leyenda = this.chartData.labels.map((label, index) => {
+    return {
+      label,
+      desc: descripcionesFijas[label] || 'Sin descripción',
+      color: colores[index] || '#000000'
+    };
+  });
 
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
@@ -579,30 +601,9 @@ const leyenda = this.chartData.labels.map((label, index) => {
   } else {
     console.warn('No se encontró el canvas del gráfico');
   }
+  await this.dibujarPiePagina(doc);
 
-  const margin = 10;
-
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'italic');
-  const footerY = pageHeight - 40;
-  doc.text('UMSA: Teléfono: (591-2) 2612298 | E-mail: informate@umsa.bo', pageWidth / 2, footerY, { align: 'center' });
-  doc.text('Av. Villazón N° 1995, Plaza del Bicentenario - Zona Central, La Paz, Bolivia', pageWidth / 2, footerY + 20, { align: 'center' });
-  doc.text('IDRDU: Av. 6 de Agosto, Edificio HOY Nro. 2170 Piso 12', pageWidth / 2, footerY + 10, { align: 'center' });
-
-  const totalPages = doc.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-    doc.setFontSize(8);
-  }
-
-
-
-  doc.save('reporte-con-grafico.pdf');
-
-
-
+  doc.save('reporte-del-test-vocacional.pdf');
 }
-
-
 
 }

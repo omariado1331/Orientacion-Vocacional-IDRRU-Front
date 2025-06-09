@@ -30,7 +30,7 @@ export class ProvinciaService {
     { id: 6, nombre: 'FRANZ TAMAYO' },
     { id: 7, nombre: 'GUALBERTO VILLAROEL' },
     { id: 8, nombre: 'INGAVI' },
-    { id: 9, nombre: 'INQUISIVO' },
+    { id: 9, nombre: 'INQUISIVI' },
     { id: 10, nombre: 'JOSE MANUEL PANDO' },
     { id: 11, nombre: 'LARECAJA' },
     { id: 12, nombre: 'LOAYZA' },
@@ -41,7 +41,7 @@ export class ProvinciaService {
     { id: 17, nombre: 'NOR YUNGAS' },
     { id: 18, nombre: 'OMASUYOS' },
     { id: 19, nombre: 'PACAJES' },
-    { id: 20, nombre: 'SUDYUNGAS' }
+    { id: 20, nombre: 'SUD YUNGAS' }
   ];
 
 
@@ -67,7 +67,7 @@ export class ProvinciaService {
     new Provincia(6, 'FRANZ TAMAYO'),
     new Provincia(7, 'GUALBERTO VILLAROEL'),
     new Provincia(8, 'INGAVI'),
-    new Provincia(9, 'INQUISIVO'),
+    new Provincia(9, 'INQUISIVI'),
     new Provincia(10, 'JOSE MANUEL PANDO'),
     new Provincia(11, 'LARECAJA'),
     new Provincia(12, 'LOAYZA'),
@@ -78,7 +78,7 @@ export class ProvinciaService {
     new Provincia(17, 'NOR YUNGAS'),
     new Provincia(18, 'OMASUYOS'),
     new Provincia(19, 'PACAJES'),
-    new Provincia(20, 'SUDYUNGAS')
+    new Provincia(20, 'SUD YUNGAS')
 
   ]
 }
