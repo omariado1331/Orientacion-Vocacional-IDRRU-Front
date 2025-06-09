@@ -360,10 +360,13 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     this.facultadService.getAll().subscribe(facultades => {
       this.todasLasFacultades = facultades.map(f => ({
         ...f,
-        carreras: typeof f.carreras === 'string' ? JSON.parse(f.carreras) : f.carreras
+        carreras: typeof f.carreras === 'string' ? JSON.parse(f.carreras) : f.carreras,
+        chaside: (f as any).idChaside || 0
       }));
     });
   }
+
+
 
   // GESTIÓN DE FILTROS
 
@@ -851,9 +854,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   verPerfilEstudiante(id: number): void {
     this.loading = true;
+
     this.estudianteService.getById(id).subscribe({
       next: (estudiante) => {
         this.estudianteSeleccionado = estudiante;
+
         this.resultadoService.getByEstudianteId(id).subscribe({
           next: (resultados) => {
             if (resultados.length === 0) {
@@ -862,55 +867,73 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
               this.loading = false;
               return;
             }
-            const resultadosCompletos = resultados.map((resultado: ResultadoDto) => {
-              const resultadoPromesas = [];
-              if (resultado.idFacultad) {
-                resultadoPromesas.push(
-                  this.facultadService.getById(resultado.idFacultad).toPromise()
-                    .then(facultad => ({ tipo: 'facultad', data: facultad }))
-                    .catch(() => ({ tipo: 'facultad', data: null }))
-                );
-              }
+
+            // Procesar resultados para obtener datos adicionales
+            const resultadosPromesas = resultados.map((resultado: ResultadoDto) => {
+              const promesas = [];
+
+              // Solo buscar datos de Chaside y Holland si no los tenemos
               if (resultado.idChaside) {
-                resultadoPromesas.push(
+                promesas.push(
                   this.chasideService.getById(resultado.idChaside).toPromise()
                     .then(chaside => ({ tipo: 'chaside', data: chaside }))
                     .catch(() => ({ tipo: 'chaside', data: null }))
                 );
               }
+
               if (resultado.idHolland) {
-                resultadoPromesas.push(
+                promesas.push(
                   this.hollandService.getById(resultado.idHolland).toPromise()
                     .then(holland => ({ tipo: 'holland', data: holland }))
                     .catch(() => ({ tipo: 'holland', data: null }))
                 );
               }
-              return Promise.all(resultadoPromesas).then(resultadosAdicionales => {
+
+              return Promise.all(promesas).then(datosAdicionales => {
                 const resultadoCompleto = { ...resultado };
-                resultadosAdicionales.forEach(item => {
-                  if (item.tipo === 'facultad') {
-                    resultadoCompleto.facultad = item.data;
-                  } else if (item.tipo === 'chaside') {
+                datosAdicionales.forEach(item => {
+                  if (item.tipo === 'chaside') {
                     resultadoCompleto.chaside = item.data;
                   } else if (item.tipo === 'holland') {
                     resultadoCompleto.holland = item.data;
                   }
                 });
 
+                console.log('Resultado completo:', resultadoCompleto);
+                console.log('Todas las facultades:', this.todasLasFacultades);
+                console.log('ID Chaside:', resultado.idChaside);
+                if (resultado.idChaside && this.todasLasFacultades?.length > 0) {
+                  const facultadesRelacionadas = this.todasLasFacultades.filter(
+                    facultad => facultad.chaside === resultado.idChaside
+                  );
+                  console.log('Facultades relacionadas:', facultadesRelacionadas);
+                  console.log('IDs facultades:', this.todasLasFacultades.map(f => f.chaside));
+                  resultadoCompleto.facultad = facultadesRelacionadas[0] || null;
+                  resultadoCompleto.facultades = facultadesRelacionadas;
+                } else {
+                  resultadoCompleto.facultad = null;
+                  resultadoCompleto.facultades = [];
+                }
+                console.log('Resultado completo con facultades:', resultadoCompleto);
+
+
                 return resultadoCompleto;
               });
             });
-            Promise.all(resultadosCompletos)
+
+            Promise.all(resultadosPromesas)
               .then(resultadosFinales => {
                 this.resultadoEstudiante = resultadosFinales;
                 const primerChaside = resultadosFinales.find(r => r.chaside);
                 if (primerChaside) {
                   this.chasideData = primerChaside.chaside;
                 }
+
                 const primerHolland = resultadosFinales.find(r => r.holland);
                 if (primerHolland) {
                   this.hollandData = primerHolland.holland;
                 }
+
                 this.modalPerfilVisible = true;
                 this.loading = false;
               })
@@ -937,7 +960,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       }
     });
   }
-
   cerrarModalPerfil(): void {
     this.modalPerfilVisible = false;
     this.estudianteSeleccionado = null;
@@ -965,18 +987,93 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     try {
       this.exportando = true;
 
-      // Preparar los datos para Excel
-      const datosParaExportar = this.estudiantesFiltrados.map(est => ({
-        'CI': est.ciEstudiante,
-        'Nombre': est.nombre,
-        'Apellido Paterno': est.apPaterno,
-        'Apellido Materno': est.apMaterno,
-        'Colegio': est.colegio,
-        'Curso': est.curso,
-        'Edad': est.edad,
-        'Celular': est.celular,
-        'Fecha Registro': est.createdAt ? this.formatDate(est.createdAt) : 'No especificada'
-      }));
+      // Preparar los datos para Excel con resultados completos
+      const datosParaExportar = await Promise.all(
+        this.estudiantesFiltrados.map(async (est) => {
+          // Obtener resultados del estudiante
+          const resultados = await this.resultadoService.getByEstudianteId(est.idEstudiante).toPromise();
+
+          // Procesar el primer resultado (o el más reciente)
+          let datosResultado = {
+            'Test Realizado': 'No',
+            'Fecha Test': '',
+            'Puntaje Interés': '',
+            'Puntaje Aptitud': '',
+            'CHASIDE - Código': '',
+            'CHASIDE - Descripción': '',
+            'Holland - Código': '',
+            'Holland - Tipo': '',
+            'Holland - Descripción': '',
+            'Facultades Recomendadas': '',
+            'Carreras Relacionadas': ''
+          };
+
+          if (resultados && resultados.length > 0) {
+            // Tomar el resultado más reciente
+            const resultado = resultados[0];
+
+            datosResultado['Test Realizado'] = 'Sí';
+            datosResultado['Fecha Test'] = resultado.fecha ? this.formatDate(resultado.fecha) : '';
+            datosResultado['Puntaje Interés'] = resultado.interes?.toString() || '';
+            datosResultado['Puntaje Aptitud'] = resultado.aptitud?.toString() || '';
+
+            // Obtener datos de CHASIDE
+            if (resultado.idChaside) {
+              try {
+                const chaside = await this.chasideService.getById(resultado.idChaside).toPromise();
+                datosResultado['CHASIDE - Código'] = chaside?.codigo || '';
+                datosResultado['CHASIDE - Descripción'] = chaside?.descripcion || '';
+
+                // Obtener facultades relacionadas por CHASIDE
+                if (this.todasLasFacultades && this.todasLasFacultades.length > 0) {
+                  const facultadesRelacionadas = this.todasLasFacultades.filter(
+                    fac => fac.chaside === resultado.idChaside
+                  );
+
+                  datosResultado['Facultades Recomendadas'] = facultadesRelacionadas
+                    .map(fac => fac.nombre)
+                    .join('; ');
+
+                  // Obtener todas las carreras de las facultades relacionadas
+                  const todasLasCarreras = facultadesRelacionadas
+                    .flatMap(fac => fac.carreras || [])
+                    .filter((carrera, index, arr) => arr.indexOf(carrera) === index) // Eliminar duplicados
+                    .sort();
+
+                  datosResultado['Carreras Relacionadas'] = todasLasCarreras.join('; ');
+                }
+              } catch (error) {
+                console.error('Error al obtener datos de CHASIDE:', error);
+              }
+            }
+
+            // Obtener datos de Holland
+            if (resultado.idHolland) {
+              try {
+                const holland = await this.hollandService.getById(resultado.idHolland).toPromise();
+                datosResultado['Holland - Código'] = resultado.puntajeHolland || '';
+                datosResultado['Holland - Tipo'] = holland?.nombre || '';
+                datosResultado['Holland - Descripción'] = holland?.descripcion || '';
+              } catch (error) {
+                console.error('Error al obtener datos de Holland:', error);
+              }
+            }
+          }
+
+          return {
+            'CI': est.ciEstudiante,
+            'Nombre': est.nombre,
+            'Apellido Paterno': est.apPaterno,
+            'Apellido Materno': est.apMaterno,
+            'Colegio': est.colegio,
+            'Curso': est.curso,
+            'Edad': est.edad,
+            'Celular': est.celular,
+            'Fecha Registro': est.createdAt ? this.formatDate(est.createdAt) : 'No especificada',
+            ...datosResultado
+          };
+        })
+      );
 
       // Crear el libro de trabajo y la hoja
       const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosParaExportar);
@@ -987,7 +1084,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         ['UNIVERSIDAD MAYOR DE SAN ANDRÉS (2017-2025)'],
         ['INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA'],
         [''],
-        ['Sistema de Orientación Vocacional - Listado de Estudiantes'],
+        ['Sistema de Orientación Vocacional - Reporte Completo de Estudiantes'],
         [''],
         ['Fecha de generación: ' + this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm')],
         [''],
@@ -1029,9 +1126,22 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         XLSX.utils.sheet_add_aoa(infoSheet, [['Sin filtros aplicados']], { origin: { r: rowIndex++, c: 0 } });
       }
 
+      // Estadísticas adicionales
+      const estudiantesConTest = datosParaExportar.filter(est => est['Test Realizado'] === 'Sí').length;
+      const estudiantesSinTest = datosParaExportar.length - estudiantesConTest;
+
       XLSX.utils.sheet_add_aoa(infoSheet, [
         [''],
         [`Total registros: ${this.estudiantesFiltrados.length}`],
+        [`Estudiantes con test: ${estudiantesConTest}`],
+        [`Estudiantes sin test: ${estudiantesSinTest}`],
+        [''],
+        ['Descripción de columnas:'],
+        ['- Test Realizado: Indica si el estudiante completó el test de orientación'],
+        ['- CHASIDE: Test de intereses profesionales (C=Ciencias, H=Humanidades, A=Arte, S=Servicio Social, I=Informática, D=Derecho, E=Empresa)'],
+        ['- Holland: Test de personalidad vocacional (R=Realista, I=Investigativo, A=Artístico, S=Social, E=Emprendedor, C=Convencional)'],
+        ['- Facultades Recomendadas: Facultades de la UMSA relacionadas con el perfil CHASIDE'],
+        ['- Carreras Relacionadas: Carreras disponibles en las facultades recomendadas'],
         [''],
         ['Contacto UMSA:'],
         ['Teléfono: (591 - 2) 2612298'],
@@ -1045,22 +1155,20 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         ['Av. 6 de Agosto. Edificio HOY Nro. 2170 Piso 12']
       ], { origin: { r: rowIndex, c: 0 } });
 
-      // Añadir estilos personalizados (en la medida que XLSX lo permite)
-      const infoRange = { s: { c: 0, r: 0 }, e: { c: 9, r: rowIndex + 13 } };
+      // Ajustar fusiones de celdas para la hoja de información
       infoSheet['!merges'] = [
-        // Fusionar celdas para los títulos
         { s: { c: 0, r: 0 }, e: { c: 9, r: 0 } },
         { s: { c: 0, r: 1 }, e: { c: 9, r: 1 } },
         { s: { c: 0, r: 3 }, e: { c: 9, r: 3 } }
       ];
 
       // Ajustar ancho de columnas para la hoja de información
-      infoSheet['!cols'] = [{ wch: 60 }];
+      infoSheet['!cols'] = [{ wch: 80 }];
 
       // Añadir la hoja de información
       XLSX.utils.book_append_sheet(workbook, infoSheet, 'Información');
 
-      // Ajustar ancho de columnas para la hoja de datos
+      // Ajustar ancho de columnas para la hoja de datos (ahora con más columnas)
       const columnas = [
         { wch: 15 }, // CI
         { wch: 20 }, // Nombre
@@ -1071,27 +1179,109 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         { wch: 10 }, // Edad
         { wch: 15 }, // Celular
         { wch: 20 }, // Fecha Registro
+        { wch: 15 }, // Test Realizado
+        { wch: 20 }, // Fecha Test
+        { wch: 15 }, // Puntaje Interés
+        { wch: 15 }, // Puntaje Aptitud
+        { wch: 15 }, // CHASIDE - Código
+        { wch: 50 }, // CHASIDE - Descripción
+        { wch: 15 }, // Holland - Código
+        { wch: 20 }, // Holland - Tipo
+        { wch: 50 }, // Holland - Descripción
+        { wch: 60 }, // Facultades Recomendadas
+        { wch: 80 }  // Carreras Relacionadas
       ];
       worksheet['!cols'] = columnas;
 
       // Añadir la hoja de datos
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Estudiantes');
 
+      // Crear una hoja adicional con resumen estadístico
+      const resumenData = this.generarResumenEstadistico(datosParaExportar);
+      const resumenSheet = XLSX.utils.json_to_sheet(resumenData);
+      resumenSheet['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 20 }];
+      XLSX.utils.book_append_sheet(workbook, resumenSheet, 'Resumen Estadístico');
+
       // Generar el archivo
       const fechaActual = new Date().toISOString().split('T')[0];
-      XLSX.writeFile(workbook, `estudiantes_orientacion_umsa_${fechaActual}.xlsx`);
+      XLSX.writeFile(workbook, `orientacion_vocacional_completo_umsa_${fechaActual}.xlsx`);
 
       this.exportando = false;
-      this.mostrarNotificacion('Datos exportados en formato Excel correctamente', 'success');
+      this.mostrarNotificacion('Reporte completo exportado en formato Excel correctamente', 'success');
     } catch (error) {
-      console.error('Error al exportar Excel', error);
+      console.error('Error al exportar Excel completo', error);
       this.exportando = false;
-      this.mostrarNotificacion('Error al exportar datos en Excel', 'error');
+      this.mostrarNotificacion('Error al exportar el reporte completo en Excel', 'error');
     }
   }
 
+  // Método auxiliar para generar resumen estadístico
+  private generarResumenEstadistico(datos: any[]): any[] {
+    const resumen = [];
+
+    // Estadísticas generales
+    resumen.push({ 'Concepto': 'ESTADÍSTICAS GENERALES', 'Cantidad': '', 'Porcentaje': '' });
+    resumen.push({ 'Concepto': 'Total de estudiantes', 'Cantidad': datos.length, 'Porcentaje': '100%' });
+
+    const conTest = datos.filter(d => d['Test Realizado'] === 'Sí').length;
+    const sinTest = datos.length - conTest;
+
+    resumen.push({
+      'Concepto': 'Con test completado',
+      'Cantidad': conTest,
+      'Porcentaje': `${((conTest / datos.length) * 100).toFixed(1)}%`
+    });
+    resumen.push({
+      'Concepto': 'Sin test completado',
+      'Cantidad': sinTest,
+      'Porcentaje': `${((sinTest / datos.length) * 100).toFixed(1)}%`
+    });
+
+    // Estadísticas por CHASIDE
+    resumen.push({ 'Concepto': '', 'Cantidad': '', 'Porcentaje': '' });
+    resumen.push({ 'Concepto': 'DISTRIBUCIÓN POR CHASIDE', 'Cantidad': '', 'Porcentaje': '' });
+
+    const chasideStats: { [codigo: string]: number } = {};
+    datos.forEach(d => {
+      if (d['CHASIDE - Código']) {
+        const codigo = d['CHASIDE - Código'];
+        chasideStats[codigo] = (chasideStats[codigo] || 0) + 1;
+      }
+    });
+
+    Object.entries(chasideStats).forEach(([codigo, cantidad]) => {
+      resumen.push({
+        'Concepto': `CHASIDE ${codigo}`,
+        'Cantidad': cantidad,
+        'Porcentaje': `${(((cantidad as number) / conTest) * 100).toFixed(1)}%`
+      });
+    });
+
+    // Estadísticas por Holland
+    resumen.push({ 'Concepto': '', 'Cantidad': '', 'Porcentaje': '' });
+    resumen.push({ 'Concepto': 'DISTRIBUCIÓN POR HOLLAND', 'Cantidad': '', 'Porcentaje': '' });
+
+    const hollandStats: { [key: string]: number } = {};
+    datos.forEach(d => {
+      if (d['Holland - Tipo']) {
+        const tipo = d['Holland - Tipo'];
+        hollandStats[tipo] = (hollandStats[tipo] || 0) + 1;
+      }
+    });
+
+    Object.entries(hollandStats).forEach(([tipo, cantidad]) => {
+      resumen.push({
+        'Concepto': `Holland ${tipo}`,
+        'Cantidad': cantidad,
+        'Porcentaje': `${(((cantidad as number) / conTest) * 100).toFixed(1)}%`
+      });
+    });
+
+    return resumen;
+  }
   private async exportarPDF(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
+
       try {
         this.exportando = true;
         await import('jspdf-autotable');
@@ -1099,51 +1289,115 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
         const margin = 10;
+        let y = 15;
+        const logoUmsaColor = 'assets/umsac.png';
+        const logoIDRUColor = 'assets/idrdu.png';
+        const logoUMSA = await this.cargarImagen(logoUmsaColor);
+        const logoIDRDU = await this.cargarImagen(logoIDRUColor);
+        const agregarEncabezado = (logoUMSA: string | null, logoIDRDU: string | null) => {
+          // === ===
+          const anchoPagina = doc.internal.pageSize.getWidth();
+          const margen = 10;
+          const anchoLogo = 16;
+          const altoLogo = 16;
 
-        try {
-          const logoUMSA = await this.cargarImagen(this.logoUrlc);
-          const logoIDRDU = await this.cargarImagen(this.logoIDRU);
-          if (logoUMSA) doc.addImage(logoUMSA, 'PNG', margin, margin, 30, 30);
-          if (logoIDRDU) doc.addImage(logoIDRDU, 'PNG', pageWidth - margin - 30, margin, 30, 30);
-        } catch (error) {
-          console.warn('No se pudieron cargar las imágenes para el PDF', error);
-        }
+          // === Estilos ===
+          const fuenteNormal = 'helvetica';
+          const fuenteNegrita = 'helvetica';
+          const estiloNormal = 'normal';
+          const estiloNegrita = 'bold';
 
-        let yPos = margin + 15;
+          const tamTitulo = 10;
+          const tamSubtitulo = 10;
+          const colorTitulo: [number, number, number] = [0, 54, 107];
+          const colorTexto: [number, number, number] = [0, 54, 107];
 
+          // === Textos ===
+          const textoUMSA = 'UNIVERSIDAD MAYOR DE SAN ANDRÉS';
+          const textoVicerrectorado = 'VICERRECTORADO';
+          const textoInstituto = 'INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA';
+
+          // === posicionamiento ===
+          y = margen + 5;
+
+          // === logos ===
+          if (logoUMSA) doc.addImage(logoUMSA, 'PNG', margen, margen, anchoLogo, altoLogo);
+          if (logoIDRDU) doc.addImage(logoIDRDU, 'PNG', anchoPagina - margen - anchoLogo - 5, margen, anchoLogo, altoLogo);
+
+          // === umsa ===
+          doc.setFont(fuenteNormal, estiloNormal);
+          doc.setFontSize(tamTitulo);
+          doc.setTextColor(...colorTitulo);
+          doc.text(textoUMSA, anchoPagina / 2, y, { align: 'center' });
+
+          // === vicerectorado ===
+          y += 4;
+          doc.setFontSize(tamSubtitulo);
+          doc.setTextColor(...colorTexto);
+          doc.text(textoVicerrectorado, anchoPagina / 2, y, { align: 'center' });
+
+          // === Lineas ===
+          y += 1;
+          const anchoTexto = doc.getTextWidth(textoInstituto) + 3;
+          const inicioLinea = (anchoPagina - anchoTexto) / 2;
+          const finLinea = inicioLinea + anchoTexto;
+          doc.setDrawColor(...colorTitulo)
+          doc.setLineWidth(0.3);
+          doc.line(inicioLinea, y, finLinea, y);
+          doc.line(inicioLinea, y + 0.75, finLinea, y + 0.75);
+
+          // === instituto ===
+          y += 4.5;
+          doc.setFont(fuenteNegrita, estiloNegrita);
+          doc.setTextColor(...colorTexto);
+          doc.text(textoInstituto, anchoPagina / 2, y, { align: 'center' });
+
+          y += 10;
+        };
+        const agregarPiePagina = () => {
+          // === tamano pagina ===
+          const anchoPagina = doc.internal.pageSize.getWidth();
+          const altoPagina = doc.internal.pageSize.getHeight();
+
+          // ===estilo ===
+          const fuente = 'helvetica';
+          const estilo = 'normal';
+          const tamañoFuente = 8;
+          const colorTexto: [number, number, number] = [0, 54, 107];
+
+          // === texto ===
+          const textoLinea1 = 'Av. 6 de Agosto 2170 · Edificio Hoy Piso 12 · Teléfono - Fax (591) 2-2118556 · IP (591) 2-2612211';
+          const textoLinea2 = 'e-mail: idrdu@umsa.bo · https://www.facebook.com/IDR.DU.UMSA';
+          const fechaGeneracion = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
+
+          // === estilos ===
+          doc.setTextColor(...colorTexto);
+          doc.setFont(fuente, estilo);
+          doc.setFontSize(tamañoFuente);
+
+          // === texto ===
+          doc.text(textoLinea1, anchoPagina / 2, altoPagina - 12, { align: 'center' });
+          doc.text(textoLinea2, anchoPagina / 2, altoPagina - 8, { align: 'center' });
+        };
         // Encabezado
         const colorAzulUMSA: [number, number, number] = [0, 51, 153];
         const colorVinoUMSA: [number, number, number] = [128, 0, 32];
         const colorAzulClaro: [number, number, number] = [235, 245, 255];
         const colorGrisClaro: [number, number, number] = [240, 240, 240];
         const colorVerdeClaro: [number, number, number] = [230, 255, 230];
+        let yPos = margin + 25;
 
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...colorAzulUMSA);
-        doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 6;
-
-        doc.setFontSize(9);
-        doc.setTextColor(0, 0, 0);
-        doc.text('INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 4;
-
-        doc.setFontSize(10);
-        doc.setTextColor(...colorVinoUMSA);
-        doc.text('SISTEMA DE ORIENTACIÓN VOCACIONAL', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 8;
-
+        agregarEncabezado(logoUMSA, logoIDRDU);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(0, 0, 0);
         doc.text('Listado de Estudiantes', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 10;
+        yPos += 5;
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
 
-        let filtrosAplicados = 'Filtros aplicados: ';
+        let filtrosAplicados = '';
         let hayFiltros = false;
 
         if (this.filtros.provincia) {
@@ -1176,7 +1430,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         if (hayFiltros) {
           doc.text(filtrosAplicados.slice(0, -2), margin, yPos);
         } else {
-          doc.text('Sin filtros aplicados', margin, yPos);
+          doc.text('', margin, yPos);
         }
         const headers = [
           { header: 'CI', dataKey: 'ci' },
@@ -1211,8 +1465,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
             fillColor: [240, 240, 240]
           },
           styles: {
-            fontSize: 9,
-            cellPadding: 2
+            fontSize: 7,
+            cellPadding: 1
           },
           columnStyles: {
             0: { cellWidth: 20 }, // CI
@@ -1226,17 +1480,13 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           margin: { left: margin, right: margin }
         });
         const finalY = (doc as any).lastAutoTable.finalY + 5;
-
         doc.setFontSize(9);
         doc.text(`Total registros: ${this.estudiantesFiltrados.length}`, margin, finalY);
         const fechaGeneracion = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
         doc.text(`Generado el: ${fechaGeneracion}`, margin, finalY + 5);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
-        const footerY = pageHeight - 20;
-        doc.text('UMSA: Teléfono: (591-2) 2612298 | E-mail: informate@umsa.bo', pageWidth / 2, footerY, { align: 'center' });
-        doc.text('Av. Villazón N° 1995, Plaza del Bicentenario - Zona Central, La Paz, Bolivia', pageWidth / 2, footerY + 4, { align: 'center' });
-        doc.text('IDRDU: Av. 6 de Agosto, Edificio HOY Nro. 2170 Piso 12', pageWidth / 2, footerY + 8, { align: 'center' });
+        agregarPiePagina();
         const totalPages = doc.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
           doc.setPage(i);
@@ -1485,7 +1735,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
-    doc.text('Perfil del Estudiante', pageWidth / 2, y, { align: 'center' });
+    doc.text('PERFIL DEL ESTUDIANTE', pageWidth / 2, y, { align: 'center' });
     y += 4;
     doc.setDrawColor(...colorAzulUMSA);
     doc.setFillColor(...colorAzulClaro);
@@ -1496,16 +1746,24 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     doc.setTextColor(0, 0, 0);
     doc.text('DATOS DEL ESTUDIANTE:', margenIzquierdo + 3, y + 5);
     doc.setFont('helvetica', 'normal');
-
+    let lugar = 'Lugar no disponible';
+    let municipio: any = null;
+    let provincia: any = null;
+    if (estudiante.id_municipio) {
+      municipio = this.municipios.find((m: any) => m.idMunicipio === estudiante.id_municipio);
+      if (municipio) {
+        provincia = this.provincias.find((p: any) => p.idProvincia === municipio.idProvincia);
+      }
+    }
     const nombreCompleto = `${estudiante.nombre} ${estudiante.apPaterno} ${estudiante.apMaterno || ''}`;
-    doc.text(`Nombre: ${nombreCompleto}`, margenIzquierdo + 5, y + 11);
-    doc.text(`C.I.: ${estudiante.ciEstudiante}`, margenIzquierdo + 5, y + 17);
-    doc.text(`Edad: ${estudiante.edad} años`, margenIzquierdo + 5, y + 23);
-
-    doc.text(`Colegio: ${estudiante.colegio}`, margenIzquierdo + anchoUtil / 2, y + 11);
-    doc.text(`Celular: ${estudiante.celular || 'No especificado'}`, margenIzquierdo + anchoUtil / 2, y + 17);
-    doc.text(`Curso: ${estudiante.curso}`, margenIzquierdo + anchoUtil / 2, y + 23);
-
+    doc.text(`Nombre: ${nombreCompleto}`, margenIzquierdo + 5, y + 10);
+    doc.text(`C.I.: ${estudiante.ciEstudiante}`, margenIzquierdo + 5, y + 15);
+    doc.text(`Edad: ${estudiante.edad} años`, margenIzquierdo + 5, y + 20);
+    doc.text(`Provincia: ${provincia ? provincia.nombre : 'Desconocida'}`, margenIzquierdo + 5, y + 25);
+    doc.text(`Colegio: ${estudiante.colegio}`, margenIzquierdo + anchoUtil / 2, y + 10);
+    doc.text(`Celular: ${estudiante.celular || 'No especificado'}`, margenIzquierdo + anchoUtil / 2, y + 15);
+    doc.text(`Curso: ${estudiante.curso}`, margenIzquierdo + anchoUtil / 2, y + 20);
+    doc.text(`Municipio: ${municipio ? municipio.nombre : 'Desconocido'}`, margenIzquierdo + anchoUtil / 2, y + 25);
     y += 30;
     const todosChaside = this.resultadoEstudiante
       .filter(r => r.chaside)
@@ -1614,11 +1872,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         doc.setFillColor(...colorBase);
         doc.rect(margenIzquierdo, y, anchoUtil, 10, 'F');
         doc.setFont('helvetica', 'bold');
-        doc.text(holland.codigo, margenIzquierdo + 8, y + 6);
+        doc.text(holland.codigo, margenIzquierdo + 8, y + 5);
 
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7);
-        doc.text(fechaStr || '', margenIzquierdo + anchoUtil - 25, y + 6);
+        doc.text(fechaStr || '', margenIzquierdo + anchoUtil - 25, y + 5);
 
         y += 8;
         doc.setTextColor(0, 0, 0);
@@ -1668,9 +1926,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       todasFacultades.forEach((facultadItem, idx) => {
         verificarEspacioDisponible(40);
         const facultad = facultadItem.data;
-        const imgWidth = 20;
-        const imgHeight = 20;
-        const imgX = margenIzquierdo + anchoUtil - imgWidth - 5;
+        const imgWidth = 15;
+        const imgHeight = 15;
+        const imgX = margenIzquierdo + 2;
         const imgY = y + 5;
 
         doc.addImage(facultad.imgLogo, 'PNG', imgX, imgY, imgWidth, imgHeight);
@@ -1681,16 +1939,16 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         y += 7;
 
         if (facultad.carreras && facultad.carreras.length > 0) {
-          doc.setFontSize(7);
+          doc.setFontSize(8);
           doc.setFont('helvetica', 'bold');
-          doc.text('Carreras disponibles:', margenIzquierdo + 4, y);
+          doc.text('Carreras disponibles:', margenIzquierdo + 22, y);
           y += 4;
           const columnasCarreras = 1;
           const anchoColumna = anchoUtil / columnasCarreras;
           let columnaActual = 0;
           (facultad.carreras as string[]).slice(0, 10).forEach((carrera: string) => {
-            const xPos = margenIzquierdo + 4 + (columnaActual * anchoColumna);
-            doc.setFontSize(6);
+            const xPos = margenIzquierdo + 25 + (columnaActual * anchoColumna);
+            doc.setFontSize(8);
             doc.setFont('helvetica', 'normal');
             doc.text(`• ${carrera}`, xPos + 2, y);
             columnaActual++;
@@ -1699,19 +1957,19 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
               y += 4;
             }
           });
-          if (columnaActual > 0) y += 4;
+          if (columnaActual > 0) y += 8;
           y += 2;
         }
+        if (facultad.carreras.length < 3) y += 4;
         if (facultad.url) {
+          y += 2;
           doc.setFontSize(6);
-          doc.setFont('helvetica', 'italic');
+          doc.setFont('helvetica', 'normal');
           doc.setTextColor(0, 0, 200);
           doc.text(`Más información: ${facultad.url}`, margenIzquierdo, y);
           doc.setTextColor(0, 0, 0);
-          y += 4;
         }
-
-        y += 5;
+        y += 4;
       });
     } else {
       verificarEspacioDisponible(30);
