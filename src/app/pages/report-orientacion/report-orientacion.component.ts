@@ -11,7 +11,7 @@ import { ProvinciaService } from '../../services/provincia.service';
 import { MunicipioService } from '../../services/municipio.service';
 import { Provincia } from '../../interfaces/provincia-interface';
 import { Municipio } from '../../interfaces/municipio-interface';
-
+import { DatePipe } from '@angular/common';
 Chart.register(...registerables);
 Chart.register(ChartDataLabels);
 
@@ -20,7 +20,8 @@ Chart.register(ChartDataLabels);
   templateUrl: './report-orientacion.component.html',
   styleUrls: ['./report-orientacion.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, NgChartsModule]
+  imports: [CommonModule, FormsModule, NgChartsModule],
+  providers: [DatePipe]
 })
 export class ReportOrientacionComponent implements OnInit {
 
@@ -121,6 +122,7 @@ constructor(
   private resultadoService: ResultadoService,
   private provinciaService: ProvinciaService,
   private municipioService: MunicipioService,
+  private datePipe: DatePipe,
   @Inject(PLATFORM_ID) private platformId: Object,
   private cd: ChangeDetectorRef
 ) {}  
@@ -295,13 +297,14 @@ private generarGrafico(): void {
     this.cd.detectChanges();
 }
 
-private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number): Promise<number> {
-  const colorAzulUMSA: [number, number, number] = [0, 51, 153];
-  const colorVinoUMSA: [number, number, number] = [128, 0, 32];
-  const logoWidth = 70; // Ancho del logo
-  const logoHeight = 70; // Alto del logo
+private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number, dezplazamiento: number): Promise<number> {
+  const colorTitulo: [number, number, number] = [0, 54, 107];
+  const colorTexto: [number, number, number] = [0, 54, 107];
+  const logoWidth = 45; // Ancho del logo
+  const logoHeight = 45; // Alto del logo
 
   let yPos = margin + 25;
+  const anchoPagina = doc.internal.pageSize.getWidth(); 
 
   // 1. Cambiar rutas (usar assets/ en lugar de src/assets/)
   const logoIzquierdoUrl = "assets/umsac.png"; // Ruta corregida
@@ -313,33 +316,76 @@ private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number): Pr
     this.convertirImagenABase64(logoDerechoUrl)
   ]);
 
+    // variables
+    const textoUmsa = 'UNIVERSIDAD MAYOR DE SAN ANDRÉS';
+    const textoVicerrectorado = 'VICERRECTORADO'
+    const textoInstituto = 'INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA'
+    const tituloPdf = 'Reporte de Resultados del Test'
+
   // 3. Usar las imágenes convertidas
-  doc.addImage(logoIzqBase64, 'PNG', margin, yPos - 10, logoWidth, logoHeight);
-  doc.addImage(logoDerBase64, 'PNG', pageWidth - margin - logoWidth, yPos - 10, logoWidth, logoHeight);
-
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colorAzulUMSA);
-  doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth / 2, yPos, { align: 'center' });
-  yPos += 16;
-
-  doc.setFontSize(9);
-  doc.setTextColor(0, 0, 0);
-  doc.text('INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA', pageWidth / 2, yPos, { align: 'center' });
-  yPos += 15;
+  doc.addImage(logoIzqBase64, 'PNG', margin + dezplazamiento - 5, yPos - 10, logoWidth, logoHeight);
+  doc.addImage(logoDerBase64, 'PNG', pageWidth - margin - logoWidth - dezplazamiento, yPos - 10, logoWidth, logoHeight);
 
   doc.setFontSize(10);
-  doc.setTextColor(...colorVinoUMSA);
-  doc.text('SISTEMA DE ORIENTACIÓN VOCACIONAL', pageWidth / 2, yPos, { align: 'center' });
-  yPos += 25;
-
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(0, 0, 0);
-  doc.text('Reporte de Resultados', pageWidth / 2, yPos, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...colorTitulo);
+  doc.text(textoUmsa, pageWidth / 2, yPos, { align: 'center' });
   yPos += 14;
 
+  doc.setFontSize(10);
+  doc.setTextColor(...colorTexto);
+  doc.text(textoVicerrectorado, pageWidth / 2, yPos, { align: 'center' });
+  yPos += 14;
+
+  
+  const anchoTexto =  doc.getTextWidth(textoInstituto) + 8;
+  const centroPagina = pageWidth/2;
+  const inicioLinea = centroPagina - (anchoTexto/2)
+  const finLinea = centroPagina  + (anchoTexto/2);
+  doc.setDrawColor(...colorTitulo)
+  doc.setLineWidth(0.8)
+  doc.line(inicioLinea, yPos - 10, finLinea, yPos - 10)
+  doc.line(inicioLinea, (yPos - 10) + 2.75, finLinea, (yPos - 10) + 2.75)
+  yPos += 4;
+  
+  doc.setFontSize(10);  
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colorTexto);
+  doc.text(textoInstituto, centroPagina, yPos, { align: 'center' });
+  yPos += 30;
+
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(0, 0, 0);
+  doc.text(tituloPdf, pageWidth / 2, yPos, { align: 'center' });
+
   return yPos;
+}
+
+private async dibujarPiePagina(doc: jsPDF) {
+  // === tamano pagina ===
+  const anchoPagina = doc.internal.pageSize.getWidth();
+  const altoPagina = doc.internal.pageSize.getHeight();
+
+  // ===estilo ===
+  const fuente = 'helvetica';
+  const estilo = 'normal';
+  const tamañoFuente = 8;
+  const colorTexto: [number, number, number] = [0, 54, 107];
+
+  // === texto ===
+  const textoLinea1 = 'Av. 6 de Agosto 2170 · Edificio Hoy Piso 12 · Teléfono - Fax (591) 2-2118556 · IP (591) 2-2612211';
+  const textoLinea2 = 'e-mail: idrdu@umsa.bo · https://www.facebook.com/IDR.DU.UMSA';
+  const fechaGeneracion = this.datePipe.transform(new Date(), 'dd/MM/yyyy HH:mm');
+
+  // === estilos ===
+  doc.setTextColor(...colorTexto);
+  doc.setFont(fuente, estilo);
+  doc.setFontSize(tamañoFuente);
+
+  // === texto ===
+  doc.text(textoLinea1, anchoPagina / 2, altoPagina - 30, { align: 'center' });
+  doc.text(textoLinea2, anchoPagina / 2, altoPagina - 20, { align: 'center' });
 }
 
 // Añade este nuevo método en tu clase
@@ -363,8 +409,10 @@ async generarPDFconGraficoYTabla() {
   const pageHeight = doc.internal.pageSize.getHeight();
 
   const margin1 = 10;  // declara e inicializa primero
+  const dezplazamiento = 25;
+  //let yPos 
+  await this.dibujarCabecera(doc, pageWidth, margin1, dezplazamiento);
 
-  let yPos = await this.dibujarCabecera(doc, pageWidth, margin1);
 
   // Título centrado
   //const titulo = 'REPORTE DEL TEST VOCACIONAL';
@@ -437,6 +485,7 @@ async generarPDFconGraficoYTabla() {
   //.reduce() es como un for que acumula el 0 es valor inicial
   // Acumulador acc + r.cantidadEstudiantes
   const totalEstudiantes = this.resultados.reduce((acc, r) => acc + r.cantidadEstudiantes, 0);
+
   // MAP Sirve para recorrer un array y transformar cada elemento, devolviendo un nuevo array con los resultados.
   // this.resultados es
   /*
@@ -445,6 +494,7 @@ async generarPDFconGraficoYTabla() {
       { chaside: 'TABLA 2H', cantidadEstudiantes: 5 }
     ]
   */
+
   const rows = this.resultados.map(r => [
     // tabla 1C
     r.chaside,
@@ -551,21 +601,9 @@ async generarPDFconGraficoYTabla() {
   } else {
     console.warn('No se encontró el canvas del gráfico');
   }
+  await this.dibujarPiePagina(doc);
 
-  const margin = 10;
-
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'italic');
-  const footerY = pageHeight - 40;
-  doc.text('UMSA: Teléfono: (591-2) 2612298 | E-mail: informate@umsa.bo', pageWidth / 2, footerY, { align: 'center' });
-  doc.text('Av. Villazón N° 1995, Plaza del Bicentenario - Zona Central, La Paz, Bolivia', pageWidth / 2, footerY + 20, { align: 'center' });
-  doc.text('IDRDU: Av. 6 de Agosto, Edificio HOY Nro. 2170 Piso 12', pageWidth / 2, footerY + 10, { align: 'center' });
-
-  const totalPages = doc.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-    doc.setFontSize(8);
-  }
   doc.save('reporte-del-test-vocacional.pdf');
 }
+
 }

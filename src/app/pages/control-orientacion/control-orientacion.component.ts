@@ -1279,6 +1279,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
     return resumen;
   }
+  
   private async exportarPDF(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
 
@@ -1309,7 +1310,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
           const tamTitulo = 10;
           const tamSubtitulo = 10;
-          const colorTitulo: [number, number, number] = [0, 54, 107];
+        const colorTitulo: [number, number, number] = [0, 54, 107];
           const colorTexto: [number, number, number] = [0, 54, 107];
 
           // === Textos ===
@@ -1354,6 +1355,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
           y += 10;
         };
+
         const agregarPiePagina = () => {
           // === tamano pagina ===
           const anchoPagina = doc.internal.pageSize.getWidth();
