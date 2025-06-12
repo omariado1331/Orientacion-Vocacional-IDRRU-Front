@@ -764,9 +764,14 @@
                 Cancelar
               </button>
               <button type="button" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm"
-                [disabled]="!esFormularioValido()" (click)="guardarEdicionCompletaEstudiante()">
+                [disabled]="editarForm.invalid || !estudianteSeleccionado || loading"
+                (click)="guardarEdicionCompletaEstudiante()">
                 <i class="bi bi-check-circle me-2"></i>
-                Guardar Cambios
+                <span *ngIf="!loading">Guardar Cambios</span>
+                <span *ngIf="loading">
+                  <i class="bi bi-arrow-clockwise me-2"></i>
+                  Guardando...
+                </span>
               </button>
             </div>
           </div>

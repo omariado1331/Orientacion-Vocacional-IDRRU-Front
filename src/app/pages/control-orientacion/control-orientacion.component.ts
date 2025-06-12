@@ -146,8 +146,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       apMaterno: [''],
       colegio: ['', [Validators.required]],
       curso: ['', [Validators.required]],
-      edad: [null, [Validators.required, Validators.min(10), Validators.max(30)]],
-      celular: ['', [Validators.pattern('^[0-9]*$')]],
+      edad: ['', [Validators.required, Validators.min(10), Validators.max(30)]],
+      celular: ['', [Validators.pattern(/^\d+$/)]],
       idProvincia: [null, [Validators.required]],
       id_municipio: [null, [Validators.required]]
     });
@@ -658,28 +658,17 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   }
 
   esFormularioValido(): boolean {
-    if (!this.editarForm || this.editarForm.invalid || !this.resultadosForm) {
-      return false;
-    }
-
-    for (let i = 0; i < this.resultadosForm.length; i++) {
-      const resultadoForm = this.resultadosForm.at(i) as FormGroup;
-      if (!resultadoForm || resultadoForm.invalid) {
-        return false;
-      }
-    }
-
-    return true;
+    return this.editarForm.valid && this.estudianteSeleccionado !== null;
   }
 
   // GESTIÓN DE MODALES
 
   abrirModalEditar(estudiante: any): void {
     let provinciaEstudiante = null;
+    this.estudianteSeleccionado = estudiante;
     if (estudiante.id_municipio) {
       provinciaEstudiante = this.getProvinciaByMunicipio(estudiante.id_municipio);
     }
-
     this.editarForm.patchValue({
       ciEstudiante: estudiante.ciEstudiante,
       nombre: estudiante.nombre,
@@ -794,6 +783,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   guardarEdicionCompletaEstudiante(): void {
     if (!this.esFormularioValido() || !this.estudianteSeleccionado) {
+      console.log('Formulario inválido o estudiante no seleccionado');
+      console.log(this.editarForm.errors);
+      console.log(this.resultadosForm.errors);
+      console.log(this.resultadosForm.value);
+      console.log(this.estudianteSeleccionado);
       this.mostrarNotificacion('Por favor, complete todos los campos requeridos', 'error');
       return;
     }
@@ -899,24 +893,16 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
                   }
                 });
 
-                console.log('Resultado completo:', resultadoCompleto);
-                console.log('Todas las facultades:', this.todasLasFacultades);
-                console.log('ID Chaside:', resultado.idChaside);
                 if (resultado.idChaside && this.todasLasFacultades?.length > 0) {
                   const facultadesRelacionadas = this.todasLasFacultades.filter(
                     facultad => facultad.chaside === resultado.idChaside
                   );
-                  console.log('Facultades relacionadas:', facultadesRelacionadas);
-                  console.log('IDs facultades:', this.todasLasFacultades.map(f => f.chaside));
                   resultadoCompleto.facultad = facultadesRelacionadas[0] || null;
                   resultadoCompleto.facultades = facultadesRelacionadas;
                 } else {
                   resultadoCompleto.facultad = null;
                   resultadoCompleto.facultades = [];
                 }
-                console.log('Resultado completo con facultades:', resultadoCompleto);
-
-
                 return resultadoCompleto;
               });
             });
@@ -970,7 +956,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       document.body.focus();
     }, 0);
   }
-
   // EXPORTACIÓN
 
   exportarEstudiantes(formato: 'excel' | 'pdf'): void {
@@ -986,14 +971,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   private async exportarExcel(): Promise<void> {
     try {
       this.exportando = true;
-
-      // Preparar los datos para Excel con resultados completos
       const datosParaExportar = await Promise.all(
         this.estudiantesFiltrados.map(async (est) => {
-          // Obtener resultados del estudiante
           const resultados = await this.resultadoService.getByEstudianteId(est.idEstudiante).toPromise();
-
-          // Procesar el primer resultado (o el más reciente)
           let datosResultado = {
             'Test Realizado': 'No',
             'Fecha Test': '',
@@ -1009,22 +989,17 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           };
 
           if (resultados && resultados.length > 0) {
-            // Tomar el resultado más reciente
             const resultado = resultados[0];
 
             datosResultado['Test Realizado'] = 'Sí';
             datosResultado['Fecha Test'] = resultado.fecha ? this.formatDate(resultado.fecha) : '';
             datosResultado['Puntaje Interés'] = resultado.interes?.toString() || '';
             datosResultado['Puntaje Aptitud'] = resultado.aptitud?.toString() || '';
-
-            // Obtener datos de CHASIDE
             if (resultado.idChaside) {
               try {
                 const chaside = await this.chasideService.getById(resultado.idChaside).toPromise();
                 datosResultado['CHASIDE - Código'] = chaside?.codigo || '';
                 datosResultado['CHASIDE - Descripción'] = chaside?.descripcion || '';
-
-                // Obtener facultades relacionadas por CHASIDE
                 if (this.todasLasFacultades && this.todasLasFacultades.length > 0) {
                   const facultadesRelacionadas = this.todasLasFacultades.filter(
                     fac => fac.chaside === resultado.idChaside
@@ -1033,11 +1008,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
                   datosResultado['Facultades Recomendadas'] = facultadesRelacionadas
                     .map(fac => fac.nombre)
                     .join('; ');
-
-                  // Obtener todas las carreras de las facultades relacionadas
                   const todasLasCarreras = facultadesRelacionadas
                     .flatMap(fac => fac.carreras || [])
-                    .filter((carrera, index, arr) => arr.indexOf(carrera) === index) // Eliminar duplicados
+                    .filter((carrera, index, arr) => arr.indexOf(carrera) === index)
                     .sort();
 
                   datosResultado['Carreras Relacionadas'] = todasLasCarreras.join('; ');
@@ -1046,8 +1019,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
                 console.error('Error al obtener datos de CHASIDE:', error);
               }
             }
-
-            // Obtener datos de Holland
             if (resultado.idHolland) {
               try {
                 const holland = await this.hollandService.getById(resultado.idHolland).toPromise();
@@ -1075,13 +1046,10 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         })
       );
 
-      // Crear el libro de trabajo y la hoja
       const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosParaExportar);
       const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-
-      // Añadir información institucional antes de los datos
       const infoSheet = XLSX.utils.aoa_to_sheet([
-        ['UNIVERSIDAD MAYOR DE SAN ANDRÉS (2017-2025)'],
+        ['UNIVERSIDAD MAYOR DE SAN ANDRÉS'],
         ['INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA'],
         [''],
         ['Sistema de Orientación Vocacional - Reporte Completo de Estudiantes'],
@@ -1091,7 +1059,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         ['Filtros aplicados:']
       ]);
 
-      // Añadir información de filtros aplicados
       let rowIndex = 8;
       let hayFiltros = false;
 
@@ -1126,7 +1093,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         XLSX.utils.sheet_add_aoa(infoSheet, [['Sin filtros aplicados']], { origin: { r: rowIndex++, c: 0 } });
       }
 
-      // Estadísticas adicionales
       const estudiantesConTest = datosParaExportar.filter(est => est['Test Realizado'] === 'Sí').length;
       const estudiantesSinTest = datosParaExportar.length - estudiantesConTest;
 
@@ -1143,32 +1109,22 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         ['- Facultades Recomendadas: Facultades de la UMSA relacionadas con el perfil CHASIDE'],
         ['- Carreras Relacionadas: Carreras disponibles en las facultades recomendadas'],
         [''],
-        ['Contacto UMSA:'],
-        ['Teléfono: (591 - 2) 2612298'],
-        ['E-mail: informate@umsa.bo'],
-        ['Av. Villazón N° 1995, Plaza del Bicentenario - Zona Central'],
-        ['Ciudad de La Paz. Estado Plurinacional de Bolivia'],
+        [' https://www.facebook.com/IDR.DU.UMSA'],
         [''],
-        ['Contacto IDRDU:'],
-        ['Teléfono: (591 - 2)'],
-        ['E-mail:'],
+        ['Contacto IDRDU:(591) 2-2118556'],
+        ['Teléfono - Fax (591) 2-2118556 · IP (591) 2-2612211'],
+        ['E-mail:idrdu@umsa.bo'],
         ['Av. 6 de Agosto. Edificio HOY Nro. 2170 Piso 12']
       ], { origin: { r: rowIndex, c: 0 } });
 
-      // Ajustar fusiones de celdas para la hoja de información
       infoSheet['!merges'] = [
         { s: { c: 0, r: 0 }, e: { c: 9, r: 0 } },
         { s: { c: 0, r: 1 }, e: { c: 9, r: 1 } },
         { s: { c: 0, r: 3 }, e: { c: 9, r: 3 } }
       ];
 
-      // Ajustar ancho de columnas para la hoja de información
       infoSheet['!cols'] = [{ wch: 80 }];
-
-      // Añadir la hoja de información
       XLSX.utils.book_append_sheet(workbook, infoSheet, 'Información');
-
-      // Ajustar ancho de columnas para la hoja de datos (ahora con más columnas)
       const columnas = [
         { wch: 15 }, // CI
         { wch: 20 }, // Nombre
@@ -1192,17 +1148,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         { wch: 80 }  // Carreras Relacionadas
       ];
       worksheet['!cols'] = columnas;
-
-      // Añadir la hoja de datos
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Estudiantes');
-
-      // Crear una hoja adicional con resumen estadístico
       const resumenData = this.generarResumenEstadistico(datosParaExportar);
       const resumenSheet = XLSX.utils.json_to_sheet(resumenData);
       resumenSheet['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 20 }];
       XLSX.utils.book_append_sheet(workbook, resumenSheet, 'Resumen Estadístico');
-
-      // Generar el archivo
       const fechaActual = new Date().toISOString().split('T')[0];
       XLSX.writeFile(workbook, `orientacion_vocacional_completo_umsa_${fechaActual}.xlsx`);
 
@@ -1215,7 +1165,6 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Método auxiliar para generar resumen estadístico
   private generarResumenEstadistico(datos: any[]): any[] {
     const resumen = [];
 
@@ -1279,7 +1228,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
     return resumen;
   }
-  
+
   private async exportarPDF(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
 
@@ -1310,7 +1259,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
           const tamTitulo = 10;
           const tamSubtitulo = 10;
-        const colorTitulo: [number, number, number] = [0, 54, 107];
+          const colorTitulo: [number, number, number] = [0, 54, 107];
           const colorTexto: [number, number, number] = [0, 54, 107];
 
           // === Textos ===
@@ -1381,6 +1330,48 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           doc.text(textoLinea1, anchoPagina / 2, altoPagina - 12, { align: 'center' });
           doc.text(textoLinea2, anchoPagina / 2, altoPagina - 8, { align: 'center' });
         };
+        const agregarMarcaDeAgua = async (logoIDRDU: string | null) => {
+          if (!logoIDRDU) return;
+
+          // === Dimensiones de la página ===
+          const anchoPagina = doc.internal.pageSize.getWidth();
+          const altoPagina = doc.internal.pageSize.getHeight();
+
+          // === tamano de la marca de agua ===
+          const anchoMarcaAgua = 100;
+          const altoMarcaAgua = 100;
+
+          // === centro ===
+          const posX = (anchoPagina - anchoMarcaAgua) / 2;
+          const posY = (altoPagina - altoMarcaAgua) / 2;
+
+          try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            const img = new Image();
+            await new Promise<void>((resolve, reject) => {
+              img.onload = () => {
+                canvas.width = img.naturalWidth || 200;
+                canvas.height = img.naturalHeight || 200;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.globalAlpha = 0.15;
+                ctx.drawImage(img, 0, 0);
+
+                resolve();
+              };
+
+              img.onerror = () => reject(new Error('Error al cargar imagen'));
+              img.src = logoIDRDU;
+            });
+            const imagenConOpacidad = canvas.toDataURL('image/png');
+            doc.addImage(imagenConOpacidad, 'PNG', posX, posY, anchoMarcaAgua, altoMarcaAgua);
+
+          } catch (error) {
+            console.warn('Error al crear marca de agua:', error);
+            doc.addImage(logoIDRDU, 'PNG', posX, posY, anchoMarcaAgua * 0.8, altoMarcaAgua * 0.8);
+          }
+        };
         // Encabezado
         const colorAzulUMSA: [number, number, number] = [0, 51, 153];
         const colorVinoUMSA: [number, number, number] = [128, 0, 32];
@@ -1390,6 +1381,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         let yPos = margin + 25;
 
         agregarEncabezado(logoUMSA, logoIDRDU);
+        await agregarMarcaDeAgua(logoIDRDU);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(0, 0, 0);
@@ -1551,15 +1543,15 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     const margenIzquierdo = 15;
     const margenDerecho = 15;
     const anchoUtil = doc.internal.pageSize.width - margenIzquierdo - margenDerecho;
-    let y = 15;
     const estudiante = this.estudianteSeleccionado;
     if (!this.resultadoEstudiante || this.resultadoEstudiante.length === 0) {
       this.mostrarNotificacion('No hay resultados disponibles para exportar', 'warning');
       return;
     }
-    /*==================================
-    * Encabezado y pie de pagina del PDF
-    ====================================*/
+    /*=================================================
+    * Encabezado, marca de agua y pie de pagina del PDF
+    =================================================*/
+    let y = 15;
     const logoUmsaColor = 'assets/umsac.png';
     const logoIDRUColor = 'assets/idrdu.png';
     const logoUMSA = await this.cargarImagen(logoUmsaColor);
@@ -1649,7 +1641,48 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       doc.text(textoLinea1, anchoPagina / 2, altoPagina - 12, { align: 'center' });
       doc.text(textoLinea2, anchoPagina / 2, altoPagina - 8, { align: 'center' });
     };
-    
+    const agregarMarcaDeAgua = async (logoIDRDU: string | null) => {
+      if (!logoIDRDU) return;
+
+      // === Dimensiones de la página ===
+      const anchoPagina = doc.internal.pageSize.getWidth();
+      const altoPagina = doc.internal.pageSize.getHeight();
+
+      // === tamano de la marca de agua ===
+      const anchoMarcaAgua = 100;
+      const altoMarcaAgua = 100;
+
+      // === centro ===
+      const posX = (anchoPagina - anchoMarcaAgua) / 2;
+      const posY = (altoPagina - altoMarcaAgua) / 2;
+
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const img = new Image();
+        await new Promise<void>((resolve, reject) => {
+          img.onload = () => {
+            canvas.width = img.naturalWidth || 200;
+            canvas.height = img.naturalHeight || 200;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 0.15;
+            ctx.drawImage(img, 0, 0);
+
+            resolve();
+          };
+
+          img.onerror = () => reject(new Error('Error al cargar imagen'));
+          img.src = logoIDRDU;
+        });
+        const imagenConOpacidad = canvas.toDataURL('image/png');
+        doc.addImage(imagenConOpacidad, 'PNG', posX, posY, anchoMarcaAgua, altoMarcaAgua);
+
+      } catch (error) {
+        console.warn('Error al crear marca de agua:', error);
+        doc.addImage(logoIDRDU, 'PNG', posX, posY, anchoMarcaAgua * 0.8, altoMarcaAgua * 0.8);
+      }
+    };
     /*==================================
     * Encabezado y pie de pagina del PDF
     ====================================*/
@@ -1715,13 +1748,13 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         aptitudes: [codigo]
       };
     };
-
-    const verificarEspacioDisponible = (espacioNecesario: number): boolean => {
+    const verificarEspacioDisponible = async (espacioNecesario: number): Promise<boolean> => {
       const espacioDisponible = doc.internal.pageSize.height - y - 20;
       if (espacioDisponible < espacioNecesario) {
         doc.addPage();
         y = 15;
         agregarEncabezado(logoUMSA, logoIDRDU);
+        await agregarMarcaDeAgua(logoIDRDU);
         agregarPiePagina();
         return true;
       }
@@ -1732,6 +1765,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     };
 
     agregarEncabezado(logoUMSA, logoIDRDU);
+    await agregarMarcaDeAgua(logoIDRDU);
     agregarPiePagina();
     const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(11);
@@ -1821,7 +1855,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         orden: idx + 1
       }));
     if (todosChaside.length > 0) {
-      verificarEspacioDisponible(70);
+      await verificarEspacioDisponible(70);
       crearTitulo('RESULTADOS TEST CHASIDE');
       doc.setFillColor(...colorGrisClaro);
       doc.rect(margenIzquierdo, y, anchoUtil, 10, 'F');
@@ -1852,7 +1886,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       }
     }
     if (todosHolland.length > 0) {
-      verificarEspacioDisponible(50);
+      await verificarEspacioDisponible(50);
       crearTitulo('RESULTADOS TEST HOLLAND');
       doc.setFillColor(...colorGrisClaro);
       doc.rect(margenIzquierdo, y, anchoUtil, 10, 'F');
@@ -1922,11 +1956,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       });
     }
     if (todasFacultades.length > 0) {
-      verificarEspacioDisponible(50);
+      await verificarEspacioDisponible(50);
       crearTitulo('RECOMENDACIONES ACADÉMICAS BASADO EN RESULTADOS', colorVinoUMSA);
       doc.setTextColor(0, 54, 107);
-      todasFacultades.forEach((facultadItem, idx) => {
-        verificarEspacioDisponible(40);
+      for (const [idx, facultadItem] of todasFacultades.entries()) {
+        await verificarEspacioDisponible(40);
         const facultad = facultadItem.data;
         const imgWidth = 15;
         const imgHeight = 15;
@@ -1948,7 +1982,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           const columnasCarreras = 1;
           const anchoColumna = anchoUtil / columnasCarreras;
           let columnaActual = 0;
-          (facultad.carreras as string[]).slice(0, 10).forEach((carrera: string) => {
+          for (const carrera of (facultad.carreras as string[]).slice(0, 10)) {
             const xPos = margenIzquierdo + 25 + (columnaActual * anchoColumna);
             doc.setFontSize(8);
             doc.setFont('helvetica', 'normal');
@@ -1958,7 +1992,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
               columnaActual = 0;
               y += 4;
             }
-          });
+          }
           if (columnaActual > 0) y += 8;
           y += 2;
         }
@@ -1972,9 +2006,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           doc.setTextColor(0, 0, 0);
         }
         y += 4;
-      });
+      }
     } else {
-      verificarEspacioDisponible(30);
+      await verificarEspacioDisponible(30);
       crearTitulo('RECOMENDACIONES ACADÉMICAS', colorVinoUMSA);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
@@ -1983,7 +2017,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       doc.text('consulte con un orientador vocacional basándose en sus resultados CHASIDE y Holland.', margenIzquierdo, y);
       y += 10;
     }
-    verificarEspacioDisponible(30);
+    await verificarEspacioDisponible(30);
     crearTitulo('CONSIDERACIONES IMPORTANTES', colorVinoUMSA);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');

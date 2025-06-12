@@ -20,7 +20,8 @@
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/assets",
+            "assets": [
+              "src/assets",
               {
                 "glob": "**/*",
                 "input": "public"
@@ -34,7 +35,7 @@
             ],
             "scripts": [
               "node_modules/@popperjs/core/dist/umd/popper.min.js",
-	            "node_modules/bootstrap/dist/js/bootstrap.min.js"
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -44,6 +45,11 @@
           },
           "configurations": {
             "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -55,8 +61,7 @@
                   "maximumWarning": "4kB",
                   "maximumError": "8kB"
                 }
-              ],
-              "outputHashing": "all"
+              ]
             },
             "development": {
               "optimization": false,
