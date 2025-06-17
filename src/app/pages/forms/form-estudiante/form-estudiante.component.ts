@@ -1,6 +1,6 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { NavigationExtras, RouterModule } from '@angular/router';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators, FormBuilder, Form} from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators, FormBuilder, AbstractControl, ValidatorFn, ValidationErrors} from '@angular/forms';
 import { EstudianteI } from '../../../interfaces/estudiante-interface';
 import { ProvinciaService } from '../../../services/provincia.service';
 import { Provincia } from '../../../interfaces/provincia-interface';
@@ -18,6 +18,7 @@ import { hollandPregunta } from '../../../interfaces/holland-pregunta-intf';
 import { Resultado } from '../../../interfaces/resultado-interface';
 import { EstudianteService } from '../../../services/estudiante.service';
 import { ResultadoService } from '../../../services/resultado.service';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -47,9 +48,8 @@ export class FormEstudianteComponent {
   pregHollandSecond: hollandPregunta[] = [];
   pregHollandThird: hollandPregunta[] = [];
   pregHollandAutoev: hollandPregunta[] = [];
-  //campos de provincia y municipio seleccionados
-  //resultado del test chasides
-  //resultadoChaside = signal<Record<string, number>>({ C: 0, H: 0, A: 0, S: 0, I: 0, D: 0, E: 0 });
+  
+  
   //resultados del test de holland
   resultadoHolland = signal<Record<string, number>>({ R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 });
   estudianteGuardados!: EstudianteI;
@@ -170,14 +170,14 @@ export class FormEstudianteComponent {
           () => new FormControl(null, Validators.required)
         )),
         respuestasHF : this.formBuilder.array(this.pregHollandFirst.map(
-          () => new FormControl(null)
-        )),
+          () => new FormControl(null)), [this.minimoRespuestasSeleccionadas(5)]
+        ),
         respuestasHS : this.formBuilder.array(this.pregHollandSecond.map(
-          () => new FormControl(null)
-        )),
+          () => new FormControl(null)), [this.minimoRespuestasSeleccionadas(5)]
+        ),
         respuestasHT : this.formBuilder.array(this.pregHollandThird.map(
-          () => new FormControl(null)
-        )),
+          () => new FormControl(null)), [this.minimoRespuestasSeleccionadas(5)]
+        ),
         respuestasHA : this.formBuilder.array(this.pregHollandAutoev.map(
           () => new FormControl(null, Validators.required)
         ))
@@ -290,7 +290,8 @@ export class FormEstudianteComponent {
     if(this.carnetNum?.invalid || this.carnetExt?.invalid || this.nombre?.invalid || this.apMaterno?.invalid
       || this.apMaterno?.invalid || this.colegio?.invalid || this.curso?.invalid || this.edad?.invalid || this.celular?.invalid
       || this.municipio?.invalid || this.provincia?.invalid){
-        alert('Debes llenar todos los campos')
+        // alert('Debes llenar todos los campos')
+        this.mostrarNotificacionIncompleto('Debes llenar todos los campos');
         this.enviadoEst.set(true);
     }else{
       this.formularioActived = true;
@@ -301,7 +302,7 @@ export class FormEstudianteComponent {
   }
   mostrarChasideDos(){
     if(this.respuestasChI.invalid){
-      alert('Debes contestar TODAS las preguntas')
+      this.mostrarNotificacionIncompleto('Debes contestar TODAS las preguntas');
       this.enviadoCh.set(true);
     }else{
     this.chasideActivated = true;
@@ -311,7 +312,7 @@ export class FormEstudianteComponent {
   }
   mostrarChasideTres(){
     if(this.respuestasChIDos.invalid){
-      alert('Debes contestar TODAS las preguntas')
+      this.mostrarNotificacionIncompleto('Debes contestar TODAS las preguntas');
       this.enviadoChDos.set(true);
     }else{
     this.chasideActivatedDos = true;
@@ -321,7 +322,7 @@ export class FormEstudianteComponent {
   }
   mostrarChasideCuatro(){
     if(this.respuestasChITres.invalid){
-      alert('Debes contestar TODAS las preguntas')
+      this.mostrarNotificacionIncompleto('Debes contestar TODAS las preguntas');
       this.enviadoChTres.set(true);
     }else{
     this.chasideActivatedTres = true;
@@ -331,7 +332,7 @@ export class FormEstudianteComponent {
   }
   mostrarChasideCinco(){
     if(this.respuestasChICuatro.invalid){
-      alert('Debes contestar TODAS las preguntas')
+      this.mostrarNotificacionIncompleto('Debes contestar TODAS las preguntas');
       this.enviadoChCuatro.set(true);
     }else{
     this.chasideActivatedCuatro = true;
@@ -341,7 +342,7 @@ export class FormEstudianteComponent {
   }
   mostrarChasideSeis(){
     if(this.respuestasChA.invalid){
-      alert('Debes contestar TODAS las preguntas')
+      this.mostrarNotificacionIncompleto('Debes contestar TODAS las preguntas');
       this.enviadoChCinco.set(true);
     }else{
     this.chasideActivatedCinco = true;
@@ -351,7 +352,7 @@ export class FormEstudianteComponent {
   }
   mostrarHolland(){
     if(this.respuestasChADos.invalid){
-      alert('Debes contestar TODAS las preguntas')
+      this.mostrarNotificacionIncompleto('Debes contestar TODAS las preguntas');
       this.enviadoChSeis.set(true);
     }else{
     this.chasideActivatedSeis = true;
@@ -361,8 +362,11 @@ export class FormEstudianteComponent {
   }
   mostrarHollandDos(){
     if(!this.respuestasHF.dirty){
-      alert('Debes marcar algunas opciones')
+      this.mostrarNotificacionIncompleto('Debes marcar algunas opciones');
       this.enviadoHl.set(true);
+    }else if(this.respuestasHF.invalid && this.respuestasHF?.errors?.['minimoNoCumplido']){
+      this.mostrarNotificacionOpcionesIncompleto('Debes escoger al menos 5 actividades');
+      return;
     }else{
     this.hollandActivated = true;
     this.hollandActivatedDos = false;
@@ -371,8 +375,11 @@ export class FormEstudianteComponent {
   }
   mostrarHollandTres(){
     if(!this.respuestasHS.dirty){
-      alert('Debes marcar algunas opciones')
+      this.mostrarNotificacionIncompleto('Debes marcar algunas opciones');
       this.enviadoHlDos.set(true);
+    }else if(this.respuestasHS.invalid && this.respuestasHS?.errors?.['minimoNoCumplido']){
+      this.mostrarNotificacionOpcionesIncompleto('Debes escoger al menos 5 habilidades');
+      return;
     }else{
     this.hollandActivatedDos = true;
     this.hollandActivatedTres = false;
@@ -381,8 +388,11 @@ export class FormEstudianteComponent {
   }
   mostrarHollandCuatro(){
     if(!this.respuestasHT.dirty){
-      alert('Debes marcar algunas opciones')
+      this.mostrarNotificacionIncompleto('Debes marcar algunas opciones');
       this.enviadoHlTres.set(true);
+    }else if(this.respuestasHT.invalid && this.respuestasHT?.errors?.['minimoNoCumplido']){
+      this.mostrarNotificacionOpcionesIncompleto('Debes escoger al menos 5 habilidades');
+      return;
     }else{
     this.hollandActivatedTres = true;
     this.hollandActivatedCuatro = false;
@@ -390,9 +400,54 @@ export class FormEstudianteComponent {
     }
   }
 
+  minimoRespuestasSeleccionadas(min: number): ValidatorFn{
+    return (formArray: AbstractControl): ValidationErrors | null =>{
+      const totalRespondidas = (formArray as FormArray).controls
+      .filter(control => control.value !== null && control.value !== '').length;
+      return totalRespondidas >= min ? null : {minimoNoCumplido : true}
+    }
+  }
+
+
+  mostrarNotificacionIncompleto(mensaje: string){
+    Swal.fire({
+      title: 'Incompleto',
+      text: mensaje,
+      icon: 'error',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#d33',
+      background: '#f7f7f7',
+      color: '#333',
+      buttonsStyling: true      
+    }).then((result)=>{
+      if(result.isConfirmed){
+        return;
+      }
+    })
+  }
+
+  mostrarNotificacionOpcionesIncompleto(mensaje: string){
+    Swal.fire({
+      title: 'Incompleto',
+      text: mensaje,
+      icon: 'warning',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#d33',
+      background: '#f7f7f7',
+      color: '#333',
+      buttonsStyling: true      
+    }).then((result)=>{
+      if(result.isConfirmed){
+        return;
+      }
+    })
+  }
+
+  
+
   guardarResultado(){
     if(this.respuestasHA.invalid){
-      alert('Debes responder todas las preguntas')
+      this.mostrarNotificacionIncompleto('Debes calificar en todas las actividades');
       this.enviadoHlCuatro.set(true);
     }
     if(this.form.invalid){

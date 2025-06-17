@@ -5,11 +5,11 @@
         </h3>
     </div>
 </div>
-<div class="row">
+<div class="row mb-4">
 @for (facultad of facultadesArray; track facultad; let i = $index) {
     @if (facultad[0] == 'FMENT') {
             <!-- FACULTAD DE MEDICINA ENFERMERIA NUTRICION Y TECNOLOGIA -->
-            <div class="col-lg-4 mb-4">
+            <div class="col-lg-4">
                 <div class="card card-custom option-card">
                     <div class="option-number mt-3 mx-3">{{i+1}}</div>
                     <div class="card-body">
@@ -55,7 +55,7 @@
     }
     @if (facultad[0]== 'FO') {
             <!-- FACULTAD DE ODONTOLOGIA -->
-            <div class="col-lg-4 mb-4">
+            <div class="col-lg-4">
                 <div class="card card-custom option-card">
                     <div class="option-number mt-3 mx-3">{{i+1}}</div>
                     <div class="card-body">
@@ -102,7 +102,7 @@
     @if (facultad[0] == 'FCFB') {
         
             <!-- FACULTAD DE CIENCIAS FARMACEUTICAS Y BIOQUIMICAS -->
-            <div class="col-lg-4 mb-4">
+            <div class="col-lg-4">
                 <div class="card card-custom option-card">
                     <div class="option-number mt-3 mx-3">{{i+1}}</div>
                     <div class="card-body">

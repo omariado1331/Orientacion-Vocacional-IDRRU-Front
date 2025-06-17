@@ -1,15 +1,18 @@
 <div class="container mt-3 mb-3 align-items-center">
-    <h3 class="text-center">Test Vocacional IDR-DU</h3>
+    
     <form [formGroup]="form" autocomplete="off" (submit)="guardarResultado()">
         
         <!-- formulario de registro de estudiante -->
         <div class="container" [hidden]="formularioActived">
+            <h3 class="text-center">Test Vocacional - Registro</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Registro de estudiante</h5>
+                <h5 class="text-primary mx-3">Datos del estudiante</h5>
                 <span class="text-danger mx-3">1. Completa TODOS los campos del registro siguiendo el formado indicado</span>
                 <span class="text-danger mx-3">2. Al completar el registro presiona en el boton de SIGUIENTE</span>  
             </div>
-            <div class="card ">
+            
+            <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body align-items-center">
                     <div class="row">
                         <div class="mb-2 col-md-3">
@@ -66,7 +69,7 @@
                         </div>
                         <div class="mb-2 col-md-6">
                             <label class="form-label" [class.error]="enviadoEst() && celular?.invalid">Celular*</label>
-                            <input type="text" style="text-transform: uppercase;" class="form-control" formControlName="celular" placeholder="77265981">
+                            <input type="text" style="text-transform: uppercase;" class="form-control" formControlName="celular" placeholder="INGRESA TU NUMERO DE CELULAR">
                         </div>
                         <div class="mb-2 col-md-6">
                             <label class="form-label" [class.error]="enviadoEst() && provincia?.invalid">Provincia</label>
@@ -76,7 +79,6 @@
                                 }
                             </select>
                         </div>
-                        
                         <div class="mb-2 col-md-6">
                             <label class="form-label" [class.error]="enviadoEst() && municipio?.invalid">Municipio</label>
                             <select class="form-control" formControlName="municipio">
@@ -93,83 +95,82 @@
                 </div>
                 <button class="btn btn-success mt-2 mx-auto mb-2" type="button" (click)="mostrarChaside()">SIGUIENTE</button>
             </div>
+            
         </div>
 
         <!-- PRIMERA SECCION DE PREGUNTAS CHASIDE INTERES-->
         <div class="container" [hidden]="chasideActivated">
+            <h3 class="text-center">Test Vocacional - Chaside</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test Chaside</h5>
-                <h5 class="text-danger mx-3">Primera parte: INTERÉS</h5>
+                <h5 class="text-primary mx-3">Primera parte: INTERÉS</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
                 <span class="text-danger mx-3">4. Al terminar con el cuestionario presiona SIGUIENTE</span>
             </div>
+            
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row" formArrayName="respuestasChI"> 
                         @for (preguntain of pregChasideInteres; track preguntain; let i = $index) {
-                            <div class="col-md-1 text-center">
-                                <p >{{i+1}}.</p>  
+                            <div class="col-md-9">
+                                <p [class.error]="enviadoCh() && respuestasChI.at(i).invalid" >{{i+1}}. {{preguntain.pregunta}}</p>
                             </div>
-                            <div class="col-md-8">
-                                <p [class.error]="enviadoCh() && respuestasChI.at(i).invalid" >{{preguntain.pregunta}}</p>
-                            </div>
+                            <div class="col-auto selected-option mb-4">
                             @for (val of [1,0]; track val) {
-                                <div class="col-md-1">
                                     @if(val===1){
                                     <label class="form-check-label"> SI
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="i.toString()">
                                     </label>
                                     }@else{
-                                    <label class="form-check-label"> NO
+                                    <label class="form-check-label mx-4"> NO
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="i.toString()">
                                     </label>
                                     }
-                                </div>
-                            }                          
-                            <div class="mb-2 col-md-1"></div>
+                            }     
+                            </div>                     
                         }
                     </div>
                 </div>
                 <button class="btn btn-success mb-3 mx-auto" type="button" (click)="mostrarChasideDos()" >SIGUIENTE</button>
             </div>
+            
         </div>
         
         <!-- SEGUNDA SECCION DE PREGUNTAS CHASIDE INTERES-->
         <div class="container" [hidden]="chasideActivatedDos">
-            <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test Chaside</h5>
-                <h5 class="text-danger mx-3">Segunda parte: INTERÉS</h5>
+            <h3 class="text-center">Test Vocacional - Chaside</h3>
+            <div class="card mb-3"> 
+                <h5 class="text-primary mx-3">Segunda parte: INTERÉS</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
                 <span class="text-danger mx-3">4. Al terminar con el cuestionario presiona SIGUIENTE</span>
             </div>
+            
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row" formArrayName="respuestasChIDos"> 
                         @for (preguntain of pregChasideInteresDos; track preguntain; let i = $index) {
-                            <div class="col-md-1 text-center">
-                                <p >{{i+1}}.</p>  
+                            <div class="col-md-9">
+                                <p [class.error]="enviadoChDos() && respuestasChIDos.at(i).invalid" >{{i+1}}. {{preguntain.pregunta}}</p>
                             </div>
-                            <div class="col-md-8">
-                                <p [class.error]="enviadoChDos() && respuestasChIDos.at(i).invalid" >{{preguntain.pregunta}}</p>
-                            </div>
+                            <div class="col-auto selected-option mb-4">
                             @for (val of [1,0]; track val) {
-                                <div class="col-md-1">
                                     @if(val===1){
                                     <label class="form-check-label"> SI
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="i.toString()">
                                     </label>
                                     }@else{
-                                    <label class="form-check-label"> NO
+                                    <label class="form-check-label mx-4"> NO
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="i.toString()">
                                     </label>
                                     }
-                                </div>
+                                
                             }                          
-                            <div class="mb-2 col-md-1"></div>
+                            </div>
                         }
                     </div>
                 </div>
@@ -179,38 +180,35 @@
 
         <!-- TERCERA SECCION DE PREGUNTAS CHASIDE INTERES-->
         <div class="container" [hidden]="chasideActivatedTres">
+            <h3 class="text-center">Test Vocacional - Chaside</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test Chaside</h5>
-                <h5 class="text-danger mx-3">Tercera parte: INTERÉS</h5>
+                <h5 class="text-primary mx-3">Tercera parte: INTERÉS</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
                 <span class="text-danger mx-3">4. Al terminar con el cuestionario presiona SIGUIENTE</span>
             </div>
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row" formArrayName="respuestasChITres"> 
                         @for (preguntain of pregChasideInteresTres; track preguntain; let i = $index) {
-                            <div class="col-md-1 text-center">
-                                <p >{{i+1}}.</p>  
+                            <div class="col-md-9">
+                                <p [class.error]="enviadoChTres() && respuestasChITres.at(i).invalid" >{{i+1}}. {{preguntain.pregunta}}</p>
                             </div>
-                            <div class="col-md-8">
-                                <p [class.error]="enviadoChTres() && respuestasChITres.at(i).invalid" >{{preguntain.pregunta}}</p>
-                            </div>
+                            <div class="col-auto selected-option mb-4">
                             @for (val of [1,0]; track val) {
-                                <div class="col-md-1">
                                     @if(val===1){
                                     <label class="form-check-label"> SI
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="i.toString()">
                                     </label>
                                     }@else{
-                                    <label class="form-check-label"> NO
+                                    <label class="form-check-label mx-4"> NO
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="i.toString()">
                                     </label>
                                     }
-                                </div>
-                            }                          
-                            <div class="mb-2 col-md-1"></div>
+                            }       
+                            </div>                 
                         }
                     </div>
                 </div>
@@ -220,38 +218,36 @@
 
         <!-- CUARTA SECCION DE PREGUNTAS CHASIDE INTERES -->
         <div class="container" [hidden]="chasideActivatedCuatro">
+            <h3 class="text-center">Test Vocacional - Chaside</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test Chaside</h5>
-                <h5 class="text-danger mx-3">Cuarta parte: INTERÉS</h5>
+                <h5 class="text-primary mx-3">Cuarta parte: INTERÉS</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
                 <span class="text-danger mx-3">4. Al terminar con el cuestionario presiona SIGUIENTE</span>
             </div>
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row" formArrayName="respuestasChICuatro"> 
                         @for (preguntain of pregChasideInteresCuatro; track preguntain; let i = $index) {
-                            <div class="col-md-1 text-center">
-                                <p >{{i+1}}.</p>  
+                            <div class="col-md-9">
+                                <p [class.error]="enviadoChCuatro() && respuestasChICuatro.at(i).invalid" >{{i+1}}. {{preguntain.pregunta}}</p>
                             </div>
-                            <div class="col-md-8">
-                                <p [class.error]="enviadoChCuatro() && respuestasChICuatro.at(i).invalid" >{{preguntain.pregunta}}</p>
-                            </div>
+                            <div class="col-auto selected-option mb-4">
                             @for (val of [1,0]; track val) {
-                                <div class="col-md-1">
                                     @if(val===1){
                                     <label class="form-check-label"> SI
-                                        <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="i.toString()">
+                                        <input class="form-check-input" type="radio" [value]="val" [formControlName]="i.toString()">
                                     </label>
                                     }@else{
-                                    <label class="form-check-label"> NO
-                                        <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="i.toString()">
+                                    <label class="form-check-label mx-4"> NO
+                                        <input class="form-check-input" type="radio" [value]="val" [formControlName]="i.toString()">
                                     </label>
                                     }
-                                </div>
-                            }                          
-                            <div class="mb-2 col-md-1"></div>
+                            } 
+                            </div>                       
+                            <!-- <div class="mb-2 col-md-1"></div> -->
                         }
                     </div>
                 </div>
@@ -261,38 +257,37 @@
 
         <!-- QUINTA SECCION DE PREGUNTAS CHASIDE APTITUD -->
         <div class="container" [hidden]="chasideActivatedCinco">
+            <h3 class="text-center">Test Vocacional - Chaside</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test Chaside</h5>
-                <h5 class="text-danger mx-3">Primera parte: APTITUD</h5>
+                <h5 class="text-primary mx-3">Primera parte: APTITUD</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
                 <span class="text-danger mx-3">4. Al terminar con el cuestionario presiona SIGUIENTE</span>
             </div>
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row" formArrayName="respuestasChA">
                         @for (preguntaap of pregChasideAptitud; track preguntaap; let j = $index) {
-                            <div class="col-md-1 text-center">
-                                <p >{{j+1}}.</p>  
+                            <div class="col-md-9">
+                                <p [class.error]="enviadoChCinco() && respuestasChA.at(j).invalid" >{{j+1}}. {{preguntaap.pregunta}}</p>
                             </div>
-                            <div class="col-md-8">
-                                <p [class.error]="enviadoChCinco() && respuestasChA.at(j).invalid" >{{preguntaap.pregunta}}</p>
-                            </div>
+                            <div class="col-auto selected-option mb-4">
                             @for (val of [1,0]; track val) {
-                                <div class="col-md-1">
+                                
                                     @if (val === 1) {
                                     <label class="form-check-label"> SI
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="j.toString()">
                                     </label> 
                                     }@else {
-                                    <label class="form-check-label" for="preguntaApN{{j}}">NO
+                                    <label class="form-check-label mx-4">NO
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="j.toString()">
                                     </label> 
                                     }
-                                </div>
+                                
                             }
-                            <div class="col-md-1"></div>
+                            </div>
                         }
                     </div> 
                 </div>
@@ -302,38 +297,35 @@
 
         <!-- SEXTA SECCION DE PREGUNTAS CHASIDE APTITUD -->
         <div class="container" [hidden]="chasideActivatedSeis">
+            <h3 class="text-center">Test Vocacional - Chaside</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test Chaside</h5>
-                <h5 class="text-danger mx-3">Segunda parte: APTITUD</h5>
+                <h5 class="text-primary mx-3">Segunda parte: APTITUD</h5>
                 <span class="text-danger mx-3">1. Lee atentamenta cada pregunta</span>
                 <span class="text-danger mx-3">2. Marca SI o NO a cada una de las preguntas propuestas</span>
                 <span class="text-danger mx-3">3. Lee y responde TODAS las preguntas sin omitir ninguna</span>
                 <span class="text-danger mx-3">4. Al terminar con el cuestionario presiona SIGUIENTE</span>
             </div>
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row" formArrayName="respuestasChADos">
                         @for (preguntaap of pregChasideAptitudDos; track preguntaap; let j = $index) {
-                            <div class="col-md-1 text-center">
-                                <p >{{j+1}}.</p>  
+                            <div class="col-md-9">
+                                <p [class.error]="enviadoChSeis() && respuestasChADos.at(j).invalid" >{{j+1}}. {{preguntaap.pregunta}}</p>
                             </div>
-                            <div class="col-md-8">
-                                <p [class.error]="enviadoChSeis() && respuestasChADos.at(j).invalid" >{{preguntaap.pregunta}}</p>
-                            </div>
-                            @for (val of [1,0]; track val) {
-                                <div class="col-md-1">
+                            <div class="col-auto selected-option mb-4">
+                            @for (val of [1,0]; track val) {                               
                                     @if (val === 1) {
                                     <label class="form-check-label"> SI
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="j.toString()">
                                     </label> 
                                     }@else {
-                                    <label class="form-check-label" for="preguntaApN{{j}}">NO
+                                    <label class="form-check-label mx-4" >NO
                                         <input class="form-check-input mx-1" type="radio" [value]="val" [formControlName]="j.toString()">
                                     </label> 
                                     }
-                                </div>
                             }
-                            <div class="col-md-1"></div>
+                            </div>
                         }
                     </div> 
                 </div>
@@ -343,13 +335,14 @@
 
         <!-- PRIMERA SECCION TEST DE HOLLAND ACTIVIDADES-->
         <div class="container" [hidden]="hollandActivated">
+            <h3 class="text-center">Test Vocacional - Holland</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test de Holland</h5>
-                <h5 class="text-danger mx-3">Primera parte: ACTIVIDADES</h5>
+                <h5 class="text-primary mx-3">Primera parte: ACTIVIDADES</h5>
                 <span class="text-danger mx-3">1. Lee atentamente cada pregunta</span>
-                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que le agrada realizar</span>
+                <span class="text-danger mx-3 mb-2">2. Marca solo las actividades que le agrada realizar</span>
             </div> 
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row mt-4" formArrayName="respuestasHF">
                         @for (preguntahf of pregHollandFirst; track preguntahf; let i = $index){
@@ -369,13 +362,14 @@
 
         <!-- SEGUNDA SECCION TEST DE HOLLAND HABILIDADES-->
         <div class="container" [hidden]="hollandActivatedDos">
+            <h3 class="text-center">Test Vocacional - Holland</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test de Holland</h5>
-                <h5 class="text-danger mx-3">Segunda parte: HABILIDADES</h5>
+                <h5 class="text-primary mx-3">Segunda parte: HABILIDADES</h5>
                 <span class="text-danger mx-3">1. Lee atentamente cada pregunta</span>
-                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que puede realizar bien</span>
+                <span class="text-danger mx-3 mb-2">2. Marca solo las actividades que puede realizar bien</span>
             </div> 
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row mt-4" formArrayName="respuestasHS">
                         @for (preguntahs of pregHollandSecond; track preguntahs; let i = $index){
@@ -395,13 +389,14 @@
 
         <!-- TERCERA SECCION TEST DE HOLLAND OCUPACIONES-->
         <div class="container" [hidden]="hollandActivatedTres">
+            <h3 class="text-center">Test Vocacional - Holland</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test de Holland</h5>
-                <h5 class="text-danger mx-3">Tercera parte: OCUPACIONES</h5>
+                <h5 class="text-primary mx-3">Tercera parte: OCUPACIONES</h5>
                 <span class="text-danger mx-3">1. Lee atentamente cada pregunta</span>
-                <span class="text-danger mx-3 mb-4">2. Marca solo las actividades que te interesen o agraden</span>
+                <span class="text-danger mx-3 mb-2">2. Marca solo las actividades que te interesen o agraden</span>
             </div> 
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row mt-4" formArrayName="respuestasHT">
                         @for (preguntaht of pregHollandThird; track preguntaht; let i = $index){
@@ -422,27 +417,28 @@
 
         <!-- CUARTA SECCION TEST DE HOLLAND AUTOEVALUACION-->
         <div class="container" [hidden]="hollandActivatedCuatro">
+            <h3 class="text-center">Test Vocacional - Holland</h3>
             <div class="card mb-3">
-                <h5 class="text-primary mx-3">Test de Holland</h5>
-                <h5 class="text-danger mx-3">Cuarta parte: AUTOEVALUACION</h5>
+                <h5 class="text-primary mx-3">Cuarta parte: AUTOEVALUACION</h5>
                 <span class="text-danger mx-3">1. Lee atentamente cada pregunta</span>
-                <span class="text-danger mx-3 mb-4">2. Califica de un 1 al 7 (siendo 7 la nota máxima) tus habilidades en comparación de otras personas de tu edad</span>
+                <span class="text-danger mx-3 mb-2">2. Califica de un 1 al 7 (siendo 7 la nota máxima) tus habilidades en comparación de otras personas de tu edad</span>
             </div>
             <div class="card">
+                <div class="card-container"></div>
                 <div class="card-body form-check-inline">
                     <div class="row mt-3" formArrayName="respuestasHA">
                         @for (preguntahav of pregHollandAutoev; track preguntahav; let l = $index) {
-                            <div class="col-md-3 mb-2">
+                            <div class="col-md-4">
                                 <p [class.error]="enviadoHlCuatro() && respuestasHA.at(l).invalid" >{{preguntahav.pregunta}}</p>
                             </div>
+                            <div class="col-md-8 mb-3">
                             @for (val of [1,2,3,4,5,6,7]; track val) {
-                                <div class="col-md-1 mb-2">
-                                <label class="form-check-label mx-2">{{val}}
+                                <label class="form-check-label mx-3">{{val}}
                                     <input class="form-check-input" type="radio" [value]="val" [formControlName]="l.toString()">
                                 </label>
-                                </div>
                             }
-                            <div class="col-md-2 mb-2"></div>
+                            </div>
+                            
                         }
                     </div>
                     <!-- <button class="btn btn-danger mt-3 mb-3 mx-auto" type="button" (click)="mostrarHollandCuatro()">SIGUIENTE</button> -->

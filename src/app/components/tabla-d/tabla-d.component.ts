@@ -34,7 +34,7 @@ export class TablaDComponent {
     codigo: 'ANAPOL'
   }
   carrerasANAPOL = [
-    'Ingeniería de Tránsito y Viabilidad',
+    'Ingeniería de Tránsito y Vialidad',
     'Investigación Criminal',
     'Orden y Seguridad',
     'Administración Policial',
@@ -44,16 +44,15 @@ export class TablaDComponent {
   facultadesArray = Object.entries(this.facultades);
 
   descripcionCarreras= {
-    'Infantería': 'Es una rama militar que se enfoca en la formación de soldados de infantería, los cuales son la columna vertebral de las fuerzas terrestres. Su misión principal es la de llevar a cabo operaciones anfibias, terrestres, ribereñas, de comandos y especiales, tanto en tiempos de paz como en crisis o guerra.',
-    'Artillería': 'implica la formación de especialistas en el manejo, operación y mantenimiento de sistemas de artillería. Los egresados están capacitados para liderar, coordinar y ejecutar operaciones con armas de fuego, como cañones, obuses y cohetes, para destruir, neutralizar o reprimir al enemigo.',
-    'Caballería': 'Se refiere a la formación y el empleo de fuerzas montadas a caballo, o en su evolución moderna, a unidades que cumplen roles similares utilizando vehículos blindados o helicópteros.',
-    'Ingenería': 'Es una disciplina que combina conocimientos de ingeniería con el entorno militar, enfocándose en el diseño, construcción y mantenimiento de obras de ingeniería para apoyar las operaciones militares y la logística. Los ingenieros militares trabajan en una variedad de áreas, como la construcción de bases, puentes, aeródromos y sistemas de comunicación, así como en la gestión de riesgos y la protección de infraestructuras.',
-    'Comunicaciones': 'Abarca la especialización en la transmisión y gestión de información dentro de las fuerzas armadas, utilizando diversas tecnologías y procedimientos para asegurar la seguridad y eficacia de la comunicación. Incluye aspectos como el uso de sistemas de radio, la criptografía, la ciberseguridad, y la guerra electrónica, con el objetivo de facilitar la coordinación y el control de las operaciones militares.',
-    'Logística': 'Es la disciplina que gestiona el movimiento, abastecimiento y mantenimiento de las fuerzas armadas, asegurando que el material, el personal y las instalaciones estén donde y cuando se necesitan. Esto implica la planificación, adquisición, almacenamiento, distribución y disposición de recursos, así como la gestión de transporte, instalaciones y servicios de apoyo.',
-    'Ingeniería de Tránsito y Viabilidad': 'Se enfoca en el estudio, planificación, diseño, construcción y mantenimiento de sistemas viales para la movilidad de personas y bienes. Implica un enfoque multidisciplinario que combina elementos de ingeniería civil, transporte, logística, urbanismo y, en algunos casos, medio ambiente.',
-    'Investigación Criminal': 'También conocida como Criminalística, se enfoca en la investigación de delitos utilizando métodos científicos y técnicas para analizar evidencias y determinar la verdad de los hechos. Los profesionales en esta área analizan la escena del crimen, recopilan pruebas, identifican a los involucrados y reconstruyen los eventos para esclarecer la verdad y llevar a cabo una investigación rigurosa.',
-    'Orden y Seguridad': 'Forma profesionales capaces de prevenir, mantener y restablecer el orden público. Estos profesionales interactúan con la sociedad, desarrollando acciones preventivas, de mediación y auxilio para preservar la paz social y el normal desenvolvimiento de las actividades.',
-    'Administración Policial': 'Se centra en la gestión y dirección de instituciones policiales, enfocándose en la planificación, organización, control y supervisión de recursos humanos y materiales para el mantenimiento de la seguridad pública y la prevención del delito.'
+    'Infantería': 'La infantería es la fuerza principal de combate a pie, encargada de la acción directa contra el enemigo, utilizando armas portátiles y tácticas terrestres para alcanzar la victoria.',
+    'Artillería': 'La carrera de Artillería capacita para apoyar el combate con fuego, utilizando cañones y misiles, calculando y ejecutando disparos para destruir objetivos terrestres o aéreos.',
+    'Caballería': 'La Caballería es una rama del ejército montada a caballo, conocida por su agilidad y capacidad de maniobra, utilizada para reconocimiento, ataque y protección en el campo de batalla.',
+    'Comunicaciones': 'Capacita a profesionales para la gestión y transmisión de información estratégica en entornos militares, utilizando equipos y sistemas especializados. Se enfoca en la seguridad y eficacia de las comunicaciones para el cumplimiento de misiones.',
+    'Logística': 'Es la disciplina que planifica, gestiona y ejecuta el movimiento, suministro y mantenimiento de personal y material para las fuerzas armadas. Es esencial para el éxito de las operaciones militares.',
+    'Ingeniería de Tránsito y Vialidad': 'Es una disciplina que planifica, diseña y opera sistemas de transporte, enfocándose en el flujo vehicular, seguridad y eficiencia en vías urbanas y carreteras.',
+    'Investigación Criminal': 'Es una carrera multidisciplinaria que aplica ciencia y técnicas para resolver delitos, investigando escenas, analizando pruebas y reconstruyendo hechos para lograr la justicia.',
+    'Orden y Seguridad': 'Prepara profesionales para mantener la seguridad pública, prevenir delitos y garantizar la convivencia pacífica, enfocándose en leyes, estrategias y gestión de riesgos.',
+    'Administración Policial': 'Es una carrera que se enfoca en la gestión y dirección de las fuerzas policiales. Se centra en la planificación, organización, ejecución y control de las actividades policiales para mantener la seguridad pública.'
   }
 
   logosCarreras = {
@@ -63,7 +62,7 @@ export class TablaDComponent {
     'Ingenería': './assets/logos-facultades/COLMIL.jpeg',
     'Comunicaciones': './assets/logos-facultades/COLMIL.jpeg',
     'Logística': './assets/logos-facultades/COLMIL.jpeg',
-    'Ingeniería de Tránsito y Viabilidad': './assets/logos-facultades/ANAPOL.jpeg',
+    'Ingeniería de Tránsito y Vialidad': './assets/logos-facultades/ANAPOL.jpeg',
     'Investigación Criminal': './assets/logos-facultades/ANAPOL.jpeg',
     'Orden y Seguridad': './assets/logos-facultades/ANAPOL.jpeg',
     'Administración Policial': './assets/logos-facultades/ANAPOL.jpeg'

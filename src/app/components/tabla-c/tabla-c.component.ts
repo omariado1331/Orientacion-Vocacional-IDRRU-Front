@@ -25,9 +25,9 @@ export class TablaCComponent {
   facultadesArray = Object.entries(this.facultades); 
   
   descripcionCarreras = {
-    'Administración de Empresas': 'Es una disciplina académica que se enfoca en la gestión y dirección de organizaciones, tanto públicas como privadas, con o sin fines de lucro. Su objetivo principal es lograr la eficiencia y efectividad en la operación de una empresa, maximizando el rendimiento y la sostenibilidad a largo plazo.',
-    'Contaduría Pública': 'Es una carrera profesional que se enfoca en la gestión financiera de empresas y organizaciones. Los contadores públicos registran, analizan e interpretan la información financiera, brindando asesoramiento para la toma de decisiones estratégicas y el cumplimiento normativo.',
-    'Economía': 'Estudia la producción, distribución y consumo de bienes y servicios, con el objetivo de comprender cómo las sociedades utilizan sus recursos limitados para satisfacer sus necesidades. Los economistas analizan el comportamiento económico de individuos, empresas y gobiernos, así como las relaciones entre ellos, utilizando herramientas teóricas y cuantitativas.'
+    'Administración de Empresas': 'La Administración de Empresas es una carrera que prepara a los profesionales para gestionar y dirigir organizaciones, optimizando recursos y procesos para alcanzar objetivos y generar valor.',
+    'Contaduría Pública': 'Forma profesionales capaces de gestionar los recursos financieros de empresas, realizando auditorías, análisis, y asesoría tributaria. Su objetivo es optimizar la información financiera para la toma de decisiones estratégicas.',
+    'Economía': 'La economía es la ciencia social que estudia cómo las sociedades gestionan recursos escasos para satisfacer las necesidades. Se enfoca en la producción, distribución y consumo de bienes y servicios.'
   }
   logosCarreras = {
     'Administración de Empresas': './assets/logos-carreras/carreras-C/ADMI.jpeg',

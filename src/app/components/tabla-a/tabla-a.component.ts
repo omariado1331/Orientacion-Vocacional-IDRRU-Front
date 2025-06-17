@@ -25,9 +25,9 @@ export class TablaAComponent {
   facultadesArray = Object.entries(this.facultades);
 
   descripcionCarreras = {
-    'Arquitectura': 'Se centra en el diseño, planificación y construcción de edificios, espacios habitables y otros entornos. Es una disciplina que combina creatividad, conocimiento técnico y una visión holística del entorno construido, abarcando desde el diseño de interiores hasta el diseño urbano y la planificación de ciudades.',
-    'Artes': 'Ofrece una formación integral en diversas disciplinas artísticas, preparando a los estudiantes para la gestión, ejecución y docencia en áreas como la música, fotografía, artes digitales, artes plásticas y artes escénicas. La carrera busca desarrollar habilidades creativas, el pensamiento crítico y la capacidad de expresarse a través de diferentes medios artísticos.',
-    'Diseño': 'Forma profesionales capaces de crear soluciones visuales, funcionales y estratégicas, adaptadas a las necesidades y contextos diversos. Se centra en la comunicación visual, la creatividad y la innovación, abarcando áreas como diseño gráfico, branding, diseño de interiores y más.'
+    'Arquitectura': 'La arquitectura es una disciplina creativa que combina arte, técnica y ciencia para diseñar y construir edificios, espacios y comunidades, buscando la funcionalidad, la estética y la sostenibilidad.',
+    'Artes': 'La carrera de Artes busca desarrollar la creatividad y el talento artístico, formando profesionales capaces de crear, interpretar y comprender diversas manifestaciones artísticas.',
+    'Diseño': 'La carrera de Diseño, en sus diferentes ramas, capacita para crear soluciones visuales, funcionales y estratégicas, utilizando la creatividad y el pensamiento crítico para mejorar la calidad de productos y experiencias.'
   }
 
   logosCarreras = {
