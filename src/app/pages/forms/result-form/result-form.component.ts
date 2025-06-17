@@ -69,7 +69,7 @@ export class ResultFormComponent {
   facultades: any[] = [];
   constructor(
     private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) { }
 
   ngOnInit(): void {
@@ -101,6 +101,7 @@ export class ResultFormComponent {
       this.interes = state.interes!;
       this.aptitud = state.aptitud!;
       this.holland = state.holland!;
+      // this.chaside = 'S';
       this.chaside = state.chaside!;
       this.celular = state.celular!;
       this.curso = state.curso!;
@@ -132,31 +133,128 @@ export class ResultFormComponent {
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       const margin = 10;
-      try {
-        const logoUMSA = await this.cargarImagen('assets/umsaescudo.png');
-        const logoIDRDU = await this.cargarImagen('assets/idrdu.png');
-        if (logoUMSA) {
-          doc.addImage(logoUMSA, 'PNG', margin, margin, 15, 25);
-        }
-        if (logoIDRDU) {
-          doc.addImage(logoIDRDU, 'PNG', pageWidth - margin - 30, margin, 25, 25);
-        }
-      } catch (error) {
-        console.warn('No se pudieron cargar las imágenes para el PDF', error);
-      }
-      const yPos = 10;
-      doc.setFontSize(14)
-      doc.setFont('helvetica', 'bold')
-      doc.setTextColor(...colorAzulUMSA)
-      doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth/2, yPos+10, {align: 'center'})
-      doc.setFontSize(9)
-      doc.text('Instituto de Desarrollo Regional', pageWidth/2, yPos+20, {align: 'center'})
-      doc.text('y Desconcentración Universitaria', pageWidth/2, yPos+25, {align: 'center'})
+      // try {
+      //   const logoUMSA = await this.cargarImagen('assets/umsaescudo.png');
+      //   const logoIDRDU = await this.cargarImagen('assets/idrdu.png');
+      //   if (logoUMSA) {
+      //     doc.addImage(logoUMSA, 'PNG', margin, margin, 15, 25);
+      //   }
+      //   if (logoIDRDU) {
+      //     doc.addImage(logoIDRDU, 'PNG', pageWidth - margin - 30, margin, 25, 25);
+      //   }
+      // } catch (error) {
+      //   console.warn('No se pudieron cargar las imágenes para el PDF', error);
+      // }
+      let y =15;
+      /*==================================
+    * Encabezado y pie de pagina del PDF
+    ====================================*/
+    const logoUmsaColor = 'assets/umsac.png';
+    const logoIDRUColor = 'assets/idrdu.png';
+    const logoUMSA = await this.cargarImagen(logoUmsaColor);
+    const logoIDRDU = await this.cargarImagen(logoIDRUColor);
+    const agregarEncabezado = (logoUMSA: string | null, logoIDRDU: string | null) => {
+      // === ===
+      const anchoPagina = doc.internal.pageSize.getWidth();
+      const margen = 10;
+      const anchoLogo = 23;
+      const altoLogo = 23;
+
+      // === Estilos ===
+      const fuenteNormal = 'helvetica';
+      const fuenteNegrita = 'helvetica';
+      const estiloNormal = 'normal';
+      const estiloNegrita = 'bold';
+
+      const tamTitulo = 10;
+      const tamSubtitulo = 10;
+      const colorTitulo: [number, number, number] = [0, 54, 107];
+      const colorTexto: [number, number, number] = [0, 54, 107];
+
+      // === Textos ===
+      const textoUMSA = 'UNIVERSIDAD MAYOR DE SAN ANDRÉS';
+      const textoVicerrectorado = 'VICERRECTORADO';
+      const textoInstituto = 'INSTITUTO DE DESARROLLO REGIONAL Y DESCONCENTRACIÓN UNIVERSITARIA';
+
+      // === posicionamiento ===
+      y = margen + 5;
+
+      // === logos ===
+      if (logoUMSA) doc.addImage(logoUMSA, 'PNG', margen, margen-3, anchoLogo, altoLogo);
+      if (logoIDRDU) doc.addImage(logoIDRDU, 'PNG', anchoPagina - margen - anchoLogo , margen, anchoLogo-5, altoLogo-5);
+
+      // === umsa ===
+      doc.setFont(fuenteNormal, estiloNormal);
+      doc.setFontSize(tamTitulo);
+      doc.setTextColor(...colorTitulo);
+      doc.text(textoUMSA, anchoPagina / 2, y, { align: 'center' });
+
+      // === vicerectorado ===
+      y += 4;
+      doc.setFontSize(tamSubtitulo);
+      doc.setTextColor(...colorTexto);
+      doc.text(textoVicerrectorado, anchoPagina / 2, y, { align: 'center' });
+
+      // === Lineas ===
+      y += 1;
+      const anchoTexto = doc.getTextWidth(textoInstituto) + 3;
+      const inicioLinea = (anchoPagina - anchoTexto) / 2;
+      const finLinea = inicioLinea + anchoTexto;
+      doc.setDrawColor(...colorTitulo)
+      doc.setLineWidth(0.3);
+      doc.line(inicioLinea, y, finLinea, y);
+      doc.line(inicioLinea, y + 0.75, finLinea, y + 0.75);
+
+      // === instituto ===
+      y += 4.5;
+      doc.setFont(fuenteNegrita, estiloNegrita);
+      doc.setTextColor(...colorTexto);
+      doc.text(textoInstituto, anchoPagina / 2, y, { align: 'center' });
+
+      y += 10;
+    };
+
+    const agregarPiePagina = () => {
+      // === tamano pagina ===
+      const anchoPagina = doc.internal.pageSize.getWidth();
+      const altoPagina = doc.internal.pageSize.getHeight();
+
+      // ===estilo ===
+      const fuente = 'helvetica';
+      const estilo = 'normal';
+      const tamañoFuente = 8;
+      const colorTexto: [number, number, number] = [0, 54, 107];
+
+      // === texto ===
+      const textoLinea1 = 'Av. 6 de Agosto 2170 · Edificio Hoy Piso 12 · Teléfono - Fax (591) 2-2118556 · IP (591) 2-2612211';
+      const textoLinea2 = 'e-mail: idrdu@umsa.bo · https://www.facebook.com/IDR.DU.UMSA';
+      // === estilos ===
+      doc.setTextColor(...colorTexto);
+      doc.setFont(fuente, estilo);
+      doc.setFontSize(tamañoFuente);
+
+      // === texto ===
+      doc.text(textoLinea1, anchoPagina / 2, altoPagina - 12, { align: 'center' });
+      doc.text(textoLinea2, anchoPagina / 2, altoPagina - 8, { align: 'center' });
+    };
+
+
+    agregarEncabezado(logoUMSA, logoIDRDU);
+    agregarPiePagina();
+
+      const yPos = 0;
+      //doc.setFontSize(14)
+      //doc.setFont('helvetica', 'bold')
+      //doc.setTextColor(...colorAzulUMSA)
+      //doc.text('UNIVERSIDAD MAYOR DE SAN ANDRÉS', pageWidth/2, yPos+10, {align: 'center'})
+      //doc.setFontSize(9)
+      //doc.text('Instituto de Desarrollo Regional', pageWidth/2, yPos+20, {align: 'center'})
+      //doc.text('y Desconcentración Universitaria', pageWidth/2, yPos+25, {align: 'center'})
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(...colorVinoUMSA)
       doc.setFontSize(12)
       doc.text('RESULTADOS DEL TEST VOCACIONAL', pageWidth/2, yPos+35, {align: 'center'})
-      doc.line(10, yPos+40, pageWidth-10, yPos+40)
+      //doc.line(10, yPos+40, pageWidth-10, yPos+40)
       doc.text('TUS MEJORES OPCIONES SON:', pageWidth/2 , yPos+100, {align: 'center'})
       doc.setFontSize(11)
       doc.text('INTERPRETACIÓN DE RESULTADOS DE TEST HOLLAND: ', 10, yPos+220, {align: 'left'})
@@ -477,12 +575,12 @@ export class ResultFormComponent {
       doc.text(`${this.descripcionP}`, pageWidth/2, yPos+230, {align: 'center'})
       doc.text(`${this.descripcionS}`, pageWidth/2, yPos+240, {align: 'center'})
       doc.text(`${this.descripcionT}`, pageWidth/2, yPos+250, {align: 'center'})
-      doc.line(10, yPos+255, pageWidth-10, yPos+255)
-      doc.setFontSize(8)
-      doc.setFont('helvetica', 'italic')
-      doc.text('Instituto de Desarrollo Regional y Desconcentración Universitaria', pageWidth/2, yPos+258, {align: 'center'})
-      doc.text('Universidad Mayor de San Andrés', pageWidth/2, yPos+261, {align: 'center'})
-      doc.text(`Test de Orientación Vocacional ${this.fecha.getFullYear()}`, pageWidth/2, yPos+264, {align: 'center'})
+      doc.line(10, yPos+263, pageWidth-10, yPos+263)
+      // doc.setFontSize(8)
+      // doc.setFont('helvetica', 'italic')
+      // doc.text('Instituto de Desarrollo Regional y Desconcentración Universitaria', pageWidth/2, yPos+258, {align: 'center'})
+      // doc.text('Universidad Mayor de San Andrés', pageWidth/2, yPos+261, {align: 'center'})
+      // doc.text(`Test de Orientación Vocacional ${this.fecha.getFullYear()}`, pageWidth/2, yPos+264, {align: 'center'})
       doc.save('resultado.pdf')
     }
     

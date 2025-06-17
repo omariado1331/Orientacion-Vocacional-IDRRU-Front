@@ -24,9 +24,16 @@ export class TablaCComponent {
 
   facultadesArray = Object.entries(this.facultades); 
   
-  // get facultadesArray(){
-  //   return Object.entries(this.facultades);
-  // }
+  descripcionCarreras = {
+    'Administración de Empresas': 'La Administración de Empresas es una carrera que prepara a los profesionales para gestionar y dirigir organizaciones, optimizando recursos y procesos para alcanzar objetivos y generar valor.',
+    'Contaduría Pública': 'Forma profesionales capaces de gestionar los recursos financieros de empresas, realizando auditorías, análisis, y asesoría tributaria. Su objetivo es optimizar la información financiera para la toma de decisiones estratégicas.',
+    'Economía': 'La economía es la ciencia social que estudia cómo las sociedades gestionan recursos escasos para satisfacer las necesidades. Se enfoca en la producción, distribución y consumo de bienes y servicios.'
+  }
+  logosCarreras = {
+    'Administración de Empresas': './assets/logos-carreras/carreras-C/ADMI.jpeg',
+    'Contaduría Pública': './assets/logos-carreras/carreras-C/CP.png',
+    'Economía': './assets/logos-carreras/carreras-C/ECO.jpeg'
+  }
 
   ngOnInit(){
     //Primer facultad FCEF
@@ -47,4 +54,20 @@ export class TablaCComponent {
 
   constructor(){
   }
+  mostrarModal = false;
+  carrera : string = '';
+  descripcionCarrera:string = ''
+  dirLogo: string = '';
+
+
+  mostrarInfo(carrera: string){
+    this.carrera = carrera;
+    this.descripcionCarrera = this.descripcionCarreras[carrera as keyof typeof this.descripcionCarreras];
+    this.dirLogo = this.logosCarreras[carrera as keyof typeof this.logosCarreras];
+    this.mostrarModal = true;
+  }
+  ocultarInfo(){
+    this.mostrarModal = false;
+  }
+
 }

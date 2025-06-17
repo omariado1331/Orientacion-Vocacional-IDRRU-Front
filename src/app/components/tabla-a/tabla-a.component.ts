@@ -24,6 +24,18 @@ export class TablaAComponent {
 
   facultadesArray = Object.entries(this.facultades);
 
+  descripcionCarreras = {
+    'Arquitectura': 'La arquitectura es una disciplina creativa que combina arte, técnica y ciencia para diseñar y construir edificios, espacios y comunidades, buscando la funcionalidad, la estética y la sostenibilidad.',
+    'Artes': 'La carrera de Artes busca desarrollar la creatividad y el talento artístico, formando profesionales capaces de crear, interpretar y comprender diversas manifestaciones artísticas.',
+    'Diseño': 'La carrera de Diseño, en sus diferentes ramas, capacita para crear soluciones visuales, funcionales y estratégicas, utilizando la creatividad y el pensamiento crítico para mejorar la calidad de productos y experiencias.'
+  }
+
+  logosCarreras = {
+    'Arquitectura': './assets/logos-carreras/carreras-A/arqui.png',
+    'Artes': './assets/logos-carreras/carreras-A/ARTES.jpg',
+    'Diseño': './assets/logos-carreras/carreras-A/arqui.png'
+  }
+
   ngOnInit(){
     //Primer facultad FAADU
     for(const key in this.hollandFAADU){
@@ -39,4 +51,21 @@ export class TablaAComponent {
 
     this.facultadesArray = Object.entries(this.facultades).sort((a,b)=> b[1] - a[1]);
   }
+
+  mostrarModal = false;
+  carrera : string = '';
+  descripcionCarrera:string = ''
+  dirLogo: string = '';
+
+
+  mostrarInfo(carrera: string){
+    this.carrera = carrera;
+    this.descripcionCarrera = this.descripcionCarreras[carrera as keyof typeof this.descripcionCarreras];
+    this.dirLogo = this.logosCarreras[carrera as keyof typeof this.logosCarreras];
+    this.mostrarModal = true;
+  }
+  ocultarInfo(){
+    this.mostrarModal = false;
+  }
+
 }

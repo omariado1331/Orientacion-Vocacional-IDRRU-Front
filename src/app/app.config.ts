@@ -23,6 +23,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withFetch(),
       withInterceptors([authInterceptor, loadingInterceptor])
-    )
+    ),
   ]
 };

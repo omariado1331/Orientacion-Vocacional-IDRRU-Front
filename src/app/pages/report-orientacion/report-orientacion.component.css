@@ -417,17 +417,16 @@ tr:nth-child(even) {
 
 .no-resultados {
   text-align: center;
-  margin-top: 20px;
   position: relative;
-  padding-bottom: 350px; /* espacio para la imagen */
-  top: -20px; 
+  padding-bottom: 650px; /* espacio para la imagen */
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: contain;
-  background-image: url('/assets/mapa.png');
+  background-image: url('/assets/mapa.jpg');
   background-repeat: no-repeat;
-  background-position: center bottom; /* imagen abajo centrada */
+  background-position: center; /* imagen abajo centrada */
   background-size: cover; /* tamaño fijo para que no ocupe mucho */
+  background-size: 85%;
 }
 
 

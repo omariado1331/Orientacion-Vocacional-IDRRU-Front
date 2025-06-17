@@ -197,7 +197,7 @@ onMunicipioChange(): void {
 cargarResultados(validarFiltros: boolean = true): void {
   // Validación simple para rango de años
   if ((this.fechaInicio && !this.fechaFin) || (!this.fechaInicio && this.fechaFin)) {
-    alert('Debes seleccionar año inicio y año fin para filtrar por rango.');
+    alert('Debes seleccionar el año inicio y año fin para filtrar por rango.');
     return;
   }
   if (this.fechaInicio && this.fechaFin && this.fechaInicio > this.fechaFin) {
@@ -205,7 +205,13 @@ cargarResultados(validarFiltros: boolean = true): void {
     return;
   }
 
-
+  // 🚨 NUEVA VALIDACIÓN: si hay provincia y municipio, pero no fechas
+  if ((this.idProvincia != null && this.idMunicipio != null) &&
+      (!this.fechaInicio || this.fechaInicio.trim() === '') &&
+      (!this.fechaFin || this.fechaFin.trim() === '')) {
+    alert('Debes ingresar año inicio y año fin para filtrar los resultados.');
+    return;
+  }
 
   this.resultadoService.busquedaProvincia(this.idProvincia, this.idMunicipio, this.fechaInicio, this.fechaFin)
     .subscribe({

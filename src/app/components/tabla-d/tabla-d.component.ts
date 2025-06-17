@@ -34,7 +34,7 @@ export class TablaDComponent {
     codigo: 'ANAPOL'
   }
   carrerasANAPOL = [
-    'Ingeniería de Tránsito y Viabilidad',
+    'Ingeniería de Tránsito y Vialidad',
     'Investigación Criminal',
     'Orden y Seguridad',
     'Administración Policial',
@@ -42,6 +42,31 @@ export class TablaDComponent {
   hollandANAPOLArray = Object.entries(this.hollandANAPOL);
 
   facultadesArray = Object.entries(this.facultades);
+
+  descripcionCarreras= {
+    'Infantería': 'La infantería es la fuerza principal de combate a pie, encargada de la acción directa contra el enemigo, utilizando armas portátiles y tácticas terrestres para alcanzar la victoria.',
+    'Artillería': 'La carrera de Artillería capacita para apoyar el combate con fuego, utilizando cañones y misiles, calculando y ejecutando disparos para destruir objetivos terrestres o aéreos.',
+    'Caballería': 'La Caballería es una rama del ejército montada a caballo, conocida por su agilidad y capacidad de maniobra, utilizada para reconocimiento, ataque y protección en el campo de batalla.',
+    'Comunicaciones': 'Capacita a profesionales para la gestión y transmisión de información estratégica en entornos militares, utilizando equipos y sistemas especializados. Se enfoca en la seguridad y eficacia de las comunicaciones para el cumplimiento de misiones.',
+    'Logística': 'Es la disciplina que planifica, gestiona y ejecuta el movimiento, suministro y mantenimiento de personal y material para las fuerzas armadas. Es esencial para el éxito de las operaciones militares.',
+    'Ingeniería de Tránsito y Vialidad': 'Es una disciplina que planifica, diseña y opera sistemas de transporte, enfocándose en el flujo vehicular, seguridad y eficiencia en vías urbanas y carreteras.',
+    'Investigación Criminal': 'Es una carrera multidisciplinaria que aplica ciencia y técnicas para resolver delitos, investigando escenas, analizando pruebas y reconstruyendo hechos para lograr la justicia.',
+    'Orden y Seguridad': 'Prepara profesionales para mantener la seguridad pública, prevenir delitos y garantizar la convivencia pacífica, enfocándose en leyes, estrategias y gestión de riesgos.',
+    'Administración Policial': 'Es una carrera que se enfoca en la gestión y dirección de las fuerzas policiales. Se centra en la planificación, organización, ejecución y control de las actividades policiales para mantener la seguridad pública.'
+  }
+
+  logosCarreras = {
+    'Infantería': './assets/logos-facultades/COLMIL.jpeg',
+    'Artillería': './assets/logos-facultades/COLMIL.jpeg',
+    'Caballería': './assets/logos-facultades/COLMIL.jpeg',
+    'Ingenería': './assets/logos-facultades/COLMIL.jpeg',
+    'Comunicaciones': './assets/logos-facultades/COLMIL.jpeg',
+    'Logística': './assets/logos-facultades/COLMIL.jpeg',
+    'Ingeniería de Tránsito y Vialidad': './assets/logos-facultades/ANAPOL.jpeg',
+    'Investigación Criminal': './assets/logos-facultades/ANAPOL.jpeg',
+    'Orden y Seguridad': './assets/logos-facultades/ANAPOL.jpeg',
+    'Administración Policial': './assets/logos-facultades/ANAPOL.jpeg'
+  }
 
   ngOnInit(){
     //Primer facultad COLMIL
@@ -72,5 +97,21 @@ export class TablaDComponent {
 
     //por ultimo ordenar de mayor a menor facultades en un array
     this.facultadesArray = Object.entries(this.facultades).sort((a,b) => b[1]-a[1]);
+  }
+
+  mostrarModal = false;
+  carrera : string = '';
+  descripcionCarrera:string = ''
+  dirLogo: string = '';
+
+
+  mostrarInfo(carrera: string){
+    this.carrera = carrera;
+    this.descripcionCarrera = this.descripcionCarreras[carrera as keyof typeof this.descripcionCarreras];
+    this.dirLogo = this.logosCarreras[carrera as keyof typeof this.logosCarreras];
+    this.mostrarModal = true;
+  }
+  ocultarInfo(){
+    this.mostrarModal = false;
   }
 }

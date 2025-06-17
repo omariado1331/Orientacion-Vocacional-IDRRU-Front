@@ -5,12 +5,12 @@
         </h3>
     </div>
 </div>
-<div class="row">
+<div class="row mb-4">
     <div class="col-lg-2"></div>
 @for (facultad of facultadesArray; track facultad; let i = $index) {
     @if (facultad[0] == 'FCPN') {
             <!-- FACULTAD DE CIENCIAS PURAS Y NATURALES -->
-            <div class="col-lg-4 mb-4">
+            <div class="col-lg-4">
                 <div class="card card-custom option-card">
                     <div class="option-number mt-3 mx-3">{{i+1}}</div>
                     <div class="card-body">
@@ -37,7 +37,9 @@
                             <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
                             <div class="career-list">
                                 @for( carrera of carrerasFCPN; track carrera){
-                                <div class="career-item">{{carrera}}</div>
+                                <div class="career-item d-flex justify-content-between">{{carrera}}
+                                    <button class="btn btn-primary btn-sm" (click)="mostrarInfo(carrera)">info</button>
+                                </div>
                                 }
                             </div>
                         </div>
@@ -54,7 +56,7 @@
     }
     @if (facultad[0]== 'FA') {
             <!-- FACULTAD DE AGRONOMIA -->
-            <div class="col-lg-4 mb-4">
+            <div class="col-lg-4">
                 <div class="card card-custom option-card">
                     <div class="option-number mt-3 mx-3">{{i+1}}</div>
                     <div class="card-body">
@@ -81,7 +83,9 @@
                             <h6 class="text-muted mb-2">Carreras Disponibles:</h6>
                             <div class="career-list">
                                 @for( carrera of carrerasFA; track carrera){
-                                <div class="career-item">{{carrera}}</div>
+                                <div class="career-item d-flex justify-content-between">{{carrera}}
+                                    <button class="btn btn-primary btn-sm" (click)="mostrarInfo(carrera)">info</button>
+                                </div>
                                 }
                             </div>
                         </div>
@@ -99,3 +103,14 @@
 }
 </div>
 
+<!-- modal -->
+@if (mostrarModal) {
+    <div class="modal-backdrop">
+       <div class="modal-contenido">
+           <h5 class="text-primary">Carrera de {{carrera}}</h5>
+           <img src="{{dirLogo}}" alt="{{carrera}}" class="carrer-logo">
+           <p>{{descripcionCarrera}}</p>
+           <button class="btn btn-danger" (click)="ocultarInfo()">cerrar</button>
+       </div>
+    </div>
+   }

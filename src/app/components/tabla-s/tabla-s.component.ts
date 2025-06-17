@@ -51,6 +51,25 @@ export class TablaSComponent {
   //facultades array
   facultadesArray = Object.entries(this.facultades);
 
+  descripcionCarreras = {
+    'Medicina': 'La carrera de Medicina capacita para la prevención, diagnóstico y tratamiento de enfermedades, promoviendo la salud a nivel individual y comunitario con un enfoque humanista y ético.',
+    'Enfermería': 'La enfermería es una profesión de atención a la salud que abarca la promoción, prevención y cuidado de pacientes, familias y comunidades. Es una disciplina con un enfoque holístico en el bienestar.',
+    'Nutrición y Dietética': 'La carrera de Nutrición y Dietética capacita para estudiar la alimentación y nutrición humana, promoviendo la salud y bienestar, y diseñando planes alimentarios para individuos y comunidades.',
+    'Tecnología Médica': 'Es una disciplina de salud que capacita profesionales para implementar, ejecutar, evaluar e interpretar análisis y procedimientos, contribuyendo al diagnóstico, tratamiento y prevención de enfermedades.',
+    'Odontología': 'La Odontología es la disciplina de la salud que se enfoca en la prevención, diagnóstico, tratamiento y rehabilitación de la salud bucal, incluyendo dientes, encías y tejidos adyacentes.',
+    'Bioquímica': 'La Bioquímica es la ciencia que estudia la composición química de los seres vivos y sus procesos biológicos. Explora las moléculas, las reacciones y los mecanismos que sustentan la vida.',
+    'Química Farmacéutica': 'La Química Farmacéutica es una disciplina que estudia la química aplicada a la salud, abarcando el diseño, síntesis, desarrollo, producción y control de calidad de medicamentos y productos relacionados.'
+  }
+  logosCarreras = {
+    'Medicina': './assets/logos-facultades/FMENT.png',
+    'Enfermería': './assets/logos-carreras/carreras-S/ENFER.jpeg',
+    'Nutrición y Dietética': './assets/logos-carreras/carreras-S/NUTRI.jpeg',
+    'Tecnología Médica': './assets/logos-carreras/carreras-S/TECMED.jpeg',
+    'Odontología': './assets/logos-carreras/carreras-S/ODON.jpeg',
+    'Bioquímica': './assets/logos-carreras/carreras-S/FARBIO.png',
+    'Química Farmacéutica': './assets/logos-carreras/carreras-S/FARBIO.png'
+  }
+
   ngOnInit(){
     //Primer facultad FMENT
     for(const key in this.hollandFMENT){
@@ -94,4 +113,21 @@ export class TablaSComponent {
     //por ultimo ordenar de mayor a menor facultades en un array
     this.facultadesArray = Object.entries(this.facultades).sort((a,b) => b[1]-a[1]);
   }
+
+  mostrarModal = false;
+  carrera : string = '';
+  descripcionCarrera:string = ''
+  dirLogo: string = '';
+
+
+  mostrarInfo(carrera: string){
+    this.carrera = carrera;
+    this.descripcionCarrera = this.descripcionCarreras[carrera as keyof typeof this.descripcionCarreras];
+    this.dirLogo = this.logosCarreras[carrera as keyof typeof this.logosCarreras];
+    this.mostrarModal = true;
+  }
+  ocultarInfo(){
+    this.mostrarModal = false;
+  }
+
 }
