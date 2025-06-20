@@ -180,8 +180,8 @@ onProvinciaChange(): void {
 }
 
 onMunicipioChange(): void {
-  console.log('ID Municipio seleccionado:', this.idMunicipio);
-  console.log('Lista municipios:', this.municipios);
+  //console.log('ID Municipio seleccionado:', this.idMunicipio);
+  //console.log('Lista municipios:', this.municipios);
   if (this.idMunicipio != null) {
 
     const municipio = this.municipios.find(m => m.idMunicipio === this.idMunicipio);
@@ -373,7 +373,7 @@ private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number, dez
   doc.setDrawColor(...colorTitulo)
   doc.setLineWidth(0.8)
   doc.line(inicioLinea, yPos - 10, finLinea, yPos - 10)
-  doc.line(inicioLinea, (yPos - 10) + 2.75, finLinea, (yPos - 10) + 2.75)
+  doc.line(inicioLinea, (yPos - 10) + 1.75, finLinea, (yPos - 10) + 1.75)
   yPos += 4;
   
   doc.setFontSize(10);  
@@ -383,7 +383,7 @@ private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number, dez
   yPos += 30;
 
   doc.setFontSize(14);
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
   doc.setTextColor(0, 0, 0);
   doc.text(tituloPdf, pageWidth / 2, yPos, { align: 'center' });
 
