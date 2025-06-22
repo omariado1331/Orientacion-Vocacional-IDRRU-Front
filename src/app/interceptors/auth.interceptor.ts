@@ -27,7 +27,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   ];
   const esPostLibre = method === 'POST' && (path.startsWith('/estudiante') || path.startsWith('/resultado'));
   const esBusquedaProvincia = path.startsWith('/resultado/busqueda-provincia');
-  const necesitaToken = !esPostLibre && !esBusquedaProvincia && urlsProtegidas.some(url => path.startsWith(url));
+  const esResultadoFecha = path === '/resultado/fecha';
+  const necesitaToken = !esPostLibre && !esBusquedaProvincia && !esResultadoFecha && urlsProtegidas.some(url => path.startsWith(url));
 
   if (necesitaToken) {
     const token = authService.obtenerToken();

@@ -4,15 +4,15 @@
   background-image: url('/assets/umsac.png');
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: 240px;
+  background-size: 250px;
   background-color: #f4f6f90a;
   background-blend-mode: soft-light;
-  animation: fadeInBackground 1.2s ease-out;
+  animation: fadeInBackground 1.8s ease-out;
   min-height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 50px 20px;
   box-sizing: border-box;
 }
 
@@ -20,19 +20,20 @@
 .vocacional-content {
   background: rgba(255, 255, 255, 0.728);
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 80px 40px rgba(0, 0, 0, 0.1);
   padding: 50px 45px;
-  max-width: 900px;
+  max-width: 850px;
   width: 100%;
   text-align: center;
+  border: 1px solid #cccccc72;
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   animation: fadeInContent 1.5s ease;
 }
 
 /* Título */
 .vocacional-title {
-  font-size: 2.5rem;
-  color: #2c3e50;
+  font-size: 2.3rem;
+  color: #032e39;
   font-weight: 700;
   margin-bottom: 25px;
 }
@@ -40,7 +41,7 @@
 /* Texto */
 .vocacional-text {
   font-size: 1.1rem;
-  color: #444;
+  color: #272525;
   line-height: 1.7;
   margin-bottom: 35px;
   text-align: justify;
@@ -48,9 +49,9 @@
 
 /* Botón elegante */
 .vocacional-button {
+  background: linear-gradient(135deg, var(--umsa-blue-dark), var(--umsa-blue)) !important;
   display: inline-block;
   padding: 14px 30px;
-  background-color: #003f63;
   color: #ffffff;
   font-size: 1rem;
   font-weight: 600;
@@ -66,15 +67,16 @@
   box-shadow: 0 10px 24px rgba(0, 90, 138, 0.35);
 }
 
+
 /* Animaciones */
 @keyframes fadeInBackground {
   0% {
     opacity: 0;
-    background-size: 120px;
+    background-size: 140px;
   }
   100% {
     opacity: 1;
-    background-size: 220px;
+    background-size: 250px;
   }
 }
 

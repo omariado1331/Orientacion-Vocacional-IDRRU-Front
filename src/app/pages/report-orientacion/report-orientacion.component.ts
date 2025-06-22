@@ -23,6 +23,7 @@ Chart.register(ChartDataLabels);
   imports: [CommonModule, FormsModule, NgChartsModule],
   providers: [DatePipe]
 })
+
 export class ReportOrientacionComponent implements OnInit {
 
   resultados: ResultadoDtoResponse[] = [];
@@ -32,7 +33,8 @@ export class ReportOrientacionComponent implements OnInit {
 
   idProvincia?: number;
   idMunicipio?: number;
-  year?: string;
+  fechaInicio?: string;
+  fechaFin?: string;
 
   nombreProvinciaSeleccionada: string = '---';
   nombreMunicipioSeleccionado: string = '---';
@@ -47,9 +49,9 @@ export class ReportOrientacionComponent implements OnInit {
   // Leyenda original, no cambia
   nombresPorLabel: { [label: string]: string[] } = {
     'TABLA 1C': ['Ciencias Económicas', 'Ciencias Financieras'],
-    'TABLA 2H': ['Humanísticas', 'Ciencias Jurídicas','Ciencias Sociales'],
-    'TABLA 3A': ['Artes','Arquitectura ','Diseño'],
-    'TABLA 4S': ['Salud','Enfermería','Medicina'],
+    'TABLA 2H': ['Humanísticas', 'Ciencias Jurídicas', 'Ciencias Sociales'],
+    'TABLA 3A': ['Artes', 'Arquitectura', 'Diseño'],
+    'TABLA 4S': ['Salud', 'Enfermería', 'Medicina'],
     'TABLA 5I': ['Investigación', 'Ingeniería', 'Tecnología'],
     'TABLA 6D': ['Defensa', 'Seguridad'],
     'TABLA 7E': ['Exactas', 'Ciencias Puras']
@@ -81,7 +83,7 @@ export class ReportOrientacionComponent implements OnInit {
       }
     ]
   };
-
+  // opciones para mostrar el grafico (personalizar)
   chartOptions = {
     responsive: true,
     plugins: {
@@ -106,11 +108,11 @@ export class ReportOrientacionComponent implements OnInit {
           const data = context.chart.data.datasets[0].data;
           const total = data.reduce((acc: number, val: number) => acc + val, 0);
           const percent = ((value / total) * 100).toFixed(1);
-          return `${percent}%\n${context.chart.data.labels[context.dataIndex]}`;
+          return `${context.chart.data.labels[context.dataIndex]}\n${percent}%`;
         },
         font: {
           weight: 'bold' as const,
-          size: 14
+          size: 15
         },
         align: 'center' as const,
         anchor: 'center' as const,
@@ -144,12 +146,18 @@ cargarProvincias() {
   }
 
 cargarAniosDisponibles(): void {
-  this.resultadoService.busquedaProvincia(this.idProvincia, this.idMunicipio)
-    .subscribe((resultados) => {
-      const añosUnicos = Array.from(new Set(resultados.map(r => r.fecha)));
-      this.listaAnios = añosUnicos;
+  this.resultadoService.obtenerAniosDisponibles(this.idProvincia, this.idMunicipio)
+    .subscribe({
+      next: (años: string[]) => {
+        this.listaAnios = años.sort((a, b) => parseInt(b) - parseInt(a)); // orden descendente
+      },
+      error: (err) => {
+        console.error('Error al cargar años disponibles:', err);
+        this.listaAnios = [];
+      }
     });
 }
+
 
 onProvinciaChange(): void {
   if (this.idProvincia != null) {
@@ -172,8 +180,8 @@ onProvinciaChange(): void {
 }
 
 onMunicipioChange(): void {
-  console.log('ID Municipio seleccionado:', this.idMunicipio);
-  console.log('Lista municipios:', this.municipios);
+  //console.log('ID Municipio seleccionado:', this.idMunicipio);
+  //console.log('Lista municipios:', this.municipios);
   if (this.idMunicipio != null) {
 
     const municipio = this.municipios.find(m => m.idMunicipio === this.idMunicipio);
@@ -187,7 +195,25 @@ onMunicipioChange(): void {
 }
 
 cargarResultados(validarFiltros: boolean = true): void {
-  this.resultadoService.busquedaProvincia(this.idProvincia, this.idMunicipio, this.year)
+  // Validación simple para rango de años
+  if ((this.fechaInicio && !this.fechaFin) || (!this.fechaInicio && this.fechaFin)) {
+    alert('Debes seleccionar el año inicio y año fin para filtrar por rango.');
+    return;
+  }
+  if (this.fechaInicio && this.fechaFin && this.fechaInicio > this.fechaFin) {
+    alert('El año inicio no puede ser mayor que el año fin.');
+    return;
+  }
+
+  // 🚨 NUEVA VALIDACIÓN: si hay provincia y municipio, pero no fechas
+  if ((this.idProvincia != null && this.idMunicipio != null) &&
+      (!this.fechaInicio || this.fechaInicio.trim() === '') &&
+      (!this.fechaFin || this.fechaFin.trim() === '')) {
+    alert('Debes ingresar año inicio y año fin para filtrar los resultados.');
+    return;
+  }
+
+  this.resultadoService.busquedaProvincia(this.idProvincia, this.idMunicipio, this.fechaInicio, this.fechaFin)
     .subscribe({
       next: (data: ResultadoDtoResponse[]) => {
         this.resultados = data;
@@ -196,15 +222,16 @@ cargarResultados(validarFiltros: boolean = true): void {
         const filtrosAplicados = 
           (this.idProvincia !== null && this.idProvincia !== undefined) &&
           (this.idMunicipio !== null && this.idMunicipio !== undefined) &&
-          (!!this.year && this.year.trim() !== '');
+          (!!this.fechaInicio && this.fechaInicio.trim() !== '') &&
+          (!!this.fechaFin && this.fechaFin.trim() !== '');
 
         if(!filtrosAplicados){
           // Si no hay filtros, limpiar todo y ocultar todo.
           this.resultados = [];
-          this.mostrarBotonesExportar;
-          this.mostrarGrafico;
+          this.mostrarBotonesExportar = false;
+          this.mostrarGrafico = false;
           // mostrar imagen "no resultados" o dejar en false si no querés nada
-          this.mostrarImagenNoResultados;
+          this.mostrarImagenNoResultados = true;
           return; // salir antes de hacer la petición
 
         }
@@ -236,7 +263,7 @@ cargarResultados(validarFiltros: boolean = true): void {
 limpiarFiltros(): void {
   this.idProvincia = undefined;
   this.idMunicipio = undefined;
-  this.year = undefined;
+  this.fechaInicio = undefined;
   this.nombreProvinciaSeleccionada = '';
   this.nombreMunicipioSeleccionado = '';
 
@@ -259,8 +286,9 @@ private generarGrafico(): void {
   const total = Object.values(conteo).reduce((a, b) => a + b, 0);
   this.porcentajes = Object.entries(conteo).map(([codigo, cantidad]) => {
     return {
-      codigo,
+      //codigo,
       cantidad,
+      codigo,
       porcentaje: ((cantidad / total) * 100).toFixed(2)
     };
   });
@@ -300,8 +328,8 @@ private generarGrafico(): void {
 private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number, dezplazamiento: number): Promise<number> {
   const colorTitulo: [number, number, number] = [0, 54, 107];
   const colorTexto: [number, number, number] = [0, 54, 107];
-  const logoWidth = 45; // Ancho del logo
-  const logoHeight = 45; // Alto del logo
+  const logoWidth = 50; // Ancho del logo
+  const logoHeight = 50; // Alto del logo
 
   let yPos = margin + 25;
   const anchoPagina = doc.internal.pageSize.getWidth(); 
@@ -345,7 +373,7 @@ private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number, dez
   doc.setDrawColor(...colorTitulo)
   doc.setLineWidth(0.8)
   doc.line(inicioLinea, yPos - 10, finLinea, yPos - 10)
-  doc.line(inicioLinea, (yPos - 10) + 2.75, finLinea, (yPos - 10) + 2.75)
+  doc.line(inicioLinea, (yPos - 10) + 1.75, finLinea, (yPos - 10) + 1.75)
   yPos += 4;
   
   doc.setFontSize(10);  
@@ -355,7 +383,7 @@ private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number, dez
   yPos += 30;
 
   doc.setFontSize(14);
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
   doc.setTextColor(0, 0, 0);
   doc.text(tituloPdf, pageWidth / 2, yPos, { align: 'center' });
 
@@ -443,8 +471,14 @@ async generarPDFconGraficoYTabla() {
     filtros.push({titulo: 'Municipio:', valor: capitalizar(this.nombreMunicipioSeleccionado)});
   }
 
-  if(this.year){
-    filtros.push({titulo: 'Año:', valor: this.year});
+  // pdf el filtro de las fechas
+  if(this.fechaInicio){
+    let valorAnio = this.fechaInicio;
+    if(this.fechaInicio && this.fechaFin !== this.fechaInicio)
+    {
+      valorAnio = `${this.fechaInicio} - ${this.fechaFin}`
+    }
+    filtros.push({titulo: 'Año:', valor: valorAnio});
   }
 
   /*
@@ -478,7 +512,7 @@ async generarPDFconGraficoYTabla() {
 
   // TABLA DE RESULTADOS
   // Tabla centrada y angosta
-  const columns = ['Código', 'Cantidad Estudiantes', 'Porcentaje'];
+  const columns = ['Chaside', 'Respuestas Test', 'Porcentaje Total'];
 
   //Suma el total de estudintes
   // resultados es un arrays
@@ -505,15 +539,16 @@ async generarPDFconGraficoYTabla() {
     totalEstudiantes > 0 ? ((r.cantidadEstudiantes / totalEstudiantes) * 100).toFixed(2) + '%' : '0%'
   ]);
 
+  const margin = 20;
   const colCount = columns.length;
-  const tableWidth = 520;
+  const tableWidth = (pageWidth - 2 * marginLeft);
   const colWidth = tableWidth / colCount;
 
   // Aquí va el autoTable con los parámetros actualizados
   (doc as any).autoTable({
     startY: startYTable,
     // Centrar la pagina
-    margin: { left: (pageWidth - tableWidth) / 2 },
+    margin: { left: marginLeft  },
     //Define el encabezado de las columnas
     head: [columns],
     //Datos de la tabla
@@ -526,13 +561,12 @@ async generarPDFconGraficoYTabla() {
     },
     //Estilo
     //Define el ancho de cada columna 
-    styles: { fontSize: 10, cellPadding: 6, halign: 'center' },
+    styles: { fontSize: 9, cellPadding: 5, halign: 'center' },
     //Estilo general fuente, espaciado, alinear horizontalmente
     headStyles: { fillColor: [78, 121, 167], textColor: 255 },
     // filas con rayas
     theme: 'striped',
   });
-
 
   // Leyenda con colores a la izquierda con espacio
   const leyendaStartY = (doc as any).autoTable.previous.finalY + 30;
@@ -540,15 +574,15 @@ async generarPDFconGraficoYTabla() {
   const colorBoxSize = 14;
   const spacingY = 18;
 
-  //PDF 
+  // Si se cambia aqui, se cambia del PDF
   const descripcionesFijas: {[key: string]: string} = {
-    'TABLA 1C': 'Ciencias Económicas, Ciencias Financieras',
-    'TABLA 2H': 'Humanidades, Ciencias Jurídicas, Ciencias Sociales',
-    'TABLA 3A': 'Artes, Arquitectura ,Diseño',
-    'TABLA 4S': 'Salud, Enfermería, Medicina',
-    'TABLA 5I': 'Investigación, Ingeniería, Tecnología',
-    'TABLA 6D': 'Defensa, Seguridad',
-    'TABLA 7E': 'Ciencias Exactas, Ciencias Puras, Biológicas'
+    'TABLA 1C': ' Ciencias Económicas, Ciencias Financieras',
+    'TABLA 2H': ' Humanidades, Ciencias Jurídicas, Ciencias Sociales',
+    'TABLA 3A': ' Artes, Arquitectura, Diseño',
+    'TABLA 4S': ' Salud, Enfermería, Medicina',
+    'TABLA 5I': '  Investigación, Ingeniería, Tecnología',
+    'TABLA 6D': ' Defensa, Seguridad',
+    'TABLA 7E': ' Ciencias Exactas, Ciencias Puras, Biológicas'
   };
 
   const colores = [

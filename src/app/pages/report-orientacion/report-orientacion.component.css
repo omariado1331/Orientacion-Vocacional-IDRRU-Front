@@ -9,14 +9,25 @@ body {
   margin: 2rem auto;
   padding: 1.5rem;
   background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border-radius: 15px;
+  border: 1px solid #ccc;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
 }
+
+
+
+@media (max-width: 900px) {
+  .container {
+    max-width: 90%;
+
+  }
+}
+  
 
 .titulo {
   text-align: center;
   font-weight: 700;
-  font-size: 2.3rem;
+  font-size: 2rem;
   color: #004f63;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -125,6 +136,14 @@ td {
   padding-left: 20px;
 }
 
+td:nth-child(1) {
+  text-align: center;
+}
+
+td:nth-child(2) {
+  text-align: center;
+}
+
 td:nth-child(3) {
   text-align: center;
 }
@@ -186,6 +205,7 @@ tr:nth-child(even) {
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  border: 1px solid #ccc;
 }
 
 @media (max-width: 900px) {
@@ -205,7 +225,7 @@ tr:nth-child(even) {
   position: absolute;
   top: 10px;
   left: 70px;
-  width: 220px;
+  width: 250px;
   background-color: #ffffff;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -214,6 +234,66 @@ tr:nth-child(even) {
   font-size: 0.8rem;
   z-index: 1000;
 }
+
+@media (min-width: 480px) and (max-width: 1580px) {
+.leyenda-lateral {
+  position: static !important;
+  width: 90%;
+  max-width: 800px;
+  margin: 1rem auto 2rem auto;
+  box-shadow: none;
+  border: 1px solid #ddd;
+  padding: 20px;
+  padding-top: 30px;
+  padding-left: 40px;
+  border-radius: 6px;
+  background-color: #fff;
+  text-align: center;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+}
+/* Cada bloque tipo A, C, D... */
+.item-leyenda {
+  width: 150px;
+  min-width: 120px;
+  text-align: left;
+}
+
+/* Color + título */
+.color-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+/* El cuadrito de color */
+.color-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid #aaa;
+}
+
+/* Lista de descripciones */
+.item-leyenda ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.item-leyenda li {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+  .leyenda-lateral h4 {
+    padding-top: 40px;
+    margin-right: 70px;
+  }
+}
+
 
 .leyenda-lateral h4 {
   margin-top: 0;
@@ -241,7 +321,7 @@ tr:nth-child(even) {
 }
 
 
-@media (max-width: 1120px) {
+@media (max-width: 480px) {
   .leyenda-lateral {
     position: static !important;
     width: 90%;
@@ -260,7 +340,7 @@ tr:nth-child(even) {
   }
 
   .leyenda-lateral .item-leyenda {
-    flex: 1 1 75%;          /* ocupa casi la mitad del contenedor, ajustable */
+    flex: 1 1 20%;          /* ocupa casi la mitad del contenedor, ajustable */
     display: flex;
     flex-direction: row;    /* ítems en fila dentro de cada leyenda */
     align-items: center;
