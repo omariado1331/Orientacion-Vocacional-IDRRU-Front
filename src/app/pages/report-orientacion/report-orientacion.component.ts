@@ -12,6 +12,7 @@ import { MunicipioService } from '../../services/municipio.service';
 import { Provincia } from '../../interfaces/provincia-interface';
 import { Municipio } from '../../interfaces/municipio-interface';
 import { DatePipe } from '@angular/common';
+import Swal from 'sweetalert2';
 Chart.register(...registerables);
 Chart.register(ChartDataLabels);
 
@@ -170,12 +171,16 @@ onProvinciaChange(): void {
       //console.log('Municipios recibidos:', muns); // Aquí deberías ver el array con municipios
       this.municipios = muns;
       this.idMunicipio = undefined;
+      this.fechaInicio = undefined;
+      this.fechaFin = undefined;
 
       this.cargarAniosDisponibles();
     });
   } else {
     this.municipios = [];
     this.idMunicipio = undefined;
+    this.fechaInicio = undefined;
+    this.fechaFin = undefined
   }
 }
 
@@ -189,29 +194,31 @@ onMunicipioChange(): void {
   } else {
     this.nombreMunicipioSeleccionado = '---';
   }
+  this.fechaInicio = undefined;
+  this.fechaFin = undefined;
 
   // Recarga años con filtro provincia + municipio
   this.cargarAniosDisponibles();
 }
 
+
 cargarResultados(validarFiltros: boolean = true): void {
   // Validación simple para rango de años
-  if ((this.fechaInicio && !this.fechaFin) || (!this.fechaInicio && this.fechaFin)) {
-    alert('Debes seleccionar el año inicio y año fin para filtrar por rango.');
-    return;
-  }
-  if (this.fechaInicio && this.fechaFin && this.fechaInicio > this.fechaFin) {
-    alert('El año inicio no puede ser mayor que el año fin.');
+  if (!this.idProvincia || !this.idMunicipio ) {
+    this.mostrarNotificacionAviso('Seleccione Provincia y Municipio para buscar');
     return;
   }
 
-  // 🚨 NUEVA VALIDACIÓN: si hay provincia y municipio, pero no fechas
-  if ((this.idProvincia != null && this.idMunicipio != null) &&
-      (!this.fechaInicio || this.fechaInicio.trim() === '') &&
-      (!this.fechaFin || this.fechaFin.trim() === '')) {
-    alert('Debes ingresar año inicio y año fin para filtrar los resultados.');
+  if ((this.fechaInicio && !this.fechaFin ) || (!this.fechaInicio && this.fechaFin)) {
+    this.mostrarNotificacionAviso('Seleccione ambos años para buscar');
     return;
   }
+
+  if (this.fechaInicio && this.fechaFin && (this.fechaInicio > this.fechaFin)) {
+    this.mostrarNotificacionAviso('El Año Inicio no puede ser mayor que el Año fin');
+    return;
+  }
+
 
   this.resultadoService.busquedaProvincia(this.idProvincia, this.idMunicipio, this.fechaInicio, this.fechaFin)
     .subscribe({
@@ -225,6 +232,16 @@ cargarResultados(validarFiltros: boolean = true): void {
           (!!this.fechaInicio && this.fechaInicio.trim() !== '') &&
           (!!this.fechaFin && this.fechaFin.trim() !== '');
 
+        // NUEVA VALIDACIÓN: Si no hay resultados y provincia + municipio están seleccionados
+        if (data.length === 0) {
+          this.mostrarNotificacionAviso('No existen datos para la provincia y municipio seleccionados.');
+          this.mostrarImagenNoResultados = true;
+          this.mostrarGrafico = false;
+          this.mostrarBotonesExportar = false;
+          return;
+        }
+
+
         if(!filtrosAplicados){
           // Si no hay filtros, limpiar todo y ocultar todo.
           this.resultados = [];
@@ -235,6 +252,8 @@ cargarResultados(validarFiltros: boolean = true): void {
           return; // salir antes de hacer la petición
 
         }
+
+
 
         // Mostrar botones exportar sólo si filtros están aplicados y hay resultados
         this.mostrarBotonesExportar = validarFiltros && filtrosAplicados && data.length > 0;
@@ -260,10 +279,29 @@ cargarResultados(validarFiltros: boolean = true): void {
     });
 }
 
+  mostrarNotificacionAviso(mensaje: string){
+    Swal.fire({
+      title: 'Incompleto',
+      text: mensaje,
+      icon: 'warning',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#e0a501',
+      background: '#f7f7f7',
+      color: '#333',
+      buttonsStyling: true      
+    }).then((result)=>{
+      if(result.isConfirmed){
+        return;
+      }
+    })
+  }
+
+
 limpiarFiltros(): void {
   this.idProvincia = undefined;
   this.idMunicipio = undefined;
   this.fechaInicio = undefined;
+  this.fechaFin = undefined;
   this.nombreProvinciaSeleccionada = '';
   this.nombreMunicipioSeleccionado = '';
 

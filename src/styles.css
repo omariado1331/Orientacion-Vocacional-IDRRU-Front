@@ -27,7 +27,7 @@ body {
     background-repeat: initial;
     background-position: left;
     background-size: 6%;
-    margin-top: 140px !important;
+    margin-top: 150px !important;
     font-family: "Inter", sans-serif !important;
     font-size: var(--tx-base) !important;
     font-style: normal !important;
@@ -39,15 +39,16 @@ body {
     }
 }
 
-html, body { 
-    height: 100%; 
-}
-
-/*
-body { 
-    margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; 
-}*/
-
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}

@@ -11,7 +11,7 @@ h3{
     background-image: url('/assets/umsac.png');
     background-repeat: no-repeat;
     background-position: center center;
-    background-size: 350px;
+    background-size: 480px;
     background-blend-mode:soft-light;
     background-color: #f4f6f90a;
     position: absolute;
@@ -25,6 +25,25 @@ p{
 }
 .error{
     color: red;
+}
+
+.card-seccion1 {
+  background-color: #bed8eb87; /* ejemplo: azul muy claro */
+  color: #12325d; /* texto azul oscuro */
+  border: 2px solid #1c3b6147; /* borde del mismo tono azul que usas */
+  border-radius: 15px;
+  padding: 8px;
+}
+
+.card-seccion2 {
+  background-color: #bed8eb87; /* ejemplo: azul muy claro */
+  color: #12325d; /* texto azul oscuro */
+  border: 2px solid #1c3b6147; /* borde del mismo tono azul que usas */
+  border-radius: 14px;
+}
+
+.opcion-radio {
+    margin-right: 70px;
 }
 
 .selected-option{
