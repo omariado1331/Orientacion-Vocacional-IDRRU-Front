@@ -82,12 +82,12 @@
                         </div>
                         <div class="mb-2 col-md-6">
                             <label class="form-label" [class.error]="enviadoEst() && celular?.invalid">Celular*</label>
-                            <input type="text" style="text-transform: uppercase;" class="form-control"
+                            <input type="number" class="form-control"
                                 formControlName="celular" placeholder="INGRESA TU NUMERO DE CELULAR">
                         </div>
                         <div class="mb-2 col-md-6">
                             <label class="form-label"
-                                [class.error]="enviadoEst() && provincia?.invalid">Provincia</label>
+                                [class.error]="enviadoEst() && provincia?.invalid">Provincia*</label>
                             <select class="form-control" formControlName="provincia">
                                 @for (provincia of provincias; track provincia) {
                                 <option value="{{provincia.nombre}}">{{provincia.nombre}}</option>
@@ -96,7 +96,7 @@
                         </div>
                         <div class="mb-2 col-md-6">
                             <label class="form-label"
-                                [class.error]="enviadoEst() && municipio?.invalid">Municipio</label>
+                                [class.error]="enviadoEst() && municipio?.invalid">Municipio*</label>
                             <select class="form-control" formControlName="municipio">
                                 @if (provincia?.value != "") {
                                 @for (municipio of municipios; track municipio) {

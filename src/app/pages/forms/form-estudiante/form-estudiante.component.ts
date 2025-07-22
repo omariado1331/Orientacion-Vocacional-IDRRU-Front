@@ -147,8 +147,8 @@ export class FormEstudianteComponent {
         apMaterno: new FormControl('', Validators.required),
         colegio: new FormControl('', Validators.required),
         curso: new FormControl('', Validators.required),
-        edad: new FormControl(null, Validators.required),
-        celular: new FormControl('', Validators.required),
+        edad: new FormControl(null, [Validators.required, Validators.min(14), Validators.max(80)]),
+        celular: new FormControl(null, [Validators.required, Validators.pattern(/^\d{8}$/)]), // 8 dígitos para celular
         provincia: new FormControl('', Validators.required),
         municipio: new FormControl('', Validators.required),
         respuestasChI : this.formBuilder.array(this.pregChasideInteres.map(
@@ -287,13 +287,21 @@ export class FormEstudianteComponent {
     window.scrollTo({ top: 0.5, behavior: 'instant' });
   }
   mostrarChaside(){
-    if(this.carnetNum?.invalid || this.carnetExt?.invalid || this.nombre?.invalid || this.apMaterno?.invalid
-      || this.apMaterno?.invalid || this.colegio?.invalid || this.curso?.invalid || this.edad?.invalid || this.celular?.invalid
-      || this.municipio?.invalid || this.provincia?.invalid){
-        // alert('Debes llenar todos los campos')
+    if (this.carnetNum?.invalid || this.carnetExt?.invalid || this.nombre?.invalid || this.apMaterno?.invalid
+      || this.apMaterno?.invalid || this.colegio?.invalid || this.curso?.invalid || this.municipio?.invalid 
+      || this.provincia?.invalid){
         this.mostrarNotificacionIncompleto('Debes llenar todos los campos');
         this.enviadoEst.set(true);
-    }else{
+        return;
+    } else if (this.edad?.invalid) {
+      this.mostrarNotificacionIncompleto('Debes ingresar una edad válida (entre 14 y 80 años)');
+      this.enviadoEst.set(true);
+      return;
+    } else if (this.celular?.invalid) {
+      this.mostrarNotificacionIncompleto('Debes ingresar un número de celular válido (8 dígitos)');
+      this.enviadoEst.set(true);
+      return;
+    } else {
       this.formularioActived = true;
       this.chasideActivated = false;
       this.hollandActivated = true;
