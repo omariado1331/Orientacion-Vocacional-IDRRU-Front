@@ -572,9 +572,16 @@
 
                   <div class="col-md-6">
                     <div class="form-floating">
-                      <input type="text" class="form-control border-2 rounded-3" id="curso" formControlName="curso"
-                        placeholder="Curso"
+                      <select class="form-select border-2 rounded-3" id="curso" formControlName="curso"
                         [ngClass]="{'is-invalid border-danger': editarForm.controls['curso'].invalid && editarForm.controls['curso'].touched}">
+                        <option value="" disabled>Seleccione un curso</option>
+                        <option value="1ro SECUNDARIA">1ro SECUNDARIA</option>
+                        <option value="2do SECUNDARIA">2do SECUNDARIA</option>
+                        <option value="3ro SECUNDARIA">3ro SECUNDARIA</option>
+                        <option value="4to SECUNDARIA">4to SECUNDARIA</option>
+                        <option value="5to SECUNDARIA">5to SECUNDARIA</option>
+                        <option value="6to SECUNDARIA">6to SECUNDARIA</option>
+                      </select>
                       <label for="curso" class="text-muted" style="font-size: var(--tx-base) !important;">
                         <i class="bi bi-book me-2"></i>Curso *
                       </label>
@@ -585,6 +592,8 @@
                       </div>
                     </div>
                   </div>
+
+
                   <div class="col-md-4">
                     <div class="form-floating">
                       <input type="number" class="form-control border-2 rounded-3" id="edad" formControlName="edad"
