@@ -59,6 +59,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   resultadoEstudiante: ResultadoDto[] = [];
   resultados: any[] = [];
   todasLasFacultades: Facultad[] = [];
+
+  // GESTIÓN DE SELECCIÓN MÚLTIPLE
+  estudiantesSeleccionados: Set<number> = new Set();
+  todoSeleccionado = false;
+
   // OPCIONES PARA SELECTORES
   chasideOpciones: any[] = [];
   hollandOpciones: any[] = [];
@@ -112,6 +117,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     return this.resultadosForm as FormArray<FormGroup>;
   }
 
+  
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private formBuilder: FormBuilder,
@@ -252,6 +258,14 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         this.actualizarOpcionesFiltros();
         this.filtrarEstudiantes();
         this.calcularPaginacion();
+        const idsActuales = data.map(e => e.idEstudiante);
+        this.estudiantesSeleccionados.forEach(id => {
+          if (!idsActuales.includes(id)) {
+            this.estudiantesSeleccionados.delete(id);
+          }
+        });
+
+        this.actualizarEstadoSeleccionTodos();
       },
       error: (err: unknown) => {
         console.error('Error al cargar estudiantes', err);
@@ -507,6 +521,14 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
     this.estudiantesFiltrados = resultados;
     this.calcularPaginacion();
+    const idsVisibles = this.estudiantesFiltrados.map(e => e.idEstudiante);
+    this.estudiantesSeleccionados.forEach(id => {
+      if (!idsVisibles.includes(id)) {
+        this.estudiantesSeleccionados.delete(id);
+      }
+    });
+
+    this.actualizarEstadoSeleccionTodos();
   }
 
   buscarGlobal(event: Event): void {
@@ -562,6 +584,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     if (pagina >= 1 && pagina <= this.paginacion.totalPaginas) {
       this.paginacion.paginaActual = pagina;
     }
+    this.actualizarEstadoSeleccionTodos();
   }
 
   get estudiantesPaginados(): any[] {
@@ -624,7 +647,92 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       }
     });
   }
+  // MÉTODOS PARA SELECCIÓN MÚLTIPLE
 
+  toggleSeleccionTodos(): void {
+    this.todoSeleccionado = !this.todoSeleccionado;
+
+    if (this.todoSeleccionado) {
+      // Seleccionar todos los estudiantes de la página actual
+      this.estudiantesPaginados.forEach(estudiante => {
+        this.estudiantesSeleccionados.add(estudiante.idEstudiante);
+      });
+    } else {
+      // Deseleccionar todos
+      this.estudiantesSeleccionados.clear();
+    }
+  }
+
+  toggleSeleccionEstudiante(idEstudiante: number): void {
+    if (this.estudiantesSeleccionados.has(idEstudiante)) {
+      this.estudiantesSeleccionados.delete(idEstudiante);
+    } else {
+      this.estudiantesSeleccionados.add(idEstudiante);
+    }
+    this.actualizarEstadoSeleccionTodos();
+  }
+
+  actualizarEstadoSeleccionTodos(): void {
+    const estudiantesPaginaActual = this.estudiantesPaginados.map(e => e.idEstudiante);
+    this.todoSeleccionado = estudiantesPaginaActual.length > 0 &&
+      estudiantesPaginaActual.every(id => this.estudiantesSeleccionados.has(id));
+  }
+
+  estaSeleccionado(idEstudiante: number): boolean {
+    return this.estudiantesSeleccionados.has(idEstudiante);
+  }
+
+  get tieneEstudiantesSeleccionados(): boolean {
+    return this.estudiantesSeleccionados.size > 0;
+  }
+
+  eliminarEstudiantesSeleccionados(): void {
+    const cantidad = this.estudiantesSeleccionados.size;
+
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `Se eliminarán ${cantidad} estudiante${cantidad > 1 ? 's' : ''}. Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      background: '#f7f7f7',
+      color: '#333',
+      buttonsStyling: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const idsAEliminar = Array.from(this.estudiantesSeleccionados);
+
+        // Crear observables para cada eliminación
+        const eliminaciones = idsAEliminar.map(id =>
+          this.estudianteService.delete(id)
+        );
+
+        // Ejecutar todas las eliminaciones en paralelo
+        forkJoin(eliminaciones).subscribe({
+          next: () => {
+            this.cargarEstudiantes();
+            this.estudiantesSeleccionados.clear();
+            this.todoSeleccionado = false;
+            this.notificacionService.mostrar(
+              `${cantidad} estudiante${cantidad > 1 ? 's eliminados' : ' eliminado'} exitosamente`,
+              'success'
+            );
+          },
+          error: (err) => {
+            console.error('Error al eliminar estudiantes', err);
+            this.notificacionService.mostrar('Error al eliminar algunos estudiantes', 'error');
+            // Recargar para sincronizar el estado
+            this.cargarEstudiantes();
+            this.estudiantesSeleccionados.clear();
+            this.todoSeleccionado = false;
+          }
+        });
+      }
+    });
+  }
   // GESTIÓN DE RESULTADOS
 
   inicializarFormArrayResultados(): FormArray {
