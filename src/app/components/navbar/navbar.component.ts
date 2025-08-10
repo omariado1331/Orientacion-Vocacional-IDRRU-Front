@@ -51,23 +51,38 @@ export class NavbarComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private handleScroll(): void {
-    if (!this.ticking) {
-      requestAnimationFrame(() => {
-        const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const nav = document.querySelector('.custom-navbar') as HTMLElement;
-        if (!nav) return;
-        if (currentScrollTop > this.lastScrollTop && currentScrollTop > 200) {
-          nav.classList.add('navbar-hidden');
-        } else {
-          nav.classList.remove('navbar-hidden');
-        }
-        this.lastScrollTop = Math.max(currentScrollTop, 0);
-        this.ticking = false;
-      });
-      this.ticking = true;
-    }
+
+private handleScroll(): void {
+  if (!this.ticking) {
+    requestAnimationFrame(() => {
+      const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const nav = document.querySelector('.custom-navbar') as HTMLElement;
+      if (!nav) return;
+
+      // Oculta si estás bajando y pasaste cierto umbral
+      if (currentScrollTop > this.lastScrollTop && currentScrollTop > 70) {
+        nav.classList.add('navbar-hidden');
+      }
+
+      // Muestra solo si estás en el tope de la página
+      if (currentScrollTop <= 50) {
+        nav.classList.remove('navbar-hidden');
+      }
+
+      this.lastScrollTop = currentScrollTop;
+      this.ticking = false;
+    });
+    this.ticking = true;
   }
+}
+
+
+
+
+
+
+
+
 
   /**
    * Cierra la sesión del usuario
