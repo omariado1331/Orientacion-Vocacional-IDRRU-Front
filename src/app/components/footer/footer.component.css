@@ -1,170 +1,201 @@
 .institucional-footer {
-        background: var(--umsa-blue) url('../../../assets/fondob.png') center no-repeat;
-        background-position: center -1px;
-        background-repeat: initial;
-        background-size: 4.5%;
-        width: 100%;
-        height: 120px;
-        
-        border-radius: 20px 20px 0 0;
-        font-size: var(--tx-sm);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        
-        bottom: 0;
-        left: 2.5%;
-        right: 2.5%;
-        z-index: 1030;
-        will-change: transform, opacity;
-        transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
-      
-  }
+  background: var(--umsa-blue) url('../../../assets/fondob.png') center no-repeat;
+  background-position: center -1px;
+  background-repeat: initial;
+  background-size: 4.5%;
+  width: 100%;
+  height: 120px;
+  border-radius: 20px 20px 0 0;
+  font-size: var(--tx-sm);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  bottom: 0;
+  left: 2.5%;
+  right: 2.5%;
+  z-index: 1030;
+  will-change: transform, opacity;
+  transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+}
   
-  .footer-container {
-    background-position: center;
-    width: 95%;
-    margin: 0;
-    left: 2.5%;
-    right: 2.5%;
-    flex-wrap: wrap;
-    position:relative;
-    gap:inherit;
-  }
+.footer-container {
+  background-position: center;
+  width: 95%;
+  margin: 0;
+  left: 2.5%;
+  right: 2.5%;
+  flex-wrap: wrap;
+  position:relative;
+  gap:inherit;
+}
+
+.logo {
+  width: 60px;
+  margin-bottom: 0.2rem;
+  margin: 0;
+  padding: 0;
+  max-width: 100px;
+  height: auto;
   
-  .logo {
-    width: 60px;
-    margin-bottom: 0.2rem;
-    margin: 0;
-    padding: 0;
-    max-width: 100px;
+}
+.logoidr{
+  width: 90px;
+  background-color: rgba(240, 248, 255, 0);
+  /* Convierte el logo en blanco */
+  filter: brightness(0) invert(1); 
+}
+
+.row{
+  margin: 0;
+  padding: 0;
+}
+
+.footer-left {
+  white-space: nowrap; /* todo en una sola línea */
+  width: auto !important; /* que no se limite al ancho fijo de bootstrap */
+  font-size: 11px; /* si querés mantener tamaño pequeño */
+  max-width: 120%;
+}
+
+.footer-right {
+  text-align: right;
+  font-size: 11px;
+}
+
+.social-icon{
+  display: flex;
+  justify-content: baseline;
+  position: inherit;
+  flex-wrap: wrap;
+}
+.icon-elem{
+  list-style: none;
+}
+
+.icon-fb, .icon-yt, .icon-ig, .icon-x, .icon-mail, .icon-geo{
+  font-size: 32px;
+  display: inline-block;
+  margin: auto 10px;
+  transition: 0.5s;
+  color: #235e9cc5;
+}
+
+.icon-fb:hover{
+  transform: translateY(-4px);
+  color: #3b5998;
+}
+.icon-yt:hover{
+  transform: translateY(-4px);
+  color: #c4302b;
+}
+.icon-ig:hover{
+  transform: translateY(-4px);
+  background: radial-gradient(circle at 30% 107%,
+    #fdf497 0%,  #fdf497 5%,
+    #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; /* necesario para ver el gradiente */
+  }
+.icon-x:hover{
+      transform: translateY(-4px);
+      color: #000000;
+}
+.icon-mail:hover{
+  transform: translateY(-4px);
+  color: #1fbb00;
+}
+.icon-geo:hover{
+  transform: translateY(-4px);
+  color: #592001;
+}
+.text-follow {
+  color: white;
+  font-size: 14px;
+  margin: 0;
+  padding: 10px;
+  align-items: center;
+  background: var(--umsa-blue);
+  display: flex; 
+  justify-content: center;
+  border-radius: 15px;
+}
+
+@media (max-width: 991.98px) {
+  .institucional-footer {
+    position:sticky;
+    overflow: hidden;
+    border-radius: 20px 20px 0 0;
     height: auto;
-    
+    background-color: transparent;
+    transform: none;
+    left: 1%;
+    margin-bottom: 1rem;
+    text-align: center;
   }
+
+  .institucional-footer ul {
+    margin-right: 0 !important;
+  }
+
+
+  .logo{
+      display: block;
+      margin: 0;
+      padding: 0;
+  }
+
   .logoidr{
-    width: 90px;
-    background-color: aliceblue;
-  }
-  
-  .row{
-    margin: 0;
-    padding: 0;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: block;
   }
 
   .footer-left {
-    word-wrap: break-word;
-    word-break: break-word;
-    font-size: 11px; /* si querés mantener tamaño pequeño */
-    max-width: 120%;
-  }
+      display: none;
+  }   
   
   .footer-right {
-    text-align: right;
-    font-size: 11px;
-  }
+      display: none;
+  }  
+  /*
+  .footer-right {
+    font-size: 10px;
+    text-align: center;
+    padding-right: 5rem;
+  }*/
 
-  .social-icon{
-    display: flex;
-    justify-content: baseline;
-    position: inherit;
-    flex-wrap: wrap;
-  }
-  .icon-elem{
-    list-style: none;
-  }
-
-  .icon-fb, .icon-yt, .icon-ig, .icon-x, .icon-mail, .icon-geo{
-    font-size: 32px;
-    display: inline-block;
-    margin: auto 10px;
-    transition: 0.5s;
-    color: var(--umsa-blue);
-  }
-
-  .icon-fb:hover{
-    transform: translateY(-8px);
-    color: #3b5998;
-  }
-  .icon-yt:hover{
-    transform: translateY(-8px);
-    color: #c4302b;
-  }
-  .icon-ig:hover{
-    transform: translateY(-8px);
-    color:color-mix(in lch longer hue, #fd5949 80%, #285AEB  20%)
-    }
-  .icon-x:hover{
-        transform: translateY(-8px);
-        color: #000000;
-  }
-  .icon-mail:hover{
-    transform: translateY(-8px);
-    color: #1fbb00;
-  }
-  .icon-geo:hover{
-    transform: translateY(-8px);
-    color: #614209;
-  }
   .text-follow {
-    color: white;
-    font-size: 16px;
-    margin: 0;
-    padding: 10px;
-    align-items: center;
-    background: var(--umsa-blue);
-    display: flex; 
-    justify-content: center;
-    border-radius: 20px;
+    display: none;
   }
 
-  @media (max-width: 991.98px) {
-    .institucional-footer {
-      position:sticky;
-      overflow: hidden;
-      border-radius: 20px 20px 0 0;
-      height: auto;
-      background-color: transparent;
-      transform: none;
-      left: 1%;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
+  .institucional-footer::before {
+    content: "";
+    align-items: center;
+    position: absolute;
+    inset: 0;
+    background: var(--umsa-blue) url('../../../assets/fondob.png') repeat;
+    background-size: 80px;
+    filter: blur(1px);
+    z-index: -1;
+    border-radius: 0 0 20px 20px;
+    transition: var(--navbar-transition);
+  }
   
-    .institucional-footer ul {
-      margin-right: 0 !important;
-    }
-    .logo{
-        display: none;
-    }
-    .logoidr{
-        
-        display: none;
-    }
-
-    .footer-left {
-        display: none;
-        
-      }   
-      .footer-right {
-        font-size: 10px;
-        text-align: center;
-        padding-right: 5rem;
-      }
-      .text-follow {
-        display: none;
-      }
-  
-    .institucional-footer::before {
-      content: "";
-      align-items: center;
-      position: absolute;
-      inset: 0;
-      background: var(--umsa-blue) url('../../../assets/fondob.png') repeat;
-      background-size: 80px;
-      filter: blur(1px);
-      z-index: -1;
-      border-radius: 0 0 20px 20px;
-      transition: var(--navbar-transition);
-    }
-    
 }
+
+/*los iconos del footer*/
+.menu-item {
+margin-left: 8px !important; /* quita cualquier desplazamiento a la derecha */
+padding-left: 8px !important; /* quita sangría interna */
+}
+
+.menu-item .social-icon {
+padding-left: 0;
+margin-left: 0;
+}
+
+.menu-item .text-follow {
+margin-left: 0;
+}
+
 

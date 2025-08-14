@@ -7,8 +7,7 @@
 
 
 .custom-navbar {
-  background: var(--umsa-blue) url('../../../assets/panel.png') center no-repeat;
-  background-position: left;
+  background: var(--umsa-blue) url('../../../assets/panel.png') no-repeat center center ;
   background-size: contain;
   width: 95%;
   height: 120px;
@@ -22,7 +21,7 @@
   transition: var(--navbar-transition);
   transform: translateY(0);
   opacity: 1;
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 2.5%;
   right: 2.5%;
@@ -31,10 +30,7 @@
   transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
 }
 
-.custom-navbar.navbar-hidden {
-  transform: translateY(-100%);
-  opacity: 0.9;
-}
+
 
 .navbar-brand {
   display: none;
@@ -208,16 +204,16 @@ html {
 }
 
 .btn-logout {
-  position: absolute;
+  position: relative;
   right: 0;
-  top: 0%;
+  top: -10px;
   transform: translateY(-50%);
   background: linear-gradient(135deg, #dc3545, #c82333, #c40606);
-  color: white;
+  color: rgb(255, 255, 255);
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: auto;
   border-radius: 10px;
-  font-size: var(--tx-xs);
+  font-size: 4px;
   letter-spacing: 0.3px;
   cursor: pointer;
   overflow: hidden;
@@ -228,8 +224,8 @@ html {
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-width: 160px;
+  gap: 2px;
+  min-width: 140px;
   justify-content: center;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);

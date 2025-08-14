@@ -4,8 +4,9 @@
             <h5 class="text-danger text-center">Los datos no se guardaron en la base de datos</h5>
         </div>
     }
-    <div class="container header-wrapper">
-        <div class="row justify-content-center mb-4">
+    
+    <div class="container header-wrapper" >
+        <div class="row justify-content-center mb-4" style="margin-bottom: 4%;">
             <div class="card header-card">
                 <div class="card-body text-center py-5">
                     <div class="profile-avatar mb-3">
@@ -181,52 +182,52 @@
     </div>
 
         <!-- Información Adicional -->
-        <div class="container justify-content-center">
-                <div class="card card-custom">
-                    <div class="card-body">
-                        <h5 class="section-title">
-                            <i class="fas fa-lightbulb me-2"></i>Interpretación de Resultados
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6 class="text-muted">¿Qué significan tus personalidades Holland?</h6>
-                                <div class="mb-2">
-                                    <span class="holland-code holland-R holland-code-small">{{holland[0]}}</span>
-                                    <strong>{{personalidadP}}:</strong> {{descripcionP}}
-                                </div>
-                                <div class="mb-2">
-                                    <span class="holland-code holland-S holland-code-small">{{holland[1]}}</span>
-                                    <strong>{{personalidadS}}:</strong> {{descripcionS}}
-                                </div>
-                                <div class="mb-2">
-                                    <span class="holland-code holland-E holland-code-small">{{holland[2]}}</span>
-                                    <strong>{{personalidadT}}:</strong> {{descripcionT}}
-                                </div>
+    <div class="container justify-content-center">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <i class="fas fa-lightbulb me-2"></i>Interpretación de Resultados
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">¿Qué significan tus personalidades Holland?</h6>
+                            <div class="mb-2">
+                                <span class="holland-code holland-R holland-code-small">{{holland[0]}}</span>
+                                <strong>{{personalidadP}}:</strong> {{descripcionP}}
                             </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted">Recomendaciones</h6>
-                                <ul class="list-unstyled">
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Considera visitar las facultades que más te interesen</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Habla con profesionales de estas áreas</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Investiga el plan de estudios de cada carrera</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Consulta con un orientador vocacional</li>
-                                </ul>
+                            <div class="mb-2">
+                                <span class="holland-code holland-S holland-code-small">{{holland[1]}}</span>
+                                <strong>{{personalidadS}}:</strong> {{descripcionS}}
                             </div>
+                            <div class="mb-2">
+                                <span class="holland-code holland-E holland-code-small">{{holland[2]}}</span>
+                                <strong>{{personalidadT}}:</strong> {{descripcionT}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Recomendaciones</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Considera visitar las facultades que más te interesen</li>
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Habla con profesionales de estas áreas</li>
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Investiga el plan de estudios de cada carrera</li>
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Consulta con un orientador vocacional</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-        </div>
+            </div>
+    </div>
 
-        <!-- Footer -->
-        <div class="text-center mt-4">
-            <p class="text-dark-50">
-                <i class="fas fa-info-circle me-1"></i>
-                Estos resultados son una guía para tu orientación vocacional. 
-                Te recomendamos consultar con un orientador para mayor información.
-            </p>
-        </div>
+    <!-- Footer -->
+    <div class="text-center mt-4" style="margin-bottom: 2%;">
+        <p class="text-dark-50">
+            <i class="fas fa-info-circle me-1"></i>
+            Estos resultados son una guía para tu orientación vocacional. 
+            Te recomendamos consultar con un orientador para mayor información.
+        </p>
+    </div>
     
-    <div class="container mb-3">
+    <div class="container mb-4">
         <div class="d-flex justify-content-center align-items-center" >
                 <button class="btn btn-danger mx-2" (click)="generarPdf()"> GENERAR PDF </button>
                 <a [routerLink]="['/']"><button class="btn btn-primary mx-2">VOLVER AL INICIO</button></a>

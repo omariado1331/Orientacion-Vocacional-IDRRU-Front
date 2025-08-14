@@ -5,6 +5,7 @@
     position: relative;
     overflow: hidden;
     width: 97%;
+    margin-top: 3%;
 }
 
 .header-card::before {

@@ -8,11 +8,12 @@
   background-color: #f4f6f90a;
   background-blend-mode: soft-light;
   animation: fadeInBackground 1.8s ease-out;
-  min-height: 80vh;
+  min-height: 20vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 50px 20px;
+  padding: 10px 20px;
+  margin-top: 30px;
   box-sizing: border-box;
 }
 
@@ -93,7 +94,7 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
   .vocacional-title {
     font-size: 2rem;
   }
@@ -106,4 +107,127 @@
     width: 100%;
     padding: 14px 0;
   }
+}
+
+/*Banner encima de el div principal */
+/* Animación de aparición */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Banner principal */
+.hero-banner {
+  width: 90%;
+  max-width: 1200px;
+  height: 280px;
+  margin: 50px auto;
+  background: url('/assets/fondoEstudiantes.png') no-repeat center center fixed;
+  background-size: cover;
+  border-radius: 25px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+  animation: fadeInUp 1s ease forwards;
+}
+
+/* Overlay degradado */
+.hero-banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0,0,0,0.2), rgba(0,0,0,0.55));
+  border-radius: 25px;
+  z-index: 1;
+}
+
+/* Texto dentro del banner */
+.hero-banner-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  z-index: 2;
+  animation: fadeInUp 1.2s ease forwards;
+}
+
+.hero-banner-text h1 {
+  font-size: 2.2rem;
+  margin-bottom: 15px;
+  font-weight: 800;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+}
+
+.hero-banner-text p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  font-weight: 400;
+  text-shadow: 1px 1px 6px rgba(0,0,0,0.3);
+}
+
+/* Botón elegante */
+.hero-button {
+  display: inline-block;
+  padding: 14px 28px;
+  background: linear-gradient(90deg, #285AEB, #1f47c0);
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.hero-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* Contenido debajo del banner */
+.hero-container {
+  width: 90%;
+  max-width: 1000px;
+  margin: 40px auto;
+}
+
+.hero-text {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+/* Responsive total */
+@media (max-width: 1200px) {
+  .hero-banner { height: 260px; }
+}
+
+@media (max-width: 992px) {
+  .hero-banner { height: 240px; }
+  .hero-banner-text h1 { font-size: 1.9rem; }
+  .hero-banner-text p { font-size: 1.05rem; }
+  .hero-button { padding: 12px 24px; font-size: 0.95rem; }
+}
+
+@media (max-width: 768px) {
+  .hero-banner { height: 220px; }
+  .hero-banner-text p,
+  .hero-button { display: none; } /* Solo mostrar título */
+  .hero-banner-text h1 { font-size: 1.7rem; }
+}
+
+@media (max-width: 576px) {
+  .hero-banner { height: 200px; }
+  .hero-banner-text h1 { font-size: 1.5rem; }
+  .hero-banner-text p,
+  .hero-button { display: none; }
+}
+
+@media (max-width: 400px) {
+  .hero-banner-text h1 { font-size: 1.3rem; }
+  .hero-banner-text p,
+  .hero-button { display: none; }
 }

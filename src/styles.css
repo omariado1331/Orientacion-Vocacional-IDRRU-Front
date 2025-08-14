@@ -10,7 +10,6 @@
     --card-border-radius: 20px;
     --transition-speed: 0.3s;
 
-
     --tx-xs: clamp(0.7rem, 1vw, 0.75rem);
     --tx-sm: clamp(0.8rem, 1vw, 0.875rem);
     --tx-base: clamp(1rem, 1.2vw, 1rem);
@@ -20,14 +19,12 @@
     --tx-xxl: clamp(2.5rem, 4vw, 3rem);
 }
 
-
-
 body {
     background-image: url(../src/assets/fondo.png);
     background-repeat: initial;
     background-position: left;
     background-size: 6%;
-    margin-top: 150px !important;
+    /*margin-top: 150px !important;*/
     font-family: "Inter", sans-serif !important;
     font-size: var(--tx-base) !important;
     font-style: normal !important;
@@ -38,7 +35,6 @@ body {
         margin-top: 0 !important;
     }
 }
-
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

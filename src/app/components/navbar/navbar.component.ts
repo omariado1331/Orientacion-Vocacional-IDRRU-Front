@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
@@ -11,13 +11,10 @@ import { Subject, takeUntil } from 'rxjs';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
-export class NavbarComponent implements AfterViewInit, OnDestroy {
-  private ticking = false;
-  private lastScrollTop = 0;
+export class NavbarComponent implements OnDestroy {
   private isBrowser: boolean;
   private destroy$ = new Subject<void>();
 
-  // Estado de autenticación
   isAuthenticated = false;
 
   constructor(
@@ -33,60 +30,11 @@ export class NavbarComponent implements AfterViewInit, OnDestroy {
       });
   }
 
-  ngAfterViewInit(): void {
-    if (this.isBrowser) {
-      this.handleScroll();
-    }
-  }
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  @HostListener('window:scroll', [])
-  onWindowScroll(): void {
-    if (this.isBrowser) {
-      this.handleScroll();
-    }
-  }
-
-
-private handleScroll(): void {
-  if (!this.ticking) {
-    requestAnimationFrame(() => {
-      const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const nav = document.querySelector('.custom-navbar') as HTMLElement;
-      if (!nav) return;
-
-      // Oculta si estás bajando y pasaste cierto umbral
-      if (currentScrollTop > this.lastScrollTop && currentScrollTop > 70) {
-        nav.classList.add('navbar-hidden');
-      }
-
-      // Muestra solo si estás en el tope de la página
-      if (currentScrollTop <= 50) {
-        nav.classList.remove('navbar-hidden');
-      }
-
-      this.lastScrollTop = currentScrollTop;
-      this.ticking = false;
-    });
-    this.ticking = true;
-  }
-}
-
-
-
-
-
-
-
-
-
-  /**
-   * Cierra la sesión del usuario
-   */
   cerrarSesion(): void {
     this.authService.cerrarSesion().subscribe({
       next: () => {
