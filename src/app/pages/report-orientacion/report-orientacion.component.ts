@@ -30,6 +30,7 @@ export class ReportOrientacionComponent implements OnInit {
   resultados: ResultadoDtoResponse[] = [];
   provincias: Provincia[] = [];
   municipios: Municipio[] = [];
+  todosMunicipios: Municipio[] = [];
   listaAnios: string[] = []; 
 
   idProvincia?: number;
@@ -131,16 +132,27 @@ constructor(
 ) {}  
 
 ngOnInit(): void {
-  this.isBrowser = isPlatformBrowser(this.platformId);
+    this.isBrowser = isPlatformBrowser(this.platformId);
   if (this.isBrowser) {
     this.cargarProvincias();
-    // No llamar a cargarResultados() acá
-    // this.cargarResultados();
+    this.cargarTodosMunicipios();
   }
 }
 
+cargarTodosMunicipios() {
+  this.municipioService.getAllMunicipios().subscribe({
+    next: (data) => {
+      this.todosMunicipios = data;
+      if (!this.idProvincia) {
+        this.municipios = data;
+      }
+    },
+    error: (err) => console.error('Error cargando municipios', err)
+  });
+}
+
 cargarProvincias() {
-    this.provinciaService.getProvinciasAll().subscribe({
+    this.provinciaService.getProvincias().subscribe({
       next: (data) => this.provincias = data,
       error: (err) => console.error('Error cargando provincias', err)
     });
@@ -162,48 +174,51 @@ cargarAniosDisponibles(): void {
 
 onProvinciaChange(): void {
   if (this.idProvincia != null) {
-
-    // Buscá la provincia por id para obtener el nombre
-    const provincia = this.provincias.find(p => p.id === this.idProvincia);
+    const provincia = this.provincias.find(p => p.idProvincia === this.idProvincia);
     this.nombreProvinciaSeleccionada = provincia ? provincia.nombre : '---';
 
-    this.municipioService.getMunicipiosPorProvinciaList(this.idProvincia).subscribe(muns => {
-      //console.log('Municipios recibidos:', muns); // Aquí deberías ver el array con municipios
+    this.municipioService.getMunicipiosPorProvinciaHttp(this.idProvincia).subscribe(muns => {
       this.municipios = muns;
       this.idMunicipio = undefined;
       this.fechaInicio = undefined;
       this.fechaFin = undefined;
-
       this.cargarAniosDisponibles();
     });
   } else {
-    this.municipios = [];
+    this.municipios = [...this.todosMunicipios];
     this.idMunicipio = undefined;
     this.fechaInicio = undefined;
-    this.fechaFin = undefined
+    this.fechaFin = undefined;
   }
 }
 
 onMunicipioChange(): void {
-  //console.log('ID Municipio seleccionado:', this.idMunicipio);
-  //console.log('Lista municipios:', this.municipios);
   if (this.idMunicipio != null) {
-
-    const municipio = this.municipios.find(m => m.idMunicipio === this.idMunicipio);
+    const municipio = this.todosMunicipios.find(m => m.idMunicipio === this.idMunicipio);
     this.nombreMunicipioSeleccionado = municipio ? municipio.nombre : '---';
+
+    if (municipio && municipio.idProvincia) {
+      if (this.idProvincia !== municipio.idProvincia) {
+        this.idProvincia = municipio.idProvincia;
+        const provincia = this.provincias.find(p => p.idProvincia === this.idProvincia);
+        this.nombreProvinciaSeleccionada = provincia ? provincia.nombre : '---';
+        
+        this.municipioService.getMunicipiosPorProvinciaHttp(this.idProvincia).subscribe(muns => {
+          this.municipios = muns;
+        });
+      }
+    }
   } else {
     this.nombreMunicipioSeleccionado = '---';
   }
+  
   this.fechaInicio = undefined;
   this.fechaFin = undefined;
-
-  // Recarga años con filtro provincia + municipio
   this.cargarAniosDisponibles();
 }
 
 
 cargarResultados(validarFiltros: boolean = true): void {
-  // Validación simple para rango de años
   if (!this.idProvincia || !this.idMunicipio ) {
     this.mostrarNotificacionAviso('Seleccione Provincia y Municipio para buscar');
     return;
@@ -224,15 +239,11 @@ cargarResultados(validarFiltros: boolean = true): void {
     .subscribe({
       next: (data: ResultadoDtoResponse[]) => {
         this.resultados = data;
-
-        // Validar si al menos uno de los filtros está aplicado (no nulo o vacío)
         const filtrosAplicados = 
           (this.idProvincia !== null && this.idProvincia !== undefined) &&
           (this.idMunicipio !== null && this.idMunicipio !== undefined) &&
           (!!this.fechaInicio && this.fechaInicio.trim() !== '') &&
           (!!this.fechaFin && this.fechaFin.trim() !== '');
-
-        // NUEVA VALIDACIÓN: Si no hay resultados y provincia + municipio están seleccionados
         if (data.length === 0) {
           this.mostrarNotificacionAviso('No existen datos para la provincia y municipio seleccionados.');
           this.mostrarImagenNoResultados = true;
@@ -243,28 +254,20 @@ cargarResultados(validarFiltros: boolean = true): void {
 
 
         if(!filtrosAplicados){
-          // Si no hay filtros, limpiar todo y ocultar todo.
           this.resultados = [];
           this.mostrarBotonesExportar = false;
           this.mostrarGrafico = false;
-          // mostrar imagen "no resultados" o dejar en false si no querés nada
           this.mostrarImagenNoResultados = true;
-          return; // salir antes de hacer la petición
-
+          return;
         }
 
-
-
-        // Mostrar botones exportar sólo si filtros están aplicados y hay resultados
         this.mostrarBotonesExportar = validarFiltros && filtrosAplicados && data.length > 0;
-
-        // Mostrar tabla o imagen según si hay resultados
         if (data.length > 0) {
-          this.mostrarImagenNoResultados = false;  // ocultar imagen si hay resultados
-          this.mostrarGrafico = true;               // mostrar gráfico si quieres
+          this.mostrarImagenNoResultados = false;  
+          this.mostrarGrafico = true;               
           if(this.mostrarBotonesExportar) this.generarGrafico();
         } else {
-          this.mostrarImagenNoResultados = true;   // mostrar imagen si no hay resultados
+          this.mostrarImagenNoResultados = true;   
           this.mostrarGrafico = false;
           this.mostrarBotonesExportar = false;
         }
@@ -274,7 +277,7 @@ cargarResultados(validarFiltros: boolean = true): void {
         this.resultados = [];
         this.mostrarBotonesExportar = false;
         this.mostrarGrafico = false;
-        this.mostrarImagenNoResultados = true;  // mostrar imagen en caso de error
+        this.mostrarImagenNoResultados = true;  
       }
     });
 }
@@ -304,16 +307,12 @@ limpiarFiltros(): void {
   this.fechaFin = undefined;
   this.nombreProvinciaSeleccionada = '';
   this.nombreMunicipioSeleccionado = '';
-
-  // Vaciar o resetear las listas de municipios y años
-  this.municipios = [];
+  this.municipios = [...this.todosMunicipios];
   this.listaAnios = [];
   this.resultados = [];
   this.mostrarGrafico = false;
   this.mostrarBotonesExportar = false;
-  this.mostrarImagenNoResultados = true;  // mostrar imagen al limpiar
-  // No llamar a cargarResultados para no recargar la tabla
-
+  this.mostrarImagenNoResultados = true;
 }
 
 private generarGrafico(): void {
@@ -330,12 +329,11 @@ private generarGrafico(): void {
       porcentaje: ((cantidad / total) * 100).toFixed(2)
     };
   });
-    // Definimos etiquetas y datos para el gráfico (reemplazamos objeto completo para detectar cambios)
   const labels = Object.keys(conteo);
   const data = Object.values(conteo);
 
   this.chartData = {
-    labels: Object.keys(conteo),  // labels dinámicos, no fijos
+    labels: Object.keys(conteo),
     datasets: [
       {
         data: Object.values(conteo),
@@ -348,7 +346,6 @@ private generarGrafico(): void {
 
   };
 
-  // Actualizar la leyenda personalizada con un nuevo objeto para que Angular refresque la vista
   this.nombresPorLabelActualizada = { ...this.nombresPorLabel };
   this.mostrarGrafico = true;
   this.leyenda = this.chartData.labels.map((label, index) => {
@@ -359,24 +356,21 @@ private generarGrafico(): void {
       color: this.chartData.datasets[0].backgroundColor[index]
     };
   });
-    // Forzamos la detección de cambios para actualizar el DOM
     this.cd.detectChanges();
 }
 
 private async dibujarCabecera(doc: jsPDF, pageWidth: number, margin: number, dezplazamiento: number): Promise<number> {
   const colorTitulo: [number, number, number] = [0, 54, 107];
   const colorTexto: [number, number, number] = [0, 54, 107];
-  const logoWidth = 50; // Ancho del logo
-  const logoHeight = 50; // Alto del logo
+  const logoWidth = 50; 
+  const logoHeight = 50; 
 
   let yPos = margin + 25;
   const anchoPagina = doc.internal.pageSize.getWidth(); 
 
-  // 1. Cambiar rutas (usar assets/ en lugar de src/assets/)
-  const logoIzquierdoUrl = "assets/umsac.png"; // Ruta corregida
+  const logoIzquierdoUrl = "assets/umsac.png";
   const logoDerechoUrl = "assets/idrdu.png";
 
-  // 2. Convertir imágenes a Base64 antes de usarlas
   const [logoIzqBase64, logoDerBase64] = await Promise.all([
     this.convertirImagenABase64(logoIzquierdoUrl),
     this.convertirImagenABase64(logoDerechoUrl)
@@ -582,27 +576,18 @@ async generarPDFconGraficoYTabla() {
   const tableWidth = (pageWidth - 2 * marginLeft);
   const colWidth = tableWidth / colCount;
 
-  // Aquí va el autoTable con los parámetros actualizados
   (doc as any).autoTable({
     startY: startYTable,
-    // Centrar la pagina
     margin: { left: marginLeft  },
-    //Define el encabezado de las columnas
     head: [columns],
-    //Datos de la tabla
     body: rows,
-    //Define el ancho de las columnas
     columnStyles: {
       0: { cellWidth: colWidth },
       1: { cellWidth: colWidth },
       2: { cellWidth: colWidth },
     },
-    //Estilo
-    //Define el ancho de cada columna 
     styles: { fontSize: 9, cellPadding: 5, halign: 'center' },
-    //Estilo general fuente, espaciado, alinear horizontalmente
     headStyles: { fillColor: [78, 121, 167], textColor: 255 },
-    // filas con rayas
     theme: 'striped',
   });
 

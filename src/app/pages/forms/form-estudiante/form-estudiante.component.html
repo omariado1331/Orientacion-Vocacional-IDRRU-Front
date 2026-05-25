@@ -19,95 +19,168 @@
             <div class="card card-seccion2">
                 <div class="card-container"></div>
                 <div class="card-body align-items-center">
-                    <div class="row">
-                        <div class="mb-2 col-md-3">
-                            <label class="form-label" [class.error]="enviadoEst() && carnetNum?.invalid">Carnet de
-                                Identidad*</label>
-                            <input type="number" style="text-transform: uppercase;" class="form-control"
-                                placeholder="Número de Carnet" formControlName="carnetNum">
-                        </div>
-                        <div class="mb-2 col-md-2">
-                            <label class="form-label"
-                                [class.error]="enviadoEst() && carnetExt?.invalid">Extensión*</label>
-                            <select class="form-control" formControlName="carnetExt">
-                                <option value="LP">LP</option>
-                                <option value="SCZ">SCZ</option>
-                                <option value="CB">CB</option>
-                                <option value="TJ">TJ</option>
-                                <option value="OR">OR</option>
-                                <option value="PT">PT</option>
-                                <option value="BN">BN</option>
-                                <option value="PA">PA</option>
-                                <option value="CH">CH</option>
-                            </select>
+                    <div class="row g-3">
+
+                        <!-- Carnet de Identidad -->
+                        <div class="col-md-3">
+                            <label class="campo-label" [class.error]="enviadoEst() && carnetNum?.invalid">
+                                <i class="bi bi-credit-card-fill campo-icono"></i>
+                                Carnet de Identidad *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && carnetNum?.invalid">
+                                <input type="number" class="campo-input" placeholder="Ej: 12345678" formControlName="carnetNum">
+                            </div>
+                            <span class="campo-ayuda">Solo el número, sin letras</span>
                         </div>
 
-                        <div class="mb-2 col-md-12">
-                            <label class="form-label" [class.error]="enviadoEst() && nombre?.invalid">Nombres*</label>
-                            <input type="text" style="text-transform: uppercase;" class="form-control"
-                                formControlName="nombre" placeholder="INGRESA NOMBRES">
+                        <!-- Extensión -->
+                        <div class="col-md-3">
+                            <label class="campo-label" [class.error]="enviadoEst() && carnetExt?.invalid">
+                                <i class="bi bi-geo-alt-fill campo-icono"></i>
+                                Extensión *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && carnetExt?.invalid">
+                                <select class="campo-input" formControlName="carnetExt">
+                                    <option [ngValue]="null" disabled selected>-- Elige --</option>
+                                    <option value="LP">La Paz (LP)</option>
+                                    <option value="SCZ">Santa Cruz (SCZ)</option>
+                                    <option value="CB">Cochabamba (CB)</option>
+                                    <option value="TJ">Tarija (TJ)</option>
+                                    <option value="OR">Oruro (OR)</option>
+                                    <option value="PT">Potosí (PT)</option>
+                                    <option value="BN">Beni (BN)</option>
+                                    <option value="PA">Pando (PA)</option>
+                                    <option value="CH">Chuquisaca (CH)</option>
+                                </select>
+                            </div>
+                            <span class="campo-ayuda">Departamento del carnet</span>
                         </div>
 
-                        <div class="mb-2 col-md-6">
-                            <label class="form-label" [class.error]="enviadoEst() && apPaterno?.invalid">Apellido
-                                Paterno*</label>
-                            <input type="text" style="text-transform: uppercase;" class="form-control"
-                                formControlName="apPaterno" placeholder="INGRESA APELLIDO PATERNO">
+                        <!-- Nombres -->
+                        <div class="col-md-12">
+                            <label class="campo-label" [class.error]="enviadoEst() && nombre?.invalid">
+                                <i class="bi bi-person-fill campo-icono"></i>
+                                Nombres *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && nombre?.invalid">
+                                <input type="text" class="campo-input uppercase-input" formControlName="nombre" placeholder="Ej: JUAN CARLOS">
+                            </div>
                         </div>
-                        <div class="mb-2 col-md-6">
-                            <label class="form-label" [class.error]="enviadoEst() && apMaterno?.invalid">Apellido
-                                Materno*</label>
-                            <input type="text" style="text-transform: uppercase;" class="form-control"
-                                formControlName="apMaterno" placeholder="INGRESA APELLIDO MATERNO">
+
+                        <!-- Apellido Paterno -->
+                        <div class="col-md-6">
+                            <label class="campo-label" [class.error]="enviadoEst() && apPaterno?.invalid">
+                                <i class="bi bi-person-vcard-fill campo-icono"></i>
+                                Apellido Paterno *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && apPaterno?.invalid">
+                                <input type="text" class="campo-input uppercase-input" formControlName="apPaterno" placeholder="Ej: PEREZ">
+                            </div>
                         </div>
-                        <div class="mb-2 col-md-8">
-                            <label class="form-label" [class.error]="enviadoEst() && colegio?.invalid">Colegio*</label>
-                            <input type="text" style="text-transform: uppercase;" class="form-control"
-                                formControlName="colegio" placeholder="INGRESA COLEGIO">
+
+                        <!-- Apellido Materno -->
+                        <div class="col-md-6">
+                            <label class="campo-label" [class.error]="enviadoEst() && apMaterno?.invalid">
+                                <i class="bi bi-person-vcard campo-icono"></i>
+                                Apellido Materno *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && apMaterno?.invalid">
+                                <input type="text" class="campo-input uppercase-input" formControlName="apMaterno" placeholder="Ej: GOMEZ">
+                            </div>
                         </div>
-                        <div class="mb-2 col-md-4">
-                            <label class="form-label" [class.error]="enviadoEst() && curso?.invalid">Curso*</label>
-                            <select class="form-control" formControlName="curso">
-                                <option value="1ro SECUNDARIA">1ro SECUNDARIA</option>
-                                <option value="2do SECUNDARIA">2do SECUNDARIA</option>
-                                <option value="3ro SECUNDARIA">3ro SECUNDARIA</option>
-                                <option value="4to SECUNDARIA">4to SECUNDARIA</option>
-                                <option value="5to SECUNDARIA">5to SECUNDARIA</option>
-                                <option value="6to SECUNDARIA">6to SECUNDARIA</option>
-                            </select>
+
+                        <!-- Colegio -->
+                        <div class="col-md-8">
+                            <label class="campo-label" [class.error]="enviadoEst() && colegio?.invalid">
+                                <i class="bi bi-building-fill campo-icono"></i>
+                                Nombre del Colegio *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && colegio?.invalid">
+                                <input type="text" class="campo-input uppercase-input" formControlName="colegio" placeholder="Ej: NACIONAL SIMON BOLIVAR">
+                            </div>
                         </div>
-                        <div class="mb-2 col-md-6">
-                            <label class="form-label" [class.error]="enviadoEst() && edad?.invalid">Edad*</label>
-                            <input type="number" class="form-control" formControlName="edad" placeholder="INGRESA EDAD">
+
+                        <!-- Curso -->
+                        <div class="col-md-4">
+                            <label class="campo-label" [class.error]="enviadoEst() && curso?.invalid">
+                                <i class="bi bi-mortarboard-fill campo-icono"></i>
+                                Curso *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && curso?.invalid">
+                                <select class="campo-input" formControlName="curso">
+                                    <option [ngValue]="null" disabled selected>-- Elige tu curso --</option>
+                                    <option value="1ro SECUNDARIA">1ro Secundaria</option>
+                                    <option value="2do SECUNDARIA">2do Secundaria</option>
+                                    <option value="3ro SECUNDARIA">3ro Secundaria</option>
+                                    <option value="4to SECUNDARIA">4to Secundaria</option>
+                                    <option value="5to SECUNDARIA">5to Secundaria</option>
+                                    <option value="6to SECUNDARIA">6to Secundaria</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-2 col-md-6">
-                            <label class="form-label" [class.error]="enviadoEst() && celular?.invalid">Celular*</label>
-                            <input type="number" class="form-control"
-                                formControlName="celular" placeholder="INGRESA TU NUMERO DE CELULAR">
+
+                        <!-- Edad -->
+                        <div class="col-md-6">
+                            <label class="campo-label" [class.error]="enviadoEst() && edad?.invalid">
+                                <i class="bi bi-calendar2-heart-fill campo-icono"></i>
+                                Edad *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && edad?.invalid">
+                                <input type="number" class="campo-input" formControlName="edad" placeholder="Ej: 16">
+                            </div>
                         </div>
-                        <div class="mb-2 col-md-6">
-                            <label class="form-label"
-                                [class.error]="enviadoEst() && provincia?.invalid">Provincia*</label>
-                            <select class="form-control" formControlName="provincia">
-                                @for (provincia of provincias; track provincia) {
-                                <option value="{{provincia.nombre}}">{{provincia.nombre}}</option>
-                                }
-                            </select>
+
+                        <!-- Celular -->
+                        <div class="col-md-6">
+                            <label class="campo-label" [class.error]="enviadoEst() && celular?.invalid">
+                                <i class="bi bi-phone-fill campo-icono"></i>
+                                Número de Celular *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && celular?.invalid">
+                                <input type="number" class="campo-input" formControlName="celular" placeholder="Ej: 77112233">
+                            </div>
+
                         </div>
-                        <div class="mb-2 col-md-6">
-                            <label class="form-label"
-                                [class.error]="enviadoEst() && municipio?.invalid">Municipio*</label>
-                            <select class="form-control" formControlName="municipio">
-                                @if (provincia?.value != "") {
-                                @for (municipio of municipios; track municipio) {
-                                @if (provincia?.value == municipio.idProvincia) {
-                                <option value="{{municipio.nombre}}">{{municipio.nombre}}</option>
-                                }
-                                }
-                                }
-                            </select>
+
+                        <!-- Provincia -->
+                        <div class="col-md-6">
+                            <label class="campo-label" [class.error]="enviadoEst() && provincia?.invalid">
+                                <i class="bi bi-map-fill campo-icono"></i>
+                                Provincia *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && provincia?.invalid">
+                                <select class="campo-input" formControlName="provincia">
+                                    <option [ngValue]="null" disabled selected>-- Selecciona tu Provincia --</option>
+                                    @for (prov of provincias; track prov.idProvincia) {
+                                    <option [ngValue]="prov.idProvincia">{{prov.nombre}}</option>
+                                    }
+                                </select>
+                            </div>
+                            @if (enviadoEst() && provincia?.invalid) {
+                            <div class="campo-error-msg">Debes seleccionar una provincia.</div>
+                            }
                         </div>
+
+                        <!-- Municipio -->
+                        <div class="col-md-6">
+                            <label class="campo-label" [class.error]="enviadoEst() && municipio?.invalid">
+                                <i class="bi bi-pin-map-fill campo-icono"></i>
+                                Municipio *
+                            </label>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && municipio?.invalid">
+                                <select class="campo-input" formControlName="municipio">
+                                    <option [ngValue]="null" disabled selected>-- Selecciona tu Municipio --</option>
+                                    @for (mun of municipiosFiltrados; track mun.idMunicipio) {
+                                    <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
+                                    }
+                                </select>
+                            </div>
+                            @if (enviadoEst() && municipio?.invalid) {
+                            <div class="campo-error-msg">Debes seleccionar un municipio.</div>
+                            }
+                       </div>
                     </div>
+
                 </div>
 
                 <button class="btn mt-2 mx-auto mb-3" style="background-color: #2d8032; color: white;" type="button"

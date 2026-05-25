@@ -310,3 +310,36 @@
   background-color: var(--umsa-blue-dark) !important;
   color: white !important;
 }
+
+.btn-umsa-outline {
+  color: var(--umsa-blue);
+  border-color: var(--umsa-blue);
+  background-color: transparent;
+}
+.btn-umsa-outline:hover {
+  color: #fff;
+  background-color: var(--umsa-blue);
+  border-color: var(--umsa-blue);
+}
+
+.btn-umsa-accion {
+  color: #fff;
+  background-color: var(--umsa-blue);
+  border-color: var(--umsa-blue);
+}
+.btn-umsa-accion:hover {
+  color: #fff;
+  background-color: var(--umsa-blue-dark);
+  border-color: var(--umsa-blue-dark);
+}
+
+.btn-umsa-edit {
+  color: #000;
+  background-color: var(--umsa-accent);
+  border-color: var(--umsa-accent);
+}
+.btn-umsa-edit:hover {
+  color: #000;
+  background-color: #e6b800; /* slightly darker accent */
+  border-color: #e6b800;
+}
