@@ -7,10 +7,10 @@
             <h3 class="text-center" style="font-weight: bold; margin: 3%; font-size: 1.80rem;">
                 FORMULARIO DE REGISTRO</h3>
             <div class="card mb-3 card-seccion1">
-                <h5 class="mx-3 fw-bold"
-                    style="letter-spacing: 1px; font-size: 1.35rem; margin: 8px 0; color:#32639e ">
+                <h5 class="mx-3 fw-bold" style="letter-spacing: 1px; font-size: 1.35rem; margin: 8px 0; color:#32639e ">
                 </h5>
-                <span class="text-danger mx-3">Completa <span style="font-weight: 700;">TODOS</span> los campos del registro
+                <span class="text-danger mx-3">Completa <span style="font-weight: 700;">TODOS</span> los campos del
+                    registro
                     siguiendo el formato indicado</span>
                 <span class="text-danger mx-3" style="margin-bottom: 10px;">Al completar el
                     registro presiona en el boton de <span style="font-weight: 700;">SIGUIENTE</span> </span>
@@ -28,7 +28,8 @@
                                 Carnet de Identidad *
                             </label>
                             <div class="campo-wrapper" [class.campo-error]="enviadoEst() && carnetNum?.invalid">
-                                <input type="number" class="campo-input" placeholder="Ej: 12345678" formControlName="carnetNum">
+                                <input type="number" class="campo-input" placeholder="Ej: 12345678"
+                                    formControlName="carnetNum">
                             </div>
                             <span class="campo-ayuda">Solo el número, sin letras</span>
                         </div>
@@ -63,7 +64,8 @@
                                 Nombres *
                             </label>
                             <div class="campo-wrapper" [class.campo-error]="enviadoEst() && nombre?.invalid">
-                                <input type="text" class="campo-input uppercase-input" formControlName="nombre" placeholder="Ej: JUAN CARLOS">
+                                <input type="text" class="campo-input uppercase-input" formControlName="nombre"
+                                    placeholder="Ej: JUAN CARLOS">
                             </div>
                         </div>
 
@@ -74,7 +76,8 @@
                                 Apellido Paterno *
                             </label>
                             <div class="campo-wrapper" [class.campo-error]="enviadoEst() && apPaterno?.invalid">
-                                <input type="text" class="campo-input uppercase-input" formControlName="apPaterno" placeholder="Ej: PEREZ">
+                                <input type="text" class="campo-input uppercase-input" formControlName="apPaterno"
+                                    placeholder="Ej: PEREZ">
                             </div>
                         </div>
 
@@ -85,7 +88,8 @@
                                 Apellido Materno *
                             </label>
                             <div class="campo-wrapper" [class.campo-error]="enviadoEst() && apMaterno?.invalid">
-                                <input type="text" class="campo-input uppercase-input" formControlName="apMaterno" placeholder="Ej: GOMEZ">
+                                <input type="text" class="campo-input uppercase-input" formControlName="apMaterno"
+                                    placeholder="Ej: GOMEZ">
                             </div>
                         </div>
 
@@ -96,7 +100,8 @@
                                 Nombre del Colegio *
                             </label>
                             <div class="campo-wrapper" [class.campo-error]="enviadoEst() && colegio?.invalid">
-                                <input type="text" class="campo-input uppercase-input" formControlName="colegio" placeholder="Ej: NACIONAL SIMON BOLIVAR">
+                                <input type="text" class="campo-input uppercase-input" formControlName="colegio"
+                                    placeholder="Ej: NACIONAL SIMON BOLIVAR">
                             </div>
                         </div>
 
@@ -137,7 +142,8 @@
                                 Número de Celular *
                             </label>
                             <div class="campo-wrapper" [class.campo-error]="enviadoEst() && celular?.invalid">
-                                <input type="number" class="campo-input" formControlName="celular" placeholder="Ej: 77112233">
+                                <input type="number" class="campo-input" formControlName="celular"
+                                    placeholder="Ej: 77112233">
                             </div>
 
                         </div>
@@ -170,15 +176,34 @@
                             <div class="campo-wrapper" [class.campo-error]="enviadoEst() && municipio?.invalid">
                                 <select class="campo-input" formControlName="municipio">
                                     <option [ngValue]="null" disabled selected>-- Selecciona tu Municipio --</option>
-                                    @for (mun of municipiosFiltrados; track mun.idMunicipio) {
+
+                                    @if (provincia!.value) {
+                                    <optgroup label="Municipios de la provincia seleccionada">
+                                        @for (mun of todosMunicipios; track mun.idMunicipio) {
+                                        @if (mun.idProvincia === provincia!.value) {
+                                        <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
+                                        }
+                                        }
+                                    </optgroup>
+
+                                    <optgroup label="Otros municipios">
+                                        @for (mun of todosMunicipios; track mun.idMunicipio) {
+                                        @if (mun.idProvincia !== provincia!.value) {
+                                        <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
+                                        }
+                                        }
+                                    </optgroup>
+                                    } @else {
+                                    @for (mun of todosMunicipios; track mun.idMunicipio) {
                                     <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
+                                    }
                                     }
                                 </select>
                             </div>
                             @if (enviadoEst() && municipio?.invalid) {
                             <div class="campo-error-msg">Debes seleccionar un municipio.</div>
                             }
-                       </div>
+                        </div>
                     </div>
 
                 </div>
@@ -225,13 +250,13 @@
                             @for (val of [1,0]; track val) {
                             @if(val===1){
                             <label class="form-check-label mx-4"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="i.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="i.toString()">
                             </label>
                             }@else{
                             <label class="form-check-label mx-4"> NO
-                                <input class="form-check-input mx-1"  style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="i.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="i.toString()">
                             </label>
                             }
                             }
@@ -282,13 +307,13 @@
                             @for (val of [1,0]; track val) {
                             @if(val===1){
                             <label class="form-check-label"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="i.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="i.toString()">
                             </label>
                             }@else{
                             <label class="form-check-label mx-4"> NO
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="i.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="i.toString()">
                             </label>
                             }
 
@@ -337,13 +362,13 @@
                             @for (val of [1,0]; track val) {
                             @if(val===1){
                             <label class="form-check-label"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="i.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="i.toString()">
                             </label>
                             }@else{
                             <label class="form-check-label mx-4"> NO
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="i.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="i.toString()">
                             </label>
                             }
                             }
@@ -392,13 +417,13 @@
                             @for (val of [1,0]; track val) {
                             @if(val===1){
                             <label class="form-check-label"> SI
-                                <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="i.toString()">
+                                <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="i.toString()">
                             </label>
                             }@else{
                             <label class="form-check-label mx-4"> NO
-                                <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="i.toString()">
+                                <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="i.toString()">
                             </label>
                             }
                             }
@@ -451,13 +476,13 @@
 
                             @if (val === 1) {
                             <label class="form-check-label"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="j.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="j.toString()">
                             </label>
                             }@else {
                             <label class="form-check-label mx-4">NO
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="j.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="j.toString()">
                             </label>
                             }
 
@@ -506,13 +531,13 @@
                             @for (val of [1,0]; track val) {
                             @if (val === 1) {
                             <label class="form-check-label"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="j.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="j.toString()">
                             </label>
                             }@else {
                             <label class="form-check-label mx-4">NO
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="j.toString()">
+                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="j.toString()">
                             </label>
                             }
                             }
@@ -550,7 +575,8 @@
                             <p>{{preguntahf.pregunta}}</p>
                         </div>
                         <div class="col-md-1">
-                            <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="checkbox" [value]="1" [formControlName]="i">
+                            <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="checkbox"
+                                [value]="1" [formControlName]="i">
                         </div>
                         <div class="col-md-1"></div>
                         }
@@ -588,7 +614,8 @@
                             <p>{{preguntahs.pregunta}}</p>
                         </div>
                         <div class="col-md-1">
-                            <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="checkbox" [value]="1" [formControlName]="i">
+                            <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="checkbox"
+                                [value]="1" [formControlName]="i">
                         </div>
                         <div class="col-md-1"></div>
                         }
@@ -624,7 +651,8 @@
                             <p>{{preguntaht.pregunta}}</p>
                         </div>
                         <div class="col-md-1">
-                            <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="checkbox" [value]="1" [formControlName]="i">
+                            <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="checkbox"
+                                [value]="1" [formControlName]="i">
                         </div>
                         <div class="col-md-1"></div>
                         }
@@ -661,8 +689,8 @@
                         <div class="col-md-8 mb-3">
                             @for (val of [1,2,3,4,5,6,7]; track val) {
                             <label class="form-check-label opcion-radio">{{val}}
-                                <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio" [value]="val"
-                                    [formControlName]="l.toString()">
+                                <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio"
+                                    [value]="val" [formControlName]="l.toString()">
                             </label>
                             }
                         </div>

@@ -119,7 +119,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     return this.resultadosForm as FormArray<FormGroup>;
   }
 
-  
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private formBuilder: FormBuilder,
@@ -156,9 +156,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       curso: ['', [Validators.required]],
       edad: ['', [Validators.required, Validators.min(10), Validators.max(30)]],
       celular: ['', [Validators.pattern(/^\d+$/)]],
-      // idProvincia: FK a Provincia (number) — usado sólo en el formulario de edición
       idProvincia: [null, [Validators.required]],
-      // idMunicipio: FK al Municipio (number) — nombre canónico camelCase
       idMunicipio: [null, [Validators.required]]
     });
 
@@ -313,20 +311,17 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           }
           this.municipiosPorProvincia[m.idProvincia].push(m);
         });
-        
-        // Cargar todos los municipios para el filtro
         this.opcionesFiltros.municipios = this.municipios.map(m => ({
           nombre: m.nombre,
-          idMunicipio: m.idMunicipio
+          idMunicipio: m.idMunicipio,
+          idProvincia: m.idProvincia
         }));
 
         if (this.filtros.provincia) {
           this.onProvinciaChange(this.filtros.provincia);
         }
       },
-      error: (err) => {
-        console.error('Error al cargar municipios', err);
-      }
+      error: (err) => console.error('Error al cargar municipios', err)
     });
   }
 
@@ -375,8 +370,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           // Autocompletar la provincia
           this.editarForm.patchValue({ idProvincia: provincia.idProvincia });
           // Ajustar la lista de municipios pero manteniendo el valor actual
-          this.municipiosFiltrados = this.municipiosPorProvincia[provincia.idProvincia] || 
-                                     this.municipios.filter(m => m.idProvincia === provincia.idProvincia);
+          this.municipiosFiltrados = this.municipiosPorProvincia[provincia.idProvincia] ||
+            this.municipios.filter(m => m.idProvincia === provincia.idProvincia);
         }
       }
     }
@@ -448,13 +443,10 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   }
   onProvinciaChange(idProvincia: string): void {
     this.filtros.provincia = idProvincia;
-    // Si la provincia cambia, reseteamos el municipio para no tener combinaciones inválidas
-    this.filtros.municipio = '';
-    
-    // Siempre mostrar todos los municipios
     this.opcionesFiltros.municipios = this.municipios.map(m => ({
       nombre: m.nombre,
-      idMunicipio: m.idMunicipio
+      idMunicipio: m.idMunicipio,
+      idProvincia: m.idProvincia
     }));
 
     this.filtrarEstudiantes();
@@ -467,7 +459,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     if (tipo === 'municipio' && valor) {
       const municipioIdNumerico = parseInt(valor, 10);
       const municipioSeleccionado = this.municipios.find(m => m.idMunicipio === municipioIdNumerico);
-      
+
       if (municipioSeleccionado && municipioSeleccionado.idProvincia) {
         this.filtros.provincia = municipioSeleccionado.idProvincia.toString();
       }
@@ -842,9 +834,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
     if (provinciaEstudiante) {
       const idProv: number = provinciaEstudiante.idProvincia;
-        this.municipioService.getMunicipiosPorProvinciaHttp(idProv).subscribe(muns => {
-          this.municipiosFiltrados = muns.length > 0 ? muns : this.municipios.filter((m: any) => m.idProvincia === idProv);
-        });
+      this.municipioService.getMunicipiosPorProvinciaHttp(idProv).subscribe(muns => {
+        this.municipiosFiltrados = muns.length > 0 ? muns : this.municipios.filter((m: any) => m.idProvincia === idProv);
+      });
     } else {
       this.municipiosFiltrados = this.municipios;
     }

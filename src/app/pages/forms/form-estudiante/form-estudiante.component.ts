@@ -236,28 +236,20 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
     });
 
     this.provincia!.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((idProvincia: number | null) => {
-        if (this._syncingLocation) return;
-        this._syncingLocation = true;
-        try {
-          // Siempre mantenemos todos los municipios visibles
-          this.municipiosFiltrados = [...this.todosMunicipios];
-
-          if (idProvincia !== null && idProvincia > 0) {
-            const idMunicipioActual: number | null = this.municipio!.value;
-            const municipioPerteneceAProvincia = idMunicipioActual !== null &&
-              this.todosMunicipios.some(m => m.idMunicipio === idMunicipioActual && m.idProvincia === idProvincia);
-            if (idMunicipioActual !== null && !municipioPerteneceAProvincia) {
-              this.municipio!.setValue(null, { emitEvent: false });
-            }
-          } else {
-            this.municipio!.setValue(null, { emitEvent: false });
-          }
-        } finally {
-          this._syncingLocation = false;
-        }
-      });
+  .pipe(takeUntil(this.destroy$))
+  .subscribe((idProvincia: number | null) => {
+    if (this._syncingLocation) return;
+    this._syncingLocation = true;
+    try {
+      // Ya no vaciamos el municipio ni validamos si pertenece, 
+      // porque ahora se permiten todos los municipios en la lista.
+      if (idProvincia === null || idProvincia <= 0) {
+        this.municipio!.setValue(null, { emitEvent: false });
+      }
+    } finally {
+      this._syncingLocation = false;
+    }
+  });
 
     this.municipio!.valueChanges
       .pipe(takeUntil(this.destroy$))
