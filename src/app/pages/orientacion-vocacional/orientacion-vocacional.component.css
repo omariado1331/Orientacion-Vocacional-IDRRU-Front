@@ -122,12 +122,12 @@
   max-width: 1200px;
   height: 280px;
   margin: 50px auto;
-  background: url('/assets/fondoEstudiantes.png') no-repeat center center fixed;
+  background: url('/assets/fondo_orientacion.jpg') no-repeat center center fixed;
   background-size: cover;
   border-radius: 25px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+  box-shadow: 0 12px 35px rgba(152, 148, 148, 0.204);
   animation: fadeInUp 1s ease forwards;
 }
 
@@ -138,7 +138,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(0,0,0,0.2), rgba(0,0,0,0.55));
+  background: linear-gradient(135deg, rgba(196, 192, 192, 0.2), rgba(127, 139, 141, 0.202));
   border-radius: 25px;
   z-index: 1;
 }
@@ -146,11 +146,11 @@
 /* Texto dentro del banner */
 .hero-banner-text {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  color: #fff;
+  color: #0b2e4e;
   z-index: 2;
   animation: fadeInUp 1.2s ease forwards;
 }
@@ -164,9 +164,9 @@
 
 .hero-banner-text p {
   font-size: 1.2rem;
-  margin-bottom: 20px;
+  margin-bottom: 100px;
   font-weight: 400;
-  text-shadow: 1px 1px 6px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 6px rgba(29, 27, 27, 0.3);
 }
 
 /* Botón elegante */

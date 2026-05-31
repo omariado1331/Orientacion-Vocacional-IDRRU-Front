@@ -147,7 +147,7 @@
     margin: 5px 0;
     border-radius: 0 25px 25px 0;
   }
-
+/*
   .navbar-collapse.show .nav-item {
     animation: slideInLeft 0.4s ease forwards;
     opacity: 0;
@@ -173,7 +173,7 @@
   .navbar-collapse.show .nav-item:nth-child(5) {
     animation-delay: 0.5s;
   }
-
+*/
 }
 
 @keyframes slideInLeft {
