@@ -1,84 +1,62 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { ProvinciaI } from '../interfaces/provincia-interface';
+import { catchError, tap } from 'rxjs/operators';
 import { Provincia } from '../interfaces/provincia-interface';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { PROVINCIAS_OFFLINE } from '../data/static-data';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class ProvinciaService {
 
   private baseUrl = `${environment.apiUrl}/provincia`;
+  private isBrowser: boolean;
 
-  constructor(private http: HttpClient) {}
-
-  getProvinciasList(): Observable<Provincia[]> {
-    return this.http.get<Provincia[]>(this.baseUrl);
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
   }
 
-
-
-  private mockProvincias: Provincia[] = [
-    { id: 1, nombre: 'ABEL ITURRALDE' },
-    { id: 2, nombre: 'AROMA' },
-    { id: 3, nombre: 'BAUTISTA SAAVEDRA' },
-    { id: 4, nombre: 'CAMACHO' },
-    { id: 5, nombre: 'CARANAVI' },
-    { id: 6, nombre: 'FRANZ TAMAYO' },
-    { id: 7, nombre: 'GUALBERTO VILLAROEL' },
-    { id: 8, nombre: 'INGAVI' },
-    { id: 9, nombre: 'INQUISIVI' },
-    { id: 10, nombre: 'JOSE MANUEL PANDO' },
-    { id: 11, nombre: 'LARECAJA' },
-    { id: 12, nombre: 'LOAYZA' },
-    { id: 13, nombre: 'LOS ANDES' },
-    { id: 14, nombre: 'MANCO KAPAC' },
-    { id: 15, nombre: 'MUÑECAS' },
-    { id: 16, nombre: 'MURILLO' },
-    { id: 17, nombre: 'NOR YUNGAS' },
-    { id: 18, nombre: 'OMASUYOS' },
-    { id: 19, nombre: 'PACAJES' },
-    { id: 20, nombre: 'SUD YUNGAS' }
-  ];
-
-
-  getProvinciasAll(): Observable<Provincia[]> {
-    return of(this.mockProvincias);
+  getProvincias(): Observable<Provincia[]> {
+    return this.http.get<Provincia[]>(`${this.baseUrl}`).pipe(
+      tap(data => {
+        if (this.isBrowser) {
+          localStorage.setItem('provincias_cache', JSON.stringify(data));
+        }
+      }),
+      catchError(error => {
+        console.warn('Error al obtener provincias. Usando datos offline...', error);
+        
+        let cachedData: Provincia[] | null = null;
+        if (this.isBrowser) {
+          const cache = localStorage.getItem('provincias_cache');
+          if (cache) {
+            try {
+              cachedData = JSON.parse(cache);
+            } catch (e) {
+              console.error('Error parseando caché', e);
+            }
+          }
+        }
+        return of(cachedData || PROVINCIAS_OFFLINE);
+      })
+    );
   }
 
-
-  getProvincias(): Observable<ProvinciaI[]> {
-      return this.http.get<ProvinciaI[]>(`${this.baseUrl}`);
+  /** Obtiene una provincia por su ID desde el servidor o fallback. */
+  getById(id: number): Observable<Provincia> {
+    return this.http.get<Provincia>(`${this.baseUrl}/${id}`).pipe(
+      catchError(() => {
+        const fallbackList = PROVINCIAS_OFFLINE;
+        const found = fallbackList.find(p => p.idProvincia === id);
+        if (found) return of(found);
+        throw new Error('Provincia no encontrada offline');
+      })
+    );
   }
-
-  getById(id: number): Observable<ProvinciaI> {
-      return this.http.get<ProvinciaI>(`${this.baseUrl}/${id}`);
-  }
-
-  provincias: Provincia[] = [
-    new Provincia(1, 'ABEL ITURRALDE'),
-    new Provincia(2, 'AROMA'),
-    new Provincia(3, 'BAUTISTA SAAVEDRA'),
-    new Provincia(4, 'CAMACHO'),
-    new Provincia(5, 'CARANAVI'),
-    new Provincia(6, 'FRANZ TAMAYO'),
-    new Provincia(7, 'GUALBERTO VILLAROEL'),
-    new Provincia(8, 'INGAVI'),
-    new Provincia(9, 'INQUISIVI'),
-    new Provincia(10, 'JOSE MANUEL PANDO'),
-    new Provincia(11, 'LARECAJA'),
-    new Provincia(12, 'LOAYZA'),
-    new Provincia(13, 'LOS ANDES'),
-    new Provincia(14, 'MANCO KAPAC'),
-    new Provincia(15, 'MUÑECAS'),
-    new Provincia(16, 'MURILLO'),
-    new Provincia(17, 'NOR YUNGAS'),
-    new Provincia(18, 'OMASUYOS'),
-    new Provincia(19, 'PACAJES'),
-    new Provincia(20, 'SUD YUNGAS')
-
-  ]
 }

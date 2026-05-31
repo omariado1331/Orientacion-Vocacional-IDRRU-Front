@@ -130,7 +130,7 @@
         <!-- Búsqueda Global -->
         <div class="mb-3">
           <div class="input-group input-group-sm">
-            <span class="input-group-text bg-primary text-white">
+            <span class="input-group-text bg-umsa-blue text-white">
               <i class="bi bi-search"></i>
             </span>
             <input type="text" class="form-control" placeholder="Buscar por nombre, apellido, CI o colegio..."
@@ -153,10 +153,31 @@
           <div class="col-6 col-md-3">
             <select class="form-select form-select-sm" [(ngModel)]="filtros.municipio"
               (change)="aplicarFiltro('municipio', filtros.municipio)">
-              <option value>Todos los municipios</option>
-              <option *ngFor="let municipio of opcionesFiltros.municipios" [value]="municipio.idMunicipio">
-                {{ municipio.nombre }}
-              </option>
+              <option value="">Todos los municipios</option>
+
+              <ng-container *ngIf="filtros.provincia">
+                <optgroup label="Municipios de la provincia seleccionada">
+                  <ng-container *ngFor="let municipio of opcionesFiltros.municipios">
+                    <option *ngIf="municipio.idProvincia == filtros.provincia" [value]="municipio.idMunicipio">
+                      {{ municipio.nombre }}
+                    </option>
+                  </ng-container>
+                </optgroup>
+
+                <optgroup label="Otros municipios">
+                  <ng-container *ngFor="let municipio of opcionesFiltros.municipios">
+                    <option *ngIf="municipio.idProvincia != filtros.provincia" [value]="municipio.idMunicipio">
+                      {{ municipio.nombre }}
+                    </option>
+                  </ng-container>
+                </optgroup>
+              </ng-container>
+
+              <ng-container *ngIf="!filtros.provincia">
+                <option *ngFor="let municipio of opcionesFiltros.municipios" [value]="municipio.idMunicipio">
+                  {{ municipio.nombre }}
+                </option>
+              </ng-container>
             </select>
           </div>
 
@@ -202,7 +223,7 @@
               </div>
             </div>
             <div class="col-12 col-lg-1">
-              <button class="btn btn-primary btn-sm w-100" (click)="aplicarFiltroFecha()">
+              <button class="btn btn-umsa-outline btn-sm w-100" (click)="aplicarFiltroFecha()">
                 <i class="bi bi-funnel"></i>
               </button>
             </div>
@@ -228,7 +249,8 @@
       [ngStyle]="{ display: modalPerfilVisible ? 'block' : 'none' }" aria-labelledby="perfilEstudianteModalLabel">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
-          <div class="modal-header bg-primary text-white">
+          <div class="modal-header text-white"
+            style="background: linear-gradient(135deg, var(--umsa-blue-dark), var(--umsa-blue)); border-radius: 0;">
             <h5 class="modal-title" id="perfilEstudianteModalLabel">
               <i class="bi bi-person-badge me-2"></i>
               Perfil del Estudiante
@@ -238,7 +260,7 @@
           <div class="modal-body p-0">
             <!-- Spinner de carga -->
             <div *ngIf="loading" class="text-center py-5">
-              <div class="spinner-border text-primary" role="status">
+              <div class="spinner-border text-umsa-blue" role="status">
                 <span class="visually-hidden">Cargando...</span>
               </div>
               <p class="mt-2 text-muted">
@@ -251,8 +273,8 @@
               <div class="bg-light p-4 mb-3 border-bottom position-relative">
                 <div class="row align-items-center">
                   <div class="col-auto">
-                    <div
-                      class="bg-primary text-white d-flex align-items-center justify-content-center px-3 py-2 rounded-circle">
+                    <div class="text-white d-flex align-items-center justify-content-center px-3 py-2 rounded-circle"
+                      style="background: linear-gradient(135deg, var(--umsa-blue-dark), var(--umsa-blue));">
                       <span class="fs-1">
                         {{ estudianteSeleccionado.nombre.charAt(0)
                         }}{{ estudianteSeleccionado.apPaterno.charAt(0) }}
@@ -280,11 +302,9 @@
                       </div>
                       <div>
                         <i class="bi bi-pin-map me-1"></i>
-                        {{
-                        getMunicipioNombre(
-                        estudianteSeleccionado.id_municipio
-                        )
-                        }}
+                        {{ getMunicipioNombre(
+                        estudianteSeleccionado.idMunicipio ?? estudianteSeleccionado.id_municipio
+                        ) }}
                       </div>
                     </div>
                   </div>
@@ -295,7 +315,7 @@
                 <div class="card mb-4 border-0 shadow-sm">
                   <div class="card-header bg-white py-2">
                     <h5 class="mb-0 d-flex align-items-center">
-                      <i class="bi bi-person-lines-fill me-2 text-primary"></i>
+                      <i class="bi bi-person-lines-fill me-2 text-umsa-blue"></i>
                       Datos Personales
                     </h5>
                   </div>
@@ -360,10 +380,10 @@
                 <!-- Resultados de Orientación -->
                 <div *ngIf="resultadoEstudiante && resultadoEstudiante.length > 0">
                   <h5 class="mb-2 d-flex align-items-center">
-                    <span class="badge bg-primary rounded-pill me-2">{{
+                    <span class="badge rounded-pill me-2" style="background-color: var(--umsa-blue);">{{
                       resultadoEstudiante.length
                       }}</span>
-                    <i class="bi bi-graph-up me-2 text-primary"></i>
+                    <i class="bi bi-graph-up me-2 text-umsa-blue"></i>
                     Resultados de Orientación Vocacional
                   </h5>
 
@@ -388,7 +408,7 @@
                       <div class="card mb-2 border-0 shadow-sm">
                         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                           <h6 class="mb-0 d-flex align-items-center h6">
-                            <i class="bi bi-calendar-check me-2 text-primary"></i>
+                            <i class="bi bi-calendar-check me-2 text-umsa-blue"></i>
                             Evaluación del
                             {{
                             estudianteSeleccionado.createdAt
@@ -402,7 +422,7 @@
                             <div class="col-md-6">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary text-uppercase">
+                                  <h6 class="card-title text-uppercase" style="color: var(--umsa-blue);">
                                     <i class="bi bi-star me-2"></i>
                                     Interés y Aptitud
                                   </h6>
@@ -434,13 +454,13 @@
                             <div class="col-md-6">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary text-uppercase">
+                                  <h6 class="card-title text-uppercase" style="color: var(--umsa-blue);">
                                     <i class="bi bi-award me-2"></i>
                                     Evaluación Holland
                                   </h6>
                                   <label class="d-block text-uppercase small text-muted mb-1">PERSONALIDADES:</label>
                                   <div class>
-                                    <span class="badge bg-primary me-2 fs-6" *ngFor="let letra of resultado.puntajeHolland.split(
+                                    <span class="badge me-2 fs-6" style="background-color: var(--umsa-blue);" *ngFor="let letra of resultado.puntajeHolland.split(
                                           ''
                                         )">
                                       {{ letra }}
@@ -457,7 +477,8 @@
                             <div class="col-md-6 mb-3" *ngIf="resultado.chaside">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary d-flex align-items-center text-uppercase">
+                                  <h6 class="card-title d-flex align-items-center text-uppercase"
+                                    style="color: var(--umsa-blue);">
                                     <i class="bi bi-clipboard-data me-2"></i>
                                     Test CHASIDE
                                   </h6>
@@ -490,7 +511,8 @@
                             <div class="col-md-6 mb-3" *ngIf="resultado.holland">
                               <div class="card h-100 border-0 bg-light">
                                 <div class="card-body">
-                                  <h6 class="card-title text-primary d-flex align-items-center text-uppercase">
+                                  <h6 class="card-title d-flex align-items-center text-uppercase"
+                                    style="color: var(--umsa-blue);">
                                     <i class="bi bi-person-bounding-box me-2"></i>
                                     Test Holland
                                   </h6>
@@ -515,9 +537,9 @@
                           </div>
 
                           <!-- Recomendaciones específicas -->
-                          <div class="card border-0 bg-primary bg-opacity-10 mb-0">
+                          <div class="card border-0 mb-0" style="background-color: rgba(23, 86, 163, 0.08);">
                             <div class="card-body">
-                              <h6 class="card-title text-primary">
+                              <h6 class="card-title" style="color: var(--umsa-blue);">
                                 <i class="bi bi-lightbulb me-2"></i>
                                 Recomendaciones
                               </h6>
@@ -572,7 +594,7 @@
               <i class="bi bi-x-circle me-2"></i>
               Cerrar
             </button>
-            <button type="button" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm"
+            <button type="button" class="btn btn-umsa-modern px-4 py-2 rounded-pill fw-semibold shadow-sm"
               *ngIf="estudianteSeleccionado" (click)="exportarPerfilPDF()">
               <i class="bi bi-file-earmark-pdf me-2"></i>
               Exportar PDF
@@ -586,7 +608,8 @@
       [ngStyle]="{ display: modalEditarVisible ? 'block' : 'none' }" aria-labelledby="editarEstudianteModalLabel">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content shadow-lg border-0 rounded-4">
-          <div class="modal-header bg-primary text-white">
+          <div class="modal-header text-white"
+            style="background: linear-gradient(135deg, var(--umsa-blue-dark), var(--umsa-blue)); border-radius: 0;">
             <div class="d-flex align-items-center">
               <div>
                 <h4 class="modal-title mb-1 fw-bold" id="editarEstudianteModalLabel">
@@ -795,23 +818,23 @@
 
                   <div class="col-md-6">
                     <div class="form-floating">
-                      <select class="form-select border-2 rounded-3" id="id_municipio" formControlName="id_municipio"
-                        [ngClass]="{
+                      <select class="form-select border-2 rounded-3" id="idMunicipio" formControlName="idMunicipio"
+                        (change)="onMunicipioChangeEditar($event)" [ngClass]="{
                           'is-invalid border-danger':
-                            editarForm.controls['id_municipio'].invalid &&
-                            editarForm.controls['id_municipio'].touched
+                            editarForm.controls['idMunicipio'].invalid &&
+                            editarForm.controls['idMunicipio'].touched
                         }">
                         <option [value]="null">Seleccione un municipio</option>
                         <option *ngFor="let municipio of municipiosFiltrados" [value]="municipio.idMunicipio">
                           {{ municipio.nombre }}
                         </option>
                       </select>
-                      <label for="id_municipio" class="text-muted" style="font-size: var(--tx-base) !important">
+                      <label for="idMunicipio" class="text-muted" style="font-size: var(--tx-base) !important">
                         <i class="bi bi-pin-map me-2"></i>
                         Municipio *
                       </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['id_municipio'].invalid &&
-                          editarForm.controls['id_municipio'].touched">
+                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['idMunicipio'].invalid &&
+                          editarForm.controls['idMunicipio'].touched">
                         <i class="bi bi-exclamation-triangle me-1"></i>
                         Seleccione un municipio
                       </div>
@@ -883,7 +906,8 @@
                       </td>
 
                       <td class="py-3">
-                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold">
+                        <span class="badge px-3 py-2 rounded-pill fw-semibold"
+                          style="background-color: rgba(23,86,163,0.12); color: var(--umsa-blue);">
                           {{ r.interes }}
                         </span>
                       </td>
@@ -936,7 +960,7 @@
                 <i class="bi bi-x-circle me-2"></i>
                 Cancelar
               </button>
-              <button type="button" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm"
+              <button type="button" class="btn btn-umsa-modern px-4 py-2 rounded-pill fw-semibold shadow-sm"
                 [disabled]="editarForm.invalid || !estudianteSeleccionado || loading"
                 (click)="guardarEdicionCompletaEstudiante()">
                 <i class="bi bi-check-circle me-2"></i>
@@ -1071,17 +1095,17 @@
                 <td>{{ estudiante.colegio }}</td>
                 <td>{{ estudiante.celular }}</td>
                 <td>
-                  {{ getMunicipioNombre(estudiante.id_municipio) }}
+                  {{ getMunicipioNombre(estudiante.idMunicipio ?? estudiante.id_municipio) }}
                 </td>
 
                 <td class="text-center">
                   <div class="btn-group btn-group-sm" role="group">
-                    <button class="btn px-3 rounded-start btn-primary" title="Ver Perfil"
+                    <button class="btn px-3 rounded-start btn-umsa-accion" title="Ver Perfil"
                       (click)="verPerfilEstudiante(estudiante.idEstudiante)" style="transition: all 0.2s">
                       <i class="bi bi-person-badge fs-6"></i>
                     </button>
 
-                    <button class="btn px-3 btn-warning" title="Editar" (click)="abrirModalEditar(estudiante)"
+                    <button class="btn px-3 btn-umsa-edit" title="Editar" (click)="abrirModalEditar(estudiante)"
                       style="transition: all 0.2s; margin: 0 7px">
                       <i class="bi bi-pencil fs-6"></i>
                     </button>

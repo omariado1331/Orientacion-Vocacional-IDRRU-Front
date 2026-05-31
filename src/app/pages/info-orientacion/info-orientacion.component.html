@@ -11,12 +11,6 @@
     </div>
   </div>
 
-  <!-- Loader -->
-  <div *ngIf="cargando" class="umsa-loader">
-    <div class="umsa-spinner"></div>
-    <p>Cargando información de facultades...</p>
-  </div>
-
   <div *ngIf="!cargando" class="umsa-content">
     <div class="umsa-facultades-grid">
       <div *ngFor="let facultad of facultades" class="umsa-facultad-card"

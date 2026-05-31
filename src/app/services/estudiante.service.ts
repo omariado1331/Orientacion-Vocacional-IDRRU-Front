@@ -1,35 +1,37 @@
+// estudiante.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 import { EstudianteI } from '../interfaces/estudiante-interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EstudianteService {
-  private apiUrl = `${environment.apiUrl}/estudiante`; 
+  private apiUrl = `${environment.apiUrl}/estudiante`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getAll(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  getAll(): Observable<EstudianteI[]> {
+    return this.http.get<EstudianteI[]>(this.apiUrl);
   }
 
-  getById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  getById(id: number): Observable<EstudianteI> {
+    return this.http.get<EstudianteI>(`${this.apiUrl}/${id}`);
   }
 
   create(estudiante: EstudianteI): Observable<EstudianteI> {
-    return this.http.post<EstudianteI>(`${this.apiUrl}/`, estudiante);
+    const payload = { ...estudiante, id_municipio: estudiante.idMunicipio };
+    return this.http.post<EstudianteI>(`${this.apiUrl}/`, payload);
   }
 
-  update(id: number, estudiante: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, estudiante);
+  update(id: number, estudiante: EstudianteI): Observable<EstudianteI> {
+    const payload = { ...estudiante, id_municipio: estudiante.idMunicipio };
+    return this.http.put<EstudianteI>(`${this.apiUrl}/${id}`, payload);
   }
 
-  delete(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-
 }

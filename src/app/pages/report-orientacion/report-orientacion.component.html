@@ -6,9 +6,9 @@
       <select [(ngModel)]="idProvincia" (change)="onProvinciaChange()">
         
       
-        <option [ngValue]="undefined" disabled hidden selected></option>
+        <option [ngValue]="undefined" disabled hidden selected>Seleccione Provincia</option>
         
-        <option *ngFor="let p of provincias" [ngValue]="p.id">{{ p.nombre }}</option>
+        <option *ngFor="let p of provincias" [ngValue]="p.idProvincia">{{ p.nombre }}</option>
       </select>
     </label>
 
@@ -16,7 +16,7 @@
       Municipio:
       <select [(ngModel)]="idMunicipio" (change)="onMunicipioChange()">
         
-        <option [ngValue]="undefined" disabled hidden selected></option>
+        <option [ngValue]="undefined" disabled hidden selected>Seleccione Municipio</option>
         
         <option *ngFor="let m of municipios" [ngValue]="m.idMunicipio">{{ m.nombre }}</option>
       </select>
@@ -26,7 +26,7 @@
     <label>
       Año Inicio:
       <select [(ngModel)]="fechaInicio">
-        <option value="undefined" disabled hidden selected></option>
+        <option [value]="undefined" disabled hidden selected>Seleccione Año</option>
         <option *ngFor="let y of listaAnios" [value]="y">{{ y }}</option>
       </select>
     </label>
@@ -35,7 +35,7 @@
       Año Fin:
       <select [(ngModel)]="fechaFin">
         
-        <option value="undefined" disabled hidden selected></option>
+        <option [value]="undefined" disabled hidden selected>Seleccione Año</option>
 
         <option *ngFor="let y of listaAnios" [value]="y">{{ y }}</option>
       </select>

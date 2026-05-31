@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { FACULTADES_OFFLINE } from '../data/static-data';
 
 export interface Facultad {
   idFacultad: number;
@@ -21,10 +23,21 @@ export class FacultadService {
   constructor(private http: HttpClient) { }
 
   getAll(): Observable<Facultad[]> {
-      return this.http.get<Facultad[]>(`${this.apiUrl}`);
+      return this.http.get<Facultad[]>(`${this.apiUrl}`).pipe(
+        catchError(error => {
+          console.warn('Error al obtener facultades. Usando datos offline...', error);
+          return of(FACULTADES_OFFLINE);
+        })
+      );
   }
 
   getById(id: number): Observable<Facultad> {
-      return this.http.get<Facultad>(`${this.apiUrl}/${id}`);
+      return this.http.get<Facultad>(`${this.apiUrl}/${id}`).pipe(
+        catchError(() => {
+          const found = FACULTADES_OFFLINE.find(f => f.idFacultad === id);
+          if (found) return of(found);
+          throw new Error('Facultad no encontrada offline');
+        })
+      );
   }
 }
