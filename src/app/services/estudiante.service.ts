@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
-import { EstudianteI } from '../interfaces/estudiante-interface';
+import { map } from 'rxjs/operators';
+import { Estudiante } from '../interfaces/estudiante-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -11,24 +12,56 @@ import { EstudianteI } from '../interfaces/estudiante-interface';
 export class EstudianteService {
   private apiUrl = `${environment.apiUrl}/estudiante`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getAll(): Observable<EstudianteI[]> {
-    return this.http.get<EstudianteI[]>(this.apiUrl);
+  private toBackendFormat(estudiante: Estudiante): any {
+    return {
+      ...estudiante,
+      id_estudiante: estudiante.idEstudiante,
+      ci_estudiante: estudiante.ciEstudiante,
+      ap_paterno: estudiante.apPaterno,
+      ap_materno: estudiante.apMaterno,
+      id_municipio: estudiante.idMunicipio,
+      created_at: estudiante.createdAt
+    };
   }
 
-  getById(id: number): Observable<EstudianteI> {
-    return this.http.get<EstudianteI>(`${this.apiUrl}/${id}`);
+  private toFrontendFormat(data: any): Estudiante {
+    return {
+      ...data, 
+      idEstudiante: data.id_estudiante ?? data.idEstudiante,
+      ciEstudiante: data.ci_estudiante ?? data.ciEstudiante,
+      apPaterno: data.ap_paterno ?? data.apPaterno,
+      apMaterno: data.ap_materno ?? data.apMaterno,
+      idMunicipio: data.id_municipio ?? data.idMunicipio,
+      createdAt: data.created_at ?? data.createdAt
+    };
   }
 
-  create(estudiante: EstudianteI): Observable<EstudianteI> {
-    const payload = { ...estudiante, id_municipio: estudiante.idMunicipio };
-    return this.http.post<EstudianteI>(`${this.apiUrl}/`, payload);
+  getAll(): Observable<Estudiante[]> {
+    return this.http.get<any[]>(this.apiUrl).pipe(
+      map(data => data.map(item => this.toFrontendFormat(item)))
+    );
   }
 
-  update(id: number, estudiante: EstudianteI): Observable<EstudianteI> {
-    const payload = { ...estudiante, id_municipio: estudiante.idMunicipio };
-    return this.http.put<EstudianteI>(`${this.apiUrl}/${id}`, payload);
+  getById(id: number): Observable<Estudiante> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(data => this.toFrontendFormat(data))
+    );
+  }
+
+  create(estudiante: Estudiante): Observable<Estudiante> {
+    const payload = this.toBackendFormat(estudiante);
+    return this.http.post<any>(`${this.apiUrl}/`, payload).pipe(
+      map(data => this.toFrontendFormat(data))
+    );
+  }
+
+  update(id: number, estudiante: Estudiante): Observable<Estudiante> {
+    const payload = this.toBackendFormat(estudiante);
+    return this.http.put<any>(`${this.apiUrl}/${id}`, payload).pipe(
+      map(data => this.toFrontendFormat(data))
+    );
   }
 
   delete(id: number): Observable<void> {

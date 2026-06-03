@@ -13,6 +13,7 @@ export interface Facultad {
   url: string;
   imgLogo: string;
   carreras: string[];
+  idChaside?: number;
 }
 
 @Injectable({
@@ -23,21 +24,31 @@ export class FacultadService {
   constructor(private http: HttpClient) { }
 
   getAll(): Observable<Facultad[]> {
-      return this.http.get<Facultad[]>(`${this.apiUrl}`).pipe(
-        catchError(error => {
-          console.warn('Error al obtener facultades. Usando datos offline...', error);
-          return of(FACULTADES_OFFLINE);
-        })
-      );
+    return this.http.get<Facultad[]>(this.apiUrl).pipe(
+      catchError(error => {
+        console.warn('Error al obtener facultades. Usando datos offline...', error);
+        return of(FACULTADES_OFFLINE.map(f => ({
+          ...f,
+          chaside: f.idChaside,
+          carreras: typeof f.carreras === 'string' ? JSON.parse(f.carreras) as string[] : f.carreras
+        })));
+      })
+    );
   }
 
   getById(id: number): Observable<Facultad> {
-      return this.http.get<Facultad>(`${this.apiUrl}/${id}`).pipe(
-        catchError(() => {
-          const found = FACULTADES_OFFLINE.find(f => f.idFacultad === id);
-          if (found) return of(found);
-          throw new Error('Facultad no encontrada offline');
-        })
-      );
+    return this.http.get<Facultad>(`${this.apiUrl}/${id}`).pipe(
+      catchError(() => {
+        const found = FACULTADES_OFFLINE.find(f => f.idFacultad === id);
+        if (found) {
+          return of({
+            ...found,
+            chaside: found.idChaside,
+            carreras: typeof found.carreras === 'string' ? JSON.parse(found.carreras) as string[] : found.carreras
+          });
+        }
+        throw new Error('Facultad no encontrada offline');
+      })
+    );
   }
 }

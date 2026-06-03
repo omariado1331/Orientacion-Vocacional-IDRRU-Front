@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
-import { LoginRequest, LoginResponse } from '../interfaces/auth.interface';
+import { LoginRequest, LoginResponse, Usuario } from '../interfaces/auth.interface';
 import { environment } from '../../environments/environment';
 import { jwtDecode as jwt_decode } from 'jwt-decode';
 import { NotificacionService } from './notificacion.service';
@@ -70,7 +70,7 @@ export class AuthService {
     if (!token) return false;
 
     try {
-      const tokenDecodificado: any = jwt_decode(token);
+      const tokenDecodificado = jwt_decode<{ exp: number }>(token);
       const ahora = Math.floor(Date.now() / 1000);
       const tokenValido = tokenDecodificado.exp > ahora;
       if (!tokenValido) {
@@ -96,7 +96,7 @@ export class AuthService {
     return this.esNavegador ? localStorage.getItem(this.CLAVE_TOKEN) : null;
   }
 
-  obtenerDatosUsuario(): any {
+  obtenerDatosUsuario(): Usuario | null {
     if (!this.esNavegador) return null;
     const datosUsuario = localStorage.getItem(this.DATOS_USUARIO);
     return datosUsuario ? JSON.parse(datosUsuario) : null;

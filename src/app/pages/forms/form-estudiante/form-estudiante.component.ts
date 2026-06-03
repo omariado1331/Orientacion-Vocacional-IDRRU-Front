@@ -6,7 +6,7 @@ import {
   FormsModule
 } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
-import { EstudianteI } from '../../../interfaces/estudiante-interface';
+import { Estudiante } from '../../../interfaces/estudiante-interface';
 import { ProvinciaService } from '../../../services/provincia.service';
 import { Provincia } from '../../../interfaces/provincia-interface';
 import { MunicipioService } from '../../../services/municipio.service';
@@ -72,7 +72,7 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
   puntajeInteres: number = 0;
 
   // ── Inicialización del objeto estudiante ─────────────────────────────────────
-  estudianteI: EstudianteI = {
+  estudianteI: Estudiante = {
     idMunicipio: 0,
     idEstudiante: null,
     ciEstudiante: '',
@@ -241,8 +241,6 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
     if (this._syncingLocation) return;
     this._syncingLocation = true;
     try {
-      // Ya no vaciamos el municipio ni validamos si pertenece, 
-      // porque ahora se permiten todos los municipios en la lista.
       if (idProvincia === null || idProvincia <= 0) {
         this.municipio!.setValue(null, { emitEvent: false });
       }
@@ -558,16 +556,16 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
     // ── Calcular resultados HOLLAND ──────────────────────────────────────────
     const resultadoHolland = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
     this.respuestasHF.controls.forEach((control, i) => {
-      resultadoHolland[this.pregHollandFirst[i].area] += Number(control.value);
+      resultadoHolland[this.pregHollandFirst[i].area as keyof typeof resultadoHolland] += Number(control.value);
     });
     this.respuestasHS.controls.forEach((control, i) => {
-      resultadoHolland[this.pregHollandSecond[i].area] += Number(control.value);
+      resultadoHolland[this.pregHollandSecond[i].area as keyof typeof resultadoHolland] += Number(control.value);
     });
     this.respuestasHT.controls.forEach((control, i) => {
-      resultadoHolland[this.pregHollandThird[i].area] += Number(control.value);
+      resultadoHolland[this.pregHollandThird[i].area as keyof typeof resultadoHolland] += Number(control.value);
     });
     this.respuestasHA.controls.forEach((control, i) => {
-      resultadoHolland[this.pregHollandAutoev[i].area] += Number(control.value);
+      resultadoHolland[this.pregHollandAutoev[i].area as keyof typeof resultadoHolland] += Number(control.value);
     });
     this.resultadoHolland.set(resultadoHolland);
 
@@ -590,7 +588,6 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
       },
       error: (error: any) => {
         console.error('Error al guardar los datos', error);
-        // Si el backend falla, navegar igual con datos locales
         const navigationExtras: NavigationExtras = {
           state: {
             bdform: false,
@@ -614,7 +611,7 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
   }
 
   private guardarResultadoForm(
-    estudianteGuardado: EstudianteI,
+    estudianteGuardado: Estudiante,
     resultadoEnviar: Resultado,
     provinciaNombre: string,
     municipioNombre: string

@@ -174,4 +174,34 @@ select.campo-input {
 }
 .campo-error-msg::before {
     content: "⚠";
+}
+
+/* ── Efectos Hover de Filas (Tests) ─────────────────────────── */
+
+.question-row {
+    transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
+    border-left: 4px solid transparent; /* Prepare left border for hover */
+}
+
+.question-row:hover {
+    background-color: rgba(50, 99, 158, 0.15); /* More visible background */
+    border-color: rgba(50, 99, 158, 0.3);
+    border-left: 4px solid #32639e; /* Solid left indicator */
+    transform: translateX(6px); /* Stronger displacement */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Drop shadow to pop */
+}
+
+.question-row.error {
+    background-color: rgba(231, 76, 60, 0.05);
+}
+
+.question-row:has(input:checked) {
+    background-color: rgba(45, 128, 50, 0.1) !important;
+    border-left: 4px solid #2d8032 !important;
+    border-color: rgba(45, 128, 50, 0.2) !important;
+}
+
+.transition-all {
+    transition: all 0.2s ease-in-out;
 }

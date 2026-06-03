@@ -1,4 +1,4 @@
-export interface EstudianteI {
+export interface Estudiante {
   idEstudiante: number | null;
   ciEstudiante: string;
   nombre: string;
@@ -9,4 +9,5 @@ export interface EstudianteI {
   edad: number;
   celular: string;
   idMunicipio: number;
+  createdAt?: string;
 }

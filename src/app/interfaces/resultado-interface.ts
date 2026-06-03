@@ -1,3 +1,7 @@
+import { Facultad } from '../services/facultad.service';
+import { Chaside } from './chaside-interface';
+import { Holland } from './holland-interface';
+
 export interface Resultado{
     idResultado: number | null;
     interes: number;
@@ -19,9 +23,10 @@ export interface ResultadoDto {
     idChaside?: number;
     idHolland?: number;
     idFacultad?: number;
-    facultad?: any;
-    facultades?: any[]; 
-    chaside?: any;
-    holland?: any;
+    facultad?: Facultad;
+    facultades?: Facultad[]; 
+    chaside?: Chaside;
+    holland?: Holland;
+    created_at?: string;
+    createdAt?: string;
   }
-

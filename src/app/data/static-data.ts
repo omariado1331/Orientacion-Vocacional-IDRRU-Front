@@ -1,5 +1,7 @@
 import { Provincia } from '../interfaces/provincia-interface';
 import { Municipio } from '../interfaces/municipio-interface';
+import { Chaside } from '../interfaces/chaside-interface';
+import { Holland } from '../interfaces/holland-interface';
 
 export const PROVINCIAS_OFFLINE: Provincia[] = [
   { idProvincia: 1, nombre: 'ABEL ITURRALDE' },
@@ -114,7 +116,7 @@ export const MUNICIPIOS_OFFLINE: Municipio[] = [
   { idMunicipio: 87, nombre: 'YANACACHI', idProvincia: 20 }
 ];
 
-export const CHASIDE_OFFLINE: any[] = [
+export const CHASIDE_OFFLINE: Chaside[] = [
   { idChaside: 1, codigo: 'C', descripcion: 'Administrativas y Contables' },
   { idChaside: 2, codigo: 'H', descripcion: 'Humanísticas y Sociales' },
   { idChaside: 3, codigo: 'A', descripcion: 'Artísticas' },
@@ -124,7 +126,7 @@ export const CHASIDE_OFFLINE: any[] = [
   { idChaside: 7, codigo: 'E', descripcion: 'Ciencias Exactas y Agrarias' }
 ];
 
-export const HOLLAND_OFFLINE: any[] = [
+export const HOLLAND_OFFLINE: Holland[] = [
   { idHolland: 1, nombre: 'Realista', descripcion: 'Prefieren trabajar con objetos, máquinas, herramientas, plantas o animales.' },
   { idHolland: 2, nombre: 'Investigador', descripcion: 'Prefieren observar, aprender, investigar, analizar y resolver problemas.' },
   { idHolland: 3, nombre: 'Artístico', descripcion: 'Prefieren trabajar en situaciones no estructuradas usando su imaginación y creatividad.' },
@@ -133,7 +135,17 @@ export const HOLLAND_OFFLINE: any[] = [
   { idHolland: 6, nombre: 'Convencional', descripcion: 'Prefieren trabajar con datos, procesar información y seguir instrucciones detalladas.' }
 ];
 
-export const FACULTADES_OFFLINE: any[] = [
+export interface FacultadOffline {
+  idFacultad: number;
+  nombre: string;
+  codigo: string;
+  idChaside: number;
+  url: string;
+  imgLogo: string;
+  carreras: string;
+}
+
+export const FACULTADES_OFFLINE: FacultadOffline[] = [
   {
     idFacultad: 1,
     nombre: 'Facultad de Agronomia',

@@ -9,10 +9,15 @@ import { EstudianteService } from '../../services/estudiante.service';
 import { ResultadoService } from '../../services/resultado.service';
 import { ProvinciaService } from '../../services/provincia.service';
 import { MunicipioService } from '../../services/municipio.service';
+import { Provincia } from '../../interfaces/provincia-interface';
+import { Municipio } from '../../interfaces/municipio-interface';
 import { Facultad, FacultadService } from '../../services/facultad.service';
 import { ChasideService } from '../../services/chaside.service';
 import { HollandService } from '../../services/holland.service';
 import { NotificacionService } from '../../services/notificacion.service';
+import { Estudiante } from '../../interfaces/estudiante-interface';
+import { Chaside } from '../../interfaces/chaside-interface';
+import { Holland } from '../../interfaces/holland-interface';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -55,11 +60,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   resultadosForm!: FormArray;
 
   // GESTIÓN DE ESTUDIANTES
-  estudiantes: any[] = [];
-  estudiantesFiltrados: any[] = [];
-  estudianteSeleccionado: any = null;
+  estudiantes: Estudiante[] = [];
+  estudiantesFiltrados: Estudiante[] = [];
+  estudianteSeleccionado: Estudiante | null = null;
   resultadoEstudiante: ResultadoDto[] = [];
-  resultados: any[] = [];
+  resultados: ResultadoDto[] = [];
   todasLasFacultades: Facultad[] = [];
 
   // GESTIÓN DE SELECCIÓN MÚLTIPLE
@@ -67,21 +72,21 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   todoSeleccionado = false;
 
   // OPCIONES PARA SELECTORES
-  chasideOpciones: any[] = [];
-  hollandOpciones: any[] = [];
-  facultadOpciones: any[] = [];
-  provincias: any[] = [];
-  municipiosPorProvincia: { [provinciaId: number]: any[] } = {};
-  municipios: any[] = [];
-  municipiosFiltrados: any[] = [];
+  chasideOpciones: Chaside[] = [];
+  hollandOpciones: Holland[] = [];
+  facultadOpciones: Facultad[] = [];
+  provincias: Provincia[] = [];
+  municipiosPorProvincia: { [provinciaId: number]: Municipio[] } = {};
+  municipios: Municipio[] = [];
+  municipiosFiltrados: Municipio[] = [];
   // DATOS ADICIONALES PARA VISUALIZACIONES
-  chasideData: any = null;
-  hollandData: any = null;
+  chasideData: Record<string, number> | null = null;
+  hollandData: Record<string, number> | null = null;
 
   // CONFIGURACIÓN DE FILTROS
   opcionesFiltros = {
-    provincias: [] as { nombre: string; idProvincia: number }[],
-    municipios: [] as { nombre: string; idMunicipio: number }[],
+    provincias: [] as Provincia[],
+    municipios: [] as Municipio[],
     colegios: [] as string[],
     cursos: [] as string[],
     fechasRegistro: [] as string[]
@@ -269,7 +274,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
         this.actualizarEstadoSeleccionTodos();
       },
-      error: (err: any) => {
+      error: (err: Error) => {
         console.error('Error al cargar estudiantes', err);
         this.mostrarNotificacion('No se pudieron cargar los estudiantes', 'error');
         this.estudiantes = [];
@@ -302,7 +307,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   cargarMunicipios(): void {
     this.municipioService.getAllMunicipios().subscribe({
-      next: (municipios: any[]) => {
+      next: (municipios: Municipio[]) => {
         this.municipios = municipios;
         this.municipiosPorProvincia = {};
         this.municipios.forEach(m => {
@@ -377,14 +382,14 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  getProvinciaByMunicipio(municipioId: number): any {
+  getProvinciaByMunicipio(municipioId: number): Provincia | null {
     for (const provinciaId in this.municipiosPorProvincia) {
-      const municipio = this.municipiosPorProvincia[+provinciaId].find((m: any) => m.idMunicipio === municipioId);
+      const municipio = this.municipiosPorProvincia[+provinciaId].find((m: Municipio) => Number(m.idMunicipio) === Number(municipioId));
       if (municipio) {
         return this.provincias.find(p => p.idProvincia === +provinciaId) ?? null;
       }
     }
-    const idProv = this.municipios.find((m: any) => m.idMunicipio === municipioId)?.idProvincia ?? null;
+    const idProv = this.municipios.find((m: Municipio) => Number(m.idMunicipio) === Number(municipioId))?.idProvincia ?? null;
     if (idProv !== null) {
       return this.provincias.find(p => p.idProvincia === idProv) ?? null;
     }
@@ -414,7 +419,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       this.todasLasFacultades = facultades.map(f => ({
         ...f,
         carreras: typeof f.carreras === 'string' ? JSON.parse(f.carreras) : f.carreras,
-        chaside: (f as any).idChaside || 0
+        chaside: f.idChaside || 0
       }));
     });
   }
@@ -426,7 +431,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   actualizarOpcionesFiltros(): void {
     this.opcionesFiltros.municipios = this.municipios ? this.municipios.map(m => ({
       nombre: m.nombre,
-      idMunicipio: m.idMunicipio
+      idMunicipio: m.idMunicipio,
+      idProvincia: m.idProvincia
     })) : [];
 
     this.opcionesFiltros.colegios = Array.from(
@@ -513,11 +519,11 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     if (this.filtros.provincia) {
       const idProvincia = Number(this.filtros.provincia);
       const municipiosEnProvincia: number[] = [
-        ...(this.municipiosPorProvincia[idProvincia]?.map((m: any) => m.idMunicipio) ?? []),
+        ...(this.municipiosPorProvincia[idProvincia]?.map((m: Municipio) => m.idMunicipio) ?? []),
         ...this.municipios.filter(m => m.idProvincia === idProvincia).map(m => m.idMunicipio)
       ].filter((v, i, a) => a.indexOf(v) === i); // deduplicar
       resultados = resultados.filter(estudiante => {
-        const idMun = estudiante.idMunicipio ?? estudiante.id_municipio;
+        const idMun = estudiante.idMunicipio ?? estudiante.idMunicipio;
         return municipiosEnProvincia.includes(Number(idMun));
       });
     }
@@ -525,7 +531,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     if (this.filtros.municipio) {
       const idMunicipioFiltro = Number(this.filtros.municipio);
       resultados = resultados.filter(estudiante => {
-        const idMun = estudiante.idMunicipio ?? estudiante.id_municipio;
+        const idMun = estudiante.idMunicipio ?? estudiante.idMunicipio;
         return Number(idMun) === idMunicipioFiltro;
       });
     }
@@ -583,15 +589,18 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   aplicarOrdenamiento(): void {
     this.estudiantes.sort((a, b) => {
-      let valorA: any;
-      let valorB: any;
+      let valorA: string | number | null | undefined;
+      let valorB: string | number | null | undefined;
       if (this.ordenamiento.columna === 'apellidos') {
         valorA = `${a.apPaterno || ''} ${a.apMaterno || ''}`.toLowerCase();
         valorB = `${b.apPaterno || ''} ${b.apMaterno || ''}`.toLowerCase();
       } else {
-        valorA = a[this.ordenamiento.columna] !== undefined ? a[this.ordenamiento.columna] : '';
-        valorB = b[this.ordenamiento.columna] !== undefined ? b[this.ordenamiento.columna] : '';
+        valorA = (a as Record<string, any>)[this.ordenamiento.columna] !== undefined ? (a as Record<string, any>)[this.ordenamiento.columna] : '';
+        valorB = (b as Record<string, any>)[this.ordenamiento.columna] !== undefined ? (b as Record<string, any>)[this.ordenamiento.columna] : '';
       }
+
+      if (valorA == null) valorA = '';
+      if (valorB == null) valorB = '';
 
       if (typeof valorA === 'string') valorA = valorA.toLowerCase();
       if (typeof valorB === 'string') valorB = valorB.toLowerCase();
@@ -628,7 +637,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     this.actualizarEstadoSeleccionTodos();
   }
 
-  get estudiantesPaginados(): any[] {
+  get estudiantesPaginados(): Estudiante[] {
     const inicio = (this.paginacion.paginaActual - 1) * this.paginacion.itemsPorPagina;
     const fin = inicio + this.paginacion.itemsPorPagina;
     return this.estudiantesFiltrados.slice(inicio, fin);
@@ -660,7 +669,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   // GESTIÓN DE ESTUDIANTES
 
-  eliminarEstudiante(id: number): void {
+  eliminarEstudiante(id: number | null): void {
+    if (id === null) return;
     Swal.fire({
       title: '¿Estás seguro?',
       text: 'Esta acción no se puede deshacer',
@@ -696,7 +706,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     if (this.todoSeleccionado) {
       // Seleccionar todos los estudiantes de la página actual
       this.estudiantesPaginados.forEach(estudiante => {
-        this.estudiantesSeleccionados.add(estudiante.idEstudiante);
+        this.estudiantesSeleccionados.add(estudiante.idEstudiante!);
       });
     } else {
       // Deseleccionar todos
@@ -704,7 +714,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  toggleSeleccionEstudiante(idEstudiante: number): void {
+  toggleSeleccionEstudiante(idEstudiante: number | null): void {
+    if (idEstudiante === null) return;
     if (this.estudiantesSeleccionados.has(idEstudiante)) {
       this.estudiantesSeleccionados.delete(idEstudiante);
     } else {
@@ -714,12 +725,13 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
   }
 
   actualizarEstadoSeleccionTodos(): void {
-    const estudiantesPaginaActual = this.estudiantesPaginados.map(e => e.idEstudiante);
+    const estudiantesPaginaActual = this.estudiantesPaginados.map(e => e.idEstudiante!);
     this.todoSeleccionado = estudiantesPaginaActual.length > 0 &&
       estudiantesPaginaActual.every(id => this.estudiantesSeleccionados.has(id));
   }
 
-  estaSeleccionado(idEstudiante: number): boolean {
+  estaSeleccionado(idEstudiante: number | null): boolean {
+    if (idEstudiante === null) return false;
     return this.estudiantesSeleccionados.has(idEstudiante);
   }
 
@@ -779,13 +791,14 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     return this.formBuilder.array([]);
   }
 
-  crearFormularioResultado(resultado?: any): FormGroup {
+  crearFormularioResultado(resultado?: Partial<ResultadoDto>): FormGroup {
+    const fechaResultado = resultado?.created_at || resultado?.createdAt || resultado?.fecha;
     return this.formBuilder.group({
       idResultado: [resultado?.idResultado || null],
       interes: [resultado?.interes || null, [Validators.required, Validators.min(0), Validators.max(100)]],
       aptitud: [resultado?.aptitud || null, [Validators.required, Validators.min(0), Validators.max(100)]],
       puntajeHolland: [resultado?.puntajeHolland || ''],
-      fecha: [resultado?.fecha ? this.formatearFechaParaInput(resultado.fecha) :
+      fecha: [fechaResultado ? this.formatearFechaParaInput(fechaResultado) :
         this.formatearFechaParaInput(new Date().toISOString())],
       idEstudiante: [resultado?.idEstudiante || null],
       idChaside: [resultado?.idChaside || null],
@@ -796,7 +809,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   agregarNuevoResultado(): void {
     const nuevoResultado = this.crearFormularioResultado({
-      idEstudiante: this.estudianteSeleccionado?.idEstudiante
+      idEstudiante: this.estudianteSeleccionado?.idEstudiante ?? undefined,
     });
     this.resultadosForm.push(nuevoResultado);
   }
@@ -811,10 +824,10 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   // GESTIÓN DE MODALES
 
-  abrirModalEditar(estudiante: any): void {
+  abrirModalEditar(estudiante: Estudiante): void {
     this.estudianteSeleccionado = estudiante;
-    // Normalizar el campo del municipio: soporta idMunicipio (nuevo) e id_municipio (legado)
-    const idMunicipioEstudiante: number | null = estudiante.idMunicipio ?? estudiante.id_municipio ?? null;
+    // Normalizar el campo del municipio: soporta idMunicipio (nuevo) e idMunicipio (legado)
+    const idMunicipioEstudiante: number | null = estudiante.idMunicipio ?? estudiante.idMunicipio ?? null;
     const provinciaEstudiante = idMunicipioEstudiante
       ? this.getProvinciaByMunicipio(idMunicipioEstudiante)
       : null;
@@ -835,12 +848,13 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     if (provinciaEstudiante) {
       const idProv: number = provinciaEstudiante.idProvincia;
       this.municipioService.getMunicipiosPorProvinciaHttp(idProv).subscribe(muns => {
-        this.municipiosFiltrados = muns.length > 0 ? muns : this.municipios.filter((m: any) => m.idProvincia === idProv);
+        this.municipiosFiltrados = muns.length > 0 ? muns : this.municipios.filter((m: Municipio) => m.idProvincia === idProv);
+        this.editarForm.patchValue({ idMunicipio: idMunicipioEstudiante });
       });
     } else {
       this.municipiosFiltrados = this.municipios;
     }
-    this.resultadoService.getByEstudianteId(estudiante.idEstudiante).subscribe({
+    this.resultadoService.getByEstudianteId(estudiante.idEstudiante!).subscribe({
       next: (resultados: ResultadoDto[]) => {
         if (resultados.length === 0) {
           this.resultados = [];
@@ -895,14 +909,14 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           .then(resultadosFinales => {
             this.resultados = resultadosFinales;
 
-            const primerChaside = resultadosFinales.find(r => r.chaside);
-            if (primerChaside) {
-              this.chasideData = primerChaside.chaside;
+            const primerChaside = resultadosFinales.find((r: ResultadoDto) => r.chaside);
+            if (primerChaside && primerChaside.chaside) {
+              this.chasideData = primerChaside.chaside as unknown as Record<string, number>;
             }
 
-            const primerHolland = resultadosFinales.find(r => r.holland);
-            if (primerHolland) {
-              this.hollandData = primerHolland.holland;
+            const primerHolland = resultadosFinales.find((r: ResultadoDto) => r.holland);
+            if (primerHolland && primerHolland.holland) {
+              this.hollandData = primerHolland.holland as unknown as Record<string, number>;
             }
 
             this.modalEditarVisible = true;
@@ -945,13 +959,12 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     const estudianteActualizado = {
       ...this.estudianteSeleccionado,
       ...formVal,
-      idMunicipio: formVal.idMunicipio,
-      id_municipio: formVal.idMunicipio
+      idMunicipio: formVal.idMunicipio
     };
     this.estudianteService.update(estudianteActualizado.idEstudiante, estudianteActualizado).subscribe({
 
       next: () => {
-        const resultadosOperaciones: Observable<any>[] = [];
+        const resultadosOperaciones: Observable<unknown>[] = [];
         for (let i = 0; i < this.resultadosForm.length; i++) {
           const resultadoForm = this.resultadosForm.at(i) as FormGroup;
           const resultadoData = resultadoForm.value;
@@ -998,7 +1011,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  verPerfilEstudiante(id: number): void {
+  verPerfilEstudiante(id: number | null): void {
+    if (id === null) return;
     this.loading = true;
 
     this.estudianteService.getById(id).subscribe({
@@ -1049,10 +1063,10 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
                   const facultadesRelacionadas = this.todasLasFacultades.filter(
                     facultad => facultad.chaside === resultado.idChaside
                   );
-                  resultadoCompleto.facultad = facultadesRelacionadas[0] || null;
+                  resultadoCompleto.facultad = facultadesRelacionadas[0] || undefined;
                   resultadoCompleto.facultades = facultadesRelacionadas;
                 } else {
-                  resultadoCompleto.facultad = null;
+                  resultadoCompleto.facultad = undefined;
                   resultadoCompleto.facultades = [];
                 }
                 return resultadoCompleto;
@@ -1125,7 +1139,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       this.exportando = true;
       const datosParaExportar = await Promise.all(
         this.estudiantesFiltrados.map(async (est) => {
-          const resultados = await this.resultadoService.getByEstudianteId(est.idEstudiante).toPromise();
+          const resultados = await this.resultadoService.getByEstudianteId(est.idEstudiante!).toPromise();
           let datosResultado = {
             'Test Realizado': 'No',
             'Fecha Test': '',
@@ -1317,7 +1331,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  private generarResumenEstadistico(datos: any[]): any[] {
+  private generarResumenEstadistico(datos: Record<string, unknown>[]): Record<string, unknown>[] {
     const resumen = [];
 
     // Estadísticas generales
@@ -1343,9 +1357,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     resumen.push({ 'Concepto': 'DISTRIBUCIÓN POR CHASIDE', 'Cantidad': '', 'Porcentaje': '' });
 
     const chasideStats: { [codigo: string]: number } = {};
-    datos.forEach(d => {
+    datos.forEach((d: Record<string, any>) => {
       if (d['CHASIDE - Código']) {
-        const codigo = d['CHASIDE - Código'];
+        const codigo = d['CHASIDE - Código'] as string;
         chasideStats[codigo] = (chasideStats[codigo] || 0) + 1;
       }
     });
@@ -1363,9 +1377,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     resumen.push({ 'Concepto': 'DISTRIBUCIÓN POR HOLLAND', 'Cantidad': '', 'Porcentaje': '' });
 
     const hollandStats: { [key: string]: number } = {};
-    datos.forEach(d => {
+    datos.forEach((d: Record<string, any>) => {
       if (d['Holland - Tipo']) {
-        const tipo = d['Holland - Tipo'];
+        const tipo = d['Holland - Tipo'] as string;
         hollandStats[tipo] = (hollandStats[tipo] || 0) + 1;
       }
     });
@@ -1696,6 +1710,10 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     const margenDerecho = 15;
     const anchoUtil = doc.internal.pageSize.width - margenIzquierdo - margenDerecho;
     const estudiante = this.estudianteSeleccionado;
+    if (!estudiante) {
+      this.mostrarNotificacion('No hay estudiante seleccionado', 'warning');
+      return;
+    }
     if (!this.resultadoEstudiante || this.resultadoEstudiante.length === 0) {
       this.mostrarNotificacion('No hay resultados disponibles para exportar', 'warning');
       return;
@@ -1860,7 +1878,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       };
       return areas[codigo[codigo.length - 1] as keyof typeof areas] || '';
     };
-    const correspondeACodigoChaside = (facultad: any, codigoChaside: string): boolean => {
+    const correspondeACodigoChaside = (facultad: Facultad, codigoChaside: string): boolean => {
       const mapeoCodigoANumero = {
         'C': 1, // Administrativas, Contables y Económicas
         'H': 2, // Humanísticas y Sociales
@@ -1883,7 +1901,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       };
       return descripciones[codigo];
     };
-    const procesarAreasCHASIDE = (chasideData: any) => {
+    const procesarAreasCHASIDE = (chasideData: { codigo?: string } | null | undefined) => {
       if (!chasideData?.codigo) {
         return { intereses: [], aptitudes: [] };
       }
@@ -1935,12 +1953,12 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
     doc.text('DATOS DEL ESTUDIANTE:', margenIzquierdo + 3, y + 5);
     doc.setFont('helvetica', 'normal');
     let lugar = 'Lugar no disponible';
-    let municipio: any = null;
-    let provincia: any = null;
-    if (estudiante.id_municipio) {
-      municipio = this.municipios.find((m: any) => m.idMunicipio === estudiante.id_municipio);
+    let municipio: Municipio | null = null;
+    let provincia: Provincia | null = null;
+    if (estudiante.idMunicipio) {
+      municipio = this.municipios.find((m: Municipio) => m.idMunicipio === estudiante.idMunicipio) ?? null;
       if (municipio) {
-        provincia = this.provincias.find((p: any) => p.idProvincia === municipio.idProvincia);
+        provincia = this.provincias.find((p: Provincia) => p.idProvincia === municipio!.idProvincia) ?? null;
       }
     }
     const nombreCompleto = `${estudiante.nombre} ${estudiante.apPaterno} ${estudiante.apMaterno || ''}`;
@@ -1975,11 +1993,12 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
           fechaCreacion: r.fecha
         };
       });
-    const facultadesRecomendadas = new Map<number, any>();
+    const facultadesRecomendadas = new Map<number, { data: Facultad, coincidencias: number, codigosChaside: string[], fechaCreacion?: string }>();
     const todosChasideUnicos = new Set<string>();
     this.resultadoEstudiante
       .filter(r => r.chaside && r.chaside.codigo)
       .forEach(resultado => {
+        if (!resultado.chaside) return;
         const codigoChaside = resultado.chaside.codigo;
         todosChasideUnicos.add(codigoChaside);
         if (this.todasLasFacultades) {
@@ -1989,13 +2008,16 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
               if (!facultadesRecomendadas.has(facultad.idFacultad)) {
                 facultadesRecomendadas.set(facultad.idFacultad, {
                   data: facultad,
+                  coincidencias: 1,
                   codigosChaside: [codigoChaside],
                   fechaCreacion: resultado.fecha
                 });
               } else {
                 const existing = facultadesRecomendadas.get(facultad.idFacultad);
-                if (!existing.codigosChaside.includes(codigoChaside)) {
-                  existing.codigosChaside.push(codigoChaside);
+                if (existing) {
+                  if (!existing.codigosChaside.includes(codigoChaside)) {
+                    existing.codigosChaside.push(codigoChaside);
+                  }
                 }
               }
             });
@@ -2021,17 +2043,17 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       y += 10;
       const resultadoFinal = todosChaside[todosChaside.length - 1];
 
-      if (resultadoFinal) {
+      if (resultadoFinal && resultadoFinal.data) {
         doc.setFillColor(255, 255, 255);
         doc.rect(margenIzquierdo, y, anchoUtil, 8, 'F');
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7);
-        doc.text(resultadoFinal.data.codigo[resultadoFinal.data.codigo.length - 1] || 'N/A', margenIzquierdo + 5, y + 5);
+        doc.text(resultadoFinal.data.codigo ? resultadoFinal.data.codigo[resultadoFinal.data.codigo.length - 1] : 'N/A', margenIzquierdo + 5, y + 5);
         doc.text(resultadoFinal.data.descripcion || 'N/A', margenIzquierdo + 35, y + 5);
         doc.text(resultadoFinal.puntajeInteres?.toString() || 'N/A', margenIzquierdo + 120, y + 5);
         doc.text(resultadoFinal.puntajeAptitud?.toString() || 'N/A', margenIzquierdo + 140, y + 5);
-        const fechaStr = this.estudianteSeleccionado.createdAt
-          ? this.datePipe.transform(new Date(this.estudianteSeleccionado.createdAt), 'dd/MM/yyyy')
+        const fechaStr = estudiante.createdAt
+          ? this.datePipe.transform(new Date(estudiante.createdAt), 'dd/MM/yyyy')
           : 'No disponible';
         doc.text(fechaStr || 'N/A', margenIzquierdo + 160, y + 5);
         y += 15;
@@ -2054,8 +2076,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
       todosHolland.forEach((holland, idx) => {
         const colorBase: [number, number, number] = idx % 2 === 0 ? [255, 255, 255] : [245, 245, 245];
-        const fechaStr = this.estudianteSeleccionado.createdAt
-          ? this.datePipe.transform(new Date(this.estudianteSeleccionado.createdAt), 'dd/MM/yyyy')
+        const fechaStr = estudiante.createdAt
+          ? this.datePipe.transform(new Date(estudiante.createdAt), 'dd/MM/yyyy')
           : 'No disponible';
         doc.setFillColor(...colorBase);
         doc.rect(margenIzquierdo, y, anchoUtil, 10, 'F');
