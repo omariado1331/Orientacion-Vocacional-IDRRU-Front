@@ -93,17 +93,6 @@
                             </div>
                         </div>
 
-                        <!-- Colegio -->
-                        <div class="col-md-8">
-                            <label class="campo-label" [class.error]="enviadoEst() && colegio?.invalid">
-                                <i class="bi bi-building-fill campo-icono"></i>
-                                Nombre del Colegio *
-                            </label>
-                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && colegio?.invalid">
-                                <input type="text" class="campo-input uppercase-input" formControlName="colegio"
-                                    placeholder="Ej: NACIONAL SIMON BOLIVAR">
-                            </div>
-                        </div>
 
                         <!-- Curso -->
                         <div class="col-md-4">
@@ -113,7 +102,9 @@
                             </label>
                             <div class="campo-wrapper" [class.campo-error]="enviadoEst() && curso?.invalid">
                                 <select class="campo-input" formControlName="curso">
-                                    <option [ngValue]="null" disabled selected>-- Elige tu curso --</option>
+
+                                    <option [ngValue]="null" disabled selected> -- Elige tu curso -- </option>
+
                                     <option value="1ro SECUNDARIA">1ro Secundaria</option>
                                     <option value="2do SECUNDARIA">2do Secundaria</option>
                                     <option value="3ro SECUNDARIA">3ro Secundaria</option>
@@ -125,7 +116,7 @@
                         </div>
 
                         <!-- Edad -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="campo-label" [class.error]="enviadoEst() && edad?.invalid">
                                 <i class="bi bi-calendar2-heart-fill campo-icono"></i>
                                 Edad *
@@ -136,7 +127,7 @@
                         </div>
 
                         <!-- Celular -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="campo-label" [class.error]="enviadoEst() && celular?.invalid">
                                 <i class="bi bi-phone-fill campo-icono"></i>
                                 Número de Celular *
@@ -149,7 +140,7 @@
                         </div>
 
                         <!-- Provincia -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="campo-label" [class.error]="enviadoEst() && provincia?.invalid">
                                 <i class="bi bi-map-fill campo-icono"></i>
                                 Provincia *
@@ -168,7 +159,7 @@
                         </div>
 
                         <!-- Municipio -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="campo-label" [class.error]="enviadoEst() && municipio?.invalid">
                                 <i class="bi bi-pin-map-fill campo-icono"></i>
                                 Municipio *
@@ -177,31 +168,62 @@
                                 <select class="campo-input" formControlName="municipio">
                                     <option [ngValue]="null" disabled selected>-- Selecciona tu Municipio --</option>
 
-                                    @if (provincia!.value) {
-                                    <optgroup label="Municipios de la provincia seleccionada">
-                                        @for (mun of todosMunicipios; track mun.idMunicipio) {
-                                        @if (mun.idProvincia === provincia!.value) {
+                                    
+                                    @for (mun of municipiosFiltrados; track mun.idMunicipio) {
                                         <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
-                                        }
-                                        }
-                                    </optgroup>
-
-                                    <optgroup label="Otros municipios">
-                                        @for (mun of todosMunicipios; track mun.idMunicipio) {
+                                    
+                                    <!-- <optgroup label="Otros municipios">
+                                        @for (mun of municipios; track mun.idMunicipio) {
                                         @if (mun.idProvincia !== provincia!.value) {
                                         <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
                                         }
                                         }
-                                    </optgroup>
-                                    } @else {
-                                    @for (mun of todosMunicipios; track mun.idMunicipio) {
+                                    </optgroup> -->
+                                    <!-- } @else {
+                                    @for (mun of municipios; track mun.idMunicipio) {
                                     <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
                                     }
+                                    } -->
                                     }
                                 </select>
                             </div>
                             @if (enviadoEst() && municipio?.invalid) {
                             <div class="campo-error-msg">Debes seleccionar un municipio.</div>
+                            }
+                        </div>
+
+                        <div class="col-md-4"> 
+                            <label class="campo-label" [class.error]="enviadoEst() && !colegioValido()">
+                                <i class="bi bi-building-fill campo-icono"></i>
+                                Colegio *
+                            </label>
+
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && !colegioValido()">
+
+                                <select class="campo-input" formControlName="colegio">
+                                    <option [ngValue]="null">-- Selecciona el Colegio -- </option>
+
+                                    @for (col of colegiosFiltrados; track col.idColegio) {
+                                        <option [ngValue]="col.idColegio">
+                                            {{col.nombre}}
+                                        </option>
+                                    }
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-check mt-2 mb-2">
+                                <input class="form-check-input" type="checkbox" id="usarNombreColegio" formControlName="usarNombreColegio">
+                                <label class="form-check-label" for="usarNombreColegio">Mi Colegio no aparece en la lista</label>
+                            </div>
+
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && !colegioValido()">
+                                <input type="text" class="campo-input" formControlName="nombreColegio" placeholder="Escribe el nombre de tu colegio">
+                            </div>
+
+                            @if (enviadoEst() && !colegioValido()) {
+                                <div class="campo-error-msg">Debes seleccionar un colegio o escribir su nombre.</div>
                             }
                         </div>
                     </div>

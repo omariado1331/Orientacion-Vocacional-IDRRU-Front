@@ -102,7 +102,7 @@ export class ResultFormComponent {
       this.interes = state.interes!;
       this.aptitud = state.aptitud!;
       this.holland = state.holland!;
-      // this.chaside = 'S';
+      //this.chaside = 'S';
       this.chaside = state.chaside!;
       this.celular = state.celular!;
       this.curso = state.curso!;

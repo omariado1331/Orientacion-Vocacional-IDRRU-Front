@@ -7,8 +7,8 @@ export interface Resultado{
     interes: number;
     aptitud: number;
     puntajeHolland: string;
+    puntajeChaside: string;
     fecha: string;
-    idEstudiante: number | null;
     idChaside: number;
     idHolland: number;
 }

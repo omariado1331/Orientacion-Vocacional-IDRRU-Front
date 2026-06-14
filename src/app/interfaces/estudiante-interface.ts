@@ -4,7 +4,9 @@ export interface Estudiante {
   nombre: string;
   apPaterno: string;
   apMaterno: string;
-  colegio: string;
+  idColegio: number | null;
+  nombreColegio: string | null;
+  colegio: string | null;
   curso: string;
   edad: number;
   celular: string;

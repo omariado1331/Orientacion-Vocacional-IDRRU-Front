@@ -20,8 +20,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const urlsProtegidas = [
     '/auth/logout',
-    '/holland',
-    '/chaside',
+    // '/holland',
+    // '/chaside',
     '/estudiante',
     '/resultado/', 
   ];

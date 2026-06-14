@@ -117,22 +117,22 @@ export const MUNICIPIOS_OFFLINE: Municipio[] = [
 ];
 
 export const CHASIDE_OFFLINE: Chaside[] = [
-  { idChaside: 1, codigo: 'C', descripcion: 'Administrativas y Contables' },
-  { idChaside: 2, codigo: 'H', descripcion: 'Humanísticas y Sociales' },
-  { idChaside: 3, codigo: 'A', descripcion: 'Artísticas' },
-  { idChaside: 4, codigo: 'S', descripcion: 'Medicina y Ciencias de la Salud' },
-  { idChaside: 5, codigo: 'I', descripcion: 'Ingeniería y Computación' },
-  { idChaside: 6, codigo: 'D', descripcion: 'Defensa y Seguridad' },
-  { idChaside: 7, codigo: 'E', descripcion: 'Ciencias Exactas y Agrarias' }
+  { idChaside: 1, codigo: 'C', descripcion: 'Administrativas y Contables', puntaje: 'C'},
+  { idChaside: 2, codigo: 'H', descripcion: 'Humanísticas y Sociales', puntaje: 'H'},
+  { idChaside: 3, codigo: 'A', descripcion: 'Artísticas', puntaje: 'A'},
+  { idChaside: 4, codigo: 'S', descripcion: 'Medicina y Ciencias de la Salud', puntaje: 'S' },
+  { idChaside: 5, codigo: 'I', descripcion: 'Ingeniería y Computación', puntaje: 'I' },
+  { idChaside: 6, codigo: 'D', descripcion: 'Defensa y Seguridad', puntaje: 'D' },
+  { idChaside: 7, codigo: 'E', descripcion: 'Ciencias Exactas y Agrarias', puntaje: 'E' }
 ];
 
 export const HOLLAND_OFFLINE: Holland[] = [
-  { idHolland: 1, nombre: 'Realista', descripcion: 'Prefieren trabajar con objetos, máquinas, herramientas, plantas o animales.' },
-  { idHolland: 2, nombre: 'Investigador', descripcion: 'Prefieren observar, aprender, investigar, analizar y resolver problemas.' },
-  { idHolland: 3, nombre: 'Artístico', descripcion: 'Prefieren trabajar en situaciones no estructuradas usando su imaginación y creatividad.' },
-  { idHolland: 4, nombre: 'Social', descripcion: 'Prefieren trabajar con personas para informar, enseñar, curar o ayudar.' },
-  { idHolland: 5, nombre: 'Emprendedor', descripcion: 'Prefieren trabajar con personas, influir, persuadir y dirigir.' },
-  { idHolland: 6, nombre: 'Convencional', descripcion: 'Prefieren trabajar con datos, procesar información y seguir instrucciones detalladas.' }
+  { idHolland: 1, nombre: 'Realista', descripcion: 'Prefieren trabajar con objetos, máquinas, herramientas, plantas o animales.', codigo: 'R' },
+  { idHolland: 2, nombre: 'Investigador', descripcion: 'Prefieren observar, aprender, investigar, analizar y resolver problemas.', codigo: 'I'},
+  { idHolland: 3, nombre: 'Artístico', descripcion: 'Prefieren trabajar en situaciones no estructuradas usando su imaginación y creatividad.', codigo: 'A' },
+  { idHolland: 4, nombre: 'Social', descripcion: 'Prefieren trabajar con personas para informar, enseñar, curar o ayudar.', codigo: 'S' },
+  { idHolland: 5, nombre: 'Emprendedor', descripcion: 'Prefieren trabajar con personas, influir, persuadir y dirigir.', codigo: 'E' },
+  { idHolland: 6, nombre: 'Convencional', descripcion: 'Prefieren trabajar con datos, procesar información y seguir instrucciones detalladas.', codigo: 'C'}
 ];
 
 export interface FacultadOffline {

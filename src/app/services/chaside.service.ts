@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { CHASIDE_OFFLINE } from '../data/static-data';
+import { Chaside } from '../interfaces/chaside-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ export class ChasideService {
 
   constructor(private http: HttpClient) { }
 
-  getAll(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}`).pipe(
+  getAll(): Observable<Chaside[]> {
+    return this.http.get<Chaside[]>(`${this.apiUrl}`).pipe(
       catchError(error => {
         console.warn('Error al obtener chaside. Usando datos offline...', error);
         return of(CHASIDE_OFFLINE);
@@ -23,8 +24,8 @@ export class ChasideService {
     );
   }
 
-  getById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+  getById(id: number): Observable<Chaside> {
+    return this.http.get<Chaside>(`${this.apiUrl}/${id}`).pipe(
       catchError(() => {
         const found = CHASIDE_OFFLINE.find(c => c.idChaside === id);
         if (found) return of(found);
