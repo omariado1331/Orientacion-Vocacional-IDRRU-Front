@@ -144,5 +144,40 @@ export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
     })
   }
 
+  // cargar todos los usuarios:
+  cargarUsuarios(): void {
+    this.authService.getUsuarios().subscribe({
+      next: (data) => {
+        this.usuarios = data;
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
+  // creacion de usuario
+  crearUsuario(): void {
+    if (this.usuarioForm.invalid) {
+      return;
+    }
+
+    this.authService.create(this.usuarioForm.value).subscribe({
+      next: () => {
+        this.usuarioForm.reset();
+        this.cargarUsuarios();
+        this.notificacionService.mostrar('Usuario creado exitosamente', 'success');
+      },
+      error: (err) => {
+        console.error(err);
+        this.notificacionService.mostrar('Error al crear usuario', 'error');
+      }
+    })
+  }
+
+  // modificar un usuario
+  editarUsuario(): void {
+    
+  }
 
 }
