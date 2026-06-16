@@ -81,4 +81,17 @@ export class MunicipioService {
     }
     return cachedData || MUNICIPIOS_OFFLINE;
   }
+
+  create(municipio: Municipio): Observable<Municipio> {
+    return this.http.post<Municipio>(this.apiUrl, municipio);
+  } 
+
+  update(id: number, municipio: Municipio): Observable<Municipio> {
+    return this.http.put<Municipio>(`${this.apiUrl}/${id}`, municipio);
+  } 
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
 }

@@ -22,5 +22,17 @@ export interface LoginResponse {
   token: string;
   username: string;
   nombre: string;
+  rol: string;
+}
+
+/**
+ * Representa la estructura de datos de la respuesta de obtener todos los usuarios y modificar un usuario.
+ */
+export interface UsuarioRegistrado {
+  idUsuario?: number;
+  username: string;
+  password?: string;
+  nombre: string;
+  rol: string;
 }
 

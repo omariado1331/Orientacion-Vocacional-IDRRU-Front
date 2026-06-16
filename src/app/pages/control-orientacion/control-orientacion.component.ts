@@ -231,7 +231,13 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
     this.authService.iniciarSesion(credenciales)
       .subscribe({
-        next: () => {
+        next: (respuesta) => {
+
+          if (respuesta.rol === "ADMINISTRADOR") {
+            this.router.navigate(['/admin/configuracion']);
+            return;
+          }
+
           this.isAuthenticated = true;
           this.loading = false;
           this.cargarDatos();

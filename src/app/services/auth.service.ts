@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
-import { LoginRequest, LoginResponse, Usuario } from '../interfaces/auth.interface';
+import { LoginRequest, LoginResponse, Usuario, UsuarioRegistrado } from '../interfaces/auth.interface';
 import { environment } from '../../environments/environment';
 import { jwtDecode as jwt_decode } from 'jwt-decode';
 import { NotificacionService } from './notificacion.service';
@@ -40,7 +40,8 @@ export class AuthService {
             localStorage.setItem(this.CLAVE_TOKEN, respuesta.token);
             localStorage.setItem(this.DATOS_USUARIO, JSON.stringify({
               username: respuesta.username,
-              nombre: respuesta.nombre
+              nombre: respuesta.nombre,
+              rol: respuesta.rol
             }));
           }
           this.estadoAutenticacion.next(true);
@@ -114,4 +115,48 @@ export class AuthService {
     const estaAutenticado = this.estaAutenticado();
     this.estadoAutenticacion.next(estaAutenticado);
   }
+
+  obtenerRol(): string | null {
+    const token = this.obtenerToken();
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const payload: any = jwt_decode(token);
+
+      return payload.roles?.[0] ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  esAdministrador(): boolean {
+    return this.obtenerRol() === 'ROLE_ADMINISTRADOR';
+  }
+
+  esEvaluador(): boolean {
+    return this.obtenerRol() === 'ROLE_EVALUADOR';
+  }
+
+  getUsuarios(): Observable<UsuarioRegistrado[]> {
+    return this.http.get<UsuarioRegistrado[]>(`${this.urlApi}/users`);
+  }
+
+  getById(id: number): Observable<UsuarioRegistrado> {
+    return this.http.get<UsuarioRegistrado>(`${this.urlApi}/users/${id}`);
+  }
+
+  create(usuarioRegistrado: UsuarioRegistrado): Observable<UsuarioRegistrado> {
+    return this.http.post<UsuarioRegistrado>(`${this.urlApi}/register`, usuarioRegistrado);
+  }
+
+  update(id: number, usuarioRegistrado: UsuarioRegistrado): Observable<UsuarioRegistrado>{
+    return this.http.put<UsuarioRegistrado>(`${this.urlApi}/update/${id}`, usuarioRegistrado);
+  }
+
+  delete(id: number): Observable<void>{
+    return this.http.delete<void>(`${this.urlApi}/delete/${id}`);
+  }
+
 }

@@ -70,4 +70,17 @@ export class ColegioService {
     }
     return cachedData || [];
    }
+
+  create(colegio: Colegio): Observable<Colegio> {
+    return this.http.post<Colegio>(this.apiUrl, colegio);
+  } 
+   
+  update(id: number, colegio: Colegio): Observable<Colegio> {
+    return this.http.put<Colegio>(`${this.apiUrl}/${id}`, colegio);
+  } 
+   
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+  
 }
