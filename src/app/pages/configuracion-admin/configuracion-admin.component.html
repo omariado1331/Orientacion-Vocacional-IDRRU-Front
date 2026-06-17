@@ -1,1 +1,495 @@
-<p>configuracion-admin works!</p>
+<div class="admin-container">
+
+  <h2 class="admin-title">
+    Panel de Administración
+  </h2>
+
+  <div class="tabs-admin">
+
+    <button
+      class="tab-btn"
+      [class.active]="tabActiva === 'configuracion'"
+      (click)="cambiarTab('configuracion')">
+
+      <i class="bi bi-sliders campo-icono"></i>
+      Configuración
+
+    </button>
+
+    <button
+      class="tab-btn"
+      [class.active]="tabActiva === 'usuarios'"
+      (click)="cambiarTab('usuarios')">
+
+      <i class="bi bi-people-fill campo-icono"></i>
+      Usuarios
+
+    </button>
+
+    <button
+      class="tab-btn"
+      [class.active]="tabActiva === 'municipios'"
+      (click)="cambiarTab('municipios')">
+
+      <i class="bi bi-geo-alt-fill campo-icono"></i>
+      Municipios
+
+    </button>
+
+    <button
+      class="tab-btn"
+      [class.active]="tabActiva === 'colegios'"
+      (click)="cambiarTab('colegios')">
+
+      <i class="bi bi-building-fill campo-icono"></i>
+      Colegios
+
+    </button>
+
+  </div>
+
+      @if (tabActiva === 'configuracion') {
+      <div class="card admin-card section-spacing">
+        <div class="card-header">
+          <i class="bi bi-sliders campo-icono"></i>
+          Configuración del Sistema
+        </div>
+
+        <div class="card-body">
+          <form [formGroup]="configuracionForm">
+            <div class="row g-4">
+              <div class="col-12 col-md-6">
+                <label class="form-label">
+                  <i class="bi bi-ui-checks campo-icono"></i>
+                  Formulario habilitado
+                </label>
+                <select class="form-select" formControlName="formularioHabilitado">
+                  <option [ngValue]="true">Habilitado</option>
+                  <option [ngValue]="false">Deshabilitado</option>
+                </select>
+              </div> 
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">
+                  <i class="bi bi-database-fill-check campo-icono"></i>
+                  Guardar Resultados
+                </label>
+                <select class="form-select" formControlName="guardarResultados">
+                  <option [ngValue]="true">Sí</option>
+                  <option [ngValue]="false">No</option>
+                </select>
+                
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <button type="button" class="btn btn-primary" (click)="guardarConfiguracion()">
+                <i class="bi bi-floppy-fill"></i>
+                  Guardar Configuración
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    @if (tabActiva === 'usuarios') {
+      <div class="card admin-card section-spacing">
+
+        <div class="card-header">
+          <i class="bi bi-person-plus-fill campo-icono"></i>
+          Nuevo Usuario
+        </div>
+
+        <div class="card-body">
+
+          <form [formGroup]="usuarioForm">
+
+            <div class="row g-3">
+
+              <div class="col-12 col-md-4">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-control" formControlName="nombre">
+              </div>
+
+              <div class="col-12 col-md-4">
+                <label class="form-label">Usuario</label>
+                <input type="text" class="form-control" formControlName="username">
+              </div>
+
+              <div class="col-12 col-md-4">
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-control" formControlName="password">
+              </div>
+
+              <div class="col-12 col-md-4">
+                <label class="form-label">Rol</label>
+
+                <select class="form-select" formControlName="rol">
+                  <option value="">Seleccione...</option>
+                  <option value="ADMINISTRADOR">Administrador</option>
+                  <option value="EVALUADOR">Evaluador</option>
+                </select>
+
+              </div>
+
+              <div class="col-12">
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  (click)="crearUsuario()">
+
+                  <i class="bi bi-plus-circle-fill"></i>
+                  Guardar Usuario
+
+                </button>
+              </div>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+      <div class="table-responsive">
+
+        <table class="table table-striped table-hover">
+
+          <thead class="table-dark">
+
+            <tr>
+              <th>Nombre</th>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Acciones</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            @for(usuario of usuarios; track usuario.idUsuario){
+
+            <tr>
+
+              <td>{{ usuario.nombre }}</td>
+              <td>{{ usuario.username }}</td>
+              <td>{{ usuario.rol }}</td>
+
+              <td>
+
+                <div class="action-buttons">
+
+                  <button
+                    class="btn btn-warning btn-sm btn-action"
+                    (click)="editarUsuario(usuario.idUsuario)">
+
+                    <i class="bi bi-pencil-fill"></i>
+                    Editar
+
+                  </button>
+
+                  <button
+                    class="btn btn-danger btn-sm btn-action"
+                    (click)="eliminarUsuario(usuario.idUsuario)">
+
+                    <i class="bi bi-trash-fill"></i>
+                    Eliminar
+
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    }
+
+    @if (tabActiva === 'municipios') {
+      <div class="card admin-card section-spacing">
+
+        <div class="card-header">
+          <i class="bi bi-geo-alt-fill campo-icono"></i>
+          Nuevo Municipio
+        </div>
+
+        <div class="card-body">
+
+          <form [formGroup]="municipioForm">
+
+            <div class="row g-3">
+
+              <div class="col-12 col-md-6">
+
+                <label class="form-label">Provincia</label>
+
+                <select
+                  class="form-select"
+                  formControlName="idProvincia">
+
+                  <option value="">Seleccione...</option>
+
+                  @for(provincia of provincias; track provincia.idProvincia){
+
+                    <option [value]="provincia.idProvincia">
+                      {{ provincia.nombre }}
+                    </option>
+
+                  }
+
+                </select>
+
+              </div>
+
+              <div class="col-12 col-md-6">
+
+                <label class="form-label">Municipio</label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="nombre">
+
+              </div>
+
+              <div class="col-12">
+
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  (click)="crearMunicipio()">
+
+                  <i class="bi bi-plus-circle-fill"></i>
+                    Guardar Municipio
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </form>
+
+        </div>
+
+        <div class="table-responsive">
+
+          <table class="table table-striped table-hover">
+
+            <thead class="table-dark">
+              <tr>
+                <th>Municipio</th>
+                <th>Provincia</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+            @for(municipio of municipios; track municipio.idMunicipio){
+
+            <tr>
+
+              <td>{{ municipio.nombre }}</td>
+              <td>{{ municipio.nombre }}</td>
+
+              <td>
+
+                <div class="action-buttons">
+
+                  <button
+                  class="btn btn-warning btn-sm btn-action"
+                  (click)="editarMunicipio(municipio.idMunicipio)">
+
+                    <i class="bi bi-pencil-fill"></i>
+                      Editar
+
+                  </button>
+
+                  <button
+                  class="btn btn-danger btn-sm btn-action"
+                  (click)="eliminarMunicipio(municipio.idMunicipio)">
+
+                    <i class="bi bi-trash-fill"></i>
+                      Eliminar
+
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+            }
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    @if (tabActiva === 'colegios') {
+
+      <div class="card admin-card section-spacing">
+
+        <div class="card-header">
+        <i class="bi bi-building-fill campo-icono"></i>
+          Nuevo Colegio
+        </div>
+
+        <div class="card-body">
+
+          <form [formGroup]="colegioForm">
+
+            <div class="row g-3">
+
+              <div class="col-12 col-md-4">
+
+                <label class="form-label">Provincia</label>
+
+                <select
+                class="form-select"
+                formControlName="idProvincia">
+                <!-- (change)="onProvinciaColegioChange()"> -->
+
+                  <option value=[null]>Seleccione...</option>
+
+                  @for(provincia of provincias; track provincia.idProvincia){
+
+                  <option [value]="provincia.idProvincia">
+                    {{ provincia.nombre }}
+                  </option>
+
+                  }
+
+                </select>
+
+              </div>
+
+              <div class="col-12 col-md-4">
+
+                <label class="form-label">Municipio</label>
+
+                <select
+                class="form-select"
+                formControlName="idMunicipio">
+                <!-- (change)="onMunicipioColegioChange()"> -->
+
+                  <option value="">Seleccione...</option>
+
+                  @for(municipio of municipiosFiltrados; track municipio.idMunicipio){
+
+                  <option [value]="municipio.idMunicipio">
+                    {{ municipio.nombre }}
+                  </option>
+
+                  }
+
+                </select>
+
+              </div>
+
+              <div class="col-12 col-md-4">
+
+                <label class="form-label">Colegio</label>
+
+                <input
+                type="text"
+                class="form-control"
+                formControlName="nombre">
+
+              </div>
+
+              <div class="col-12">
+
+                <button
+                type="button"
+                class="btn btn-success"
+                (click)="crearColegio()">
+
+                  <i class="bi bi-plus-circle-fill"></i>
+                    Guardar Colegio   
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </form>
+        </div>
+
+          <div class="table-responsive">
+
+            <table class="table table-striped table-hover">
+
+              <thead class="table-dark">
+
+                <tr>
+                  <th>Colegio</th>
+                  <th>Municipio</th>
+                  <th>Acciones</th>
+                </tr>
+
+              </thead>
+
+            <tbody>
+
+              @for(colegio of colegios; track colegio.idColegio){
+
+                <tr>
+
+                  <td>{{ colegio.nombre }}</td>
+                  <td>{{ colegio.nombre }}</td>
+
+                  <td>
+
+                    <div class="action-buttons">
+
+                      <button
+                      class="btn btn-warning btn-sm btn-action"
+                      (click)="editarColegio(colegio.idColegio)">
+
+                        <i class="bi bi-pencil-fill"></i>
+                          Editar
+
+                      </button>
+
+                      <button
+                      class="btn btn-danger btn-sm btn-action"
+                      (click)="eliminarColegio(colegio.idColegio)">
+
+                        <i class="bi bi-trash-fill"></i>
+                          Eliminar
+
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+            </table>
+
+          </div>
+
+      </div>
+
+    }

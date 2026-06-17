@@ -492,7 +492,7 @@
                                     <label class="d-block text-uppercase small text-muted mb-1 mt-2">AREA DE
                                       ESTUDIO:</label>
                                     <p class="mb-0 fw-semibold">
-                                      {{ resultado?.chaside.descripcion }}
+                                      {{ resultado?.chaside?.descripcion }}
                                     </p>
                                     <p class="mt-3 small text-muted mb-0">
                                       C: Administrativas y Contables, H:
@@ -521,7 +521,7 @@
                                     </p>
                                     <label class="d-block text-uppercase small text-muted mb-1">PERSONALIDAD:</label>
                                     <p class="mb-2 fw-semibold">
-                                      {{ resultado?.holland.descripcion }}
+                                      {{ resultado?.holland?.descripcion }}
                                     </p>
                                     <p class="mt-3 small text-muted mb-0">
                                       R: Realista, I: Investigador, A:
@@ -903,7 +903,7 @@
                           <div class="fw-bold text-warning mb-1">{{ r.chaside.codigo }}</div>
                           <small class="text-muted">
                             {{
-                            r.chaside.descripcion
+                            r.chaside?.descripcion
                             }}
                           </small>
                         </div>
