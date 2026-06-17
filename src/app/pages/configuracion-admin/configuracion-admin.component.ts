@@ -55,6 +55,10 @@ export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
   colegios: Colegio[] = [];
   usuarios: UsuarioRegistrado[] = [];
 
+  // variables de seleccion
+  provinciaSeleccionada: number | null = null;
+  municipioSeleccionado: number | null = null; 
+
   // inicializacion de variables para filtrar
   municipiosFiltrados: Municipio[] = [];
 

@@ -1,30 +1,38 @@
 
 /* CONTENEDOR GENERAL */
 .admin-container {
-  padding: 1rem;
-  max-width: 1400px;
+  padding: 0.25rem;
+  max-width: 1000px;
   margin: auto;
+}
+
+.card-body {
+  padding: 0.75rem !important;
 }
 
 /* TITULO */
 .admin-title {
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
+  max-width: 95%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* TARJETAS */
 .admin-card {
   border: none;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0,0,0,.08);
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
   overflow: hidden;
 }
 
 .admin-card .card-header {
   font-weight: 600;
-  padding: 1rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
 }
 
 /* TABS */
@@ -48,25 +56,30 @@
 .tabs-admin {
   display: flex;
   flex-wrap: wrap;
-  gap: .75rem;  
-  margin-bottom: 1.5rem;
+  gap: .35rem;  
+  margin-bottom: 0.75rem;
 }
 
 .tab-btn {
   border: none;
   background: white;
-  padding: .75rem 1.2rem;
-  border-radius: 10px;
+  padding: .35rem .75rem;
+  border-radius: 6px;
   font-weight: 600;
   transition: .3s;
   display: flex;
   align-items: center;
-  gap: .5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  gap: .35rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  font-size: .85rem;
+}
+
+.tab-btn i {
+  font-size: 0.9rem;  /* añadido para reducir iconos */
 }
 
 .tab-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .tab-btn.active {
@@ -76,7 +89,7 @@
 
 /* ICONOS */
 .campo-icono {
-  font-size: 1rem;
+  font-size: .9rem;
   color: #32639e;
   flex-shrink: 0;
 }
@@ -94,54 +107,172 @@
 
 /* TABLAS */
 .table-responsive {
-  border-radius: 10px;
+  border-radius: 6px;
   overflow: hidden;
+  margin-top: 0.5rem;
+  width: 100% !important;
+  min-width: 700px;
+  max-width: 100%;
 }
 
 .table {
   margin-bottom: 0;
+  font-size: .85rem;
+  width: 100%;
+  min-width: 700px;
+  table-layout: fixed;
+}
+
+/* Distribución de columnas */
+.table th:nth-child(1),
+.table td:nth-child(1) {
+  width: 30%;  /* primera columna */
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 30%;  /* segunda columna */
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 40%;  /* tercera columna (acciones) */
+}
+
+/* Para tablas con 4 columnas (usuarios) */
+.table th:nth-child(1),
+.table td:nth-child(1) {
+  width: 25%;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 25%;
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 20%;
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 30%;
 }
 
 .table th {
   white-space: nowrap;
   text-align: center;
+  padding: 0.4rem 0.5rem !important;
+  font: 0.85rem;
 }
 
 .table td {
   vertical-align: middle;
+  padding: 0.4rem 0.5rem !important;
+  text-align: center;
+}
+
+/* MENSAJES DE TABLA - altura fija */
+.mensaje-vacio td {
+  height: 150px !important;
+  padding: 2rem 0.5rem !important;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.mensaje-vacio td i {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* MENSAJES DE TABLA - más altos */
+.table tbody tr td.text-center {
+  height: 120px;  /* altura fija para mensajes */
+  vertical-align: middle;
+  font-size: 0.95rem;
+}
+
+/* Estilo para mensajes */
+.text-muted i {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
 }
 
 /* BOTONES */
+
+.btn {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  min-height: 28px;
+}
+
+.btn-success, .btn-primary {
+  padding: 0.2rem 0.8rem;
+}
+
 .btn-action {
   min-width: 90px;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
 }
 
 .action-buttons {
   display: flex;
-  gap: .5rem;
+  gap: .3rem;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* FORMULARIOS */
 .form-label {
   font-weight: 500;
+  font-size: 0.75rem;
+  margin-bottom: 0.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Para inputs en formularios de 2 columnas (municipios) */
+.col-md-6 .form-control,
+.col-md-6 .form-select {
+  width: 100%;  /* mantener 100% de su columna */
 }
 
 .form-control,
 .form-select {
-  min-height: 44px;
+  min-height: 28px;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  width: 100%;
 }
 
 /* SEPARACIÓN */
 .section-spacing {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* REDUCCION DE ESPACIO ENTRE FILAS DEL FORMULARIO */
+.row.g-2 {
+  --bs-gutter-y: 0.25rem
+}
+
+.row.g-2 > [class*="col-"] {
+  padding-right: 0.3rem;  
+  padding-left: 0.3rem;
+}
+
+.col-12 {
+  margin-bottom: 0.15rem;
 }
 
 /* MOBILE */
 @media (max-width: 768px) {
 
   .admin-title {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   .action-buttons {
@@ -152,8 +283,14 @@
     width: 100%;
   }
 
+  .table-responsive {
+    min-width: 90% !important;
+  }
+
   .table {
-    font-size: .9rem;
+    font-size: .75rem;
+    min-width: 100% !important;
+    table-layout: auto;
   }
 }
 
@@ -161,14 +298,14 @@
 @media (max-width: 576px) {
 
   .admin-container {
-    padding: .5rem;
+    padding: .15rem;
   }
 
   .card-body {
-    padding: .75rem;
+    padding: .5rem !important;
   }
 
   .table {
-    font-size: .8rem;
+    font-size: .7rem;
   }
 }

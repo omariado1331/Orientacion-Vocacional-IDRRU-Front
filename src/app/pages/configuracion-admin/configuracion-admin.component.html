@@ -57,7 +57,7 @@
 
         <div class="card-body">
           <form [formGroup]="configuracionForm">
-            <div class="row g-4">
+            <div class="row g-2">
               <div class="col-12 col-md-6">
                 <label class="form-label">
                   <i class="bi bi-ui-checks campo-icono"></i>
@@ -105,7 +105,7 @@
 
           <form [formGroup]="usuarioForm">
 
-            <div class="row g-3">
+            <div class="row g-2">
 
               <div class="col-12 col-md-4">
                 <label class="form-label">Nombre</label>
@@ -228,7 +228,7 @@
 
           <form [formGroup]="municipioForm">
 
-            <div class="row g-3">
+            <div class="row g-2">
 
               <div class="col-12 col-md-6">
 
@@ -259,7 +259,8 @@
                 <input
                   type="text"
                   class="form-control"
-                  formControlName="nombre">
+                  formControlName="nombre"
+                  placeholder="Nombre del Municipio">
 
               </div>
 
@@ -297,43 +298,54 @@
 
             <tbody>
 
-            @for(municipio of municipios; track municipio.idMunicipio){
+              @if (!provinciaSeleccionada) {
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-2" style="height: 150px; vertical-align: middle;">
+                    <i class="bi bi-info-circle" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                    Debe seleccionar una provincia
+                  </td>
+                </tr>
+              } @else if (municipios.length === 0){
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-2" style="height: 150px; vertical-align: middle;">
+                    <i class="bi bi-info-circle" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                    No se encuentran municipios para la provincia seleccionada
+                  </td>
+                </tr>
+              } @else {
+                @for(municipio of municipios; track municipio.idMunicipio){
 
-            <tr>
+                  <tr>
 
-              <td>{{ municipio.nombre }}</td>
-              <td>{{ municipio.nombre }}</td>
+                    <td>{{ municipio.nombre }}</td>
+                    <td>{{ municipio.nombre }}</td>
 
-              <td>
+                    <td>
 
-                <div class="action-buttons">
+                      <div class="action-buttons">
 
-                  <button
-                  class="btn btn-warning btn-sm btn-action"
-                  (click)="editarMunicipio(municipio.idMunicipio)">
+                        <button
+                        class="btn btn-warning btn-sm btn-action"
+                        (click)="editarMunicipio(municipio.idMunicipio)">
 
-                    <i class="bi bi-pencil-fill"></i>
-                      Editar
+                          <i class="bi bi-pencil-fill"></i>
+                            Editar
 
-                  </button>
+                        </button>
 
-                  <button
-                  class="btn btn-danger btn-sm btn-action"
-                  (click)="eliminarMunicipio(municipio.idMunicipio)">
+                        <button
+                        class="btn btn-danger btn-sm btn-action"
+                        (click)="eliminarMunicipio(municipio.idMunicipio)">
 
-                    <i class="bi bi-trash-fill"></i>
-                      Eliminar
+                          <i class="bi bi-trash-fill"></i>
+                            Eliminar
 
-                  </button>
-
-                </div>
-
-              </td>
-
-            </tr>
-
-            }
-
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
             </tbody>
           </table>
         </div>
@@ -353,7 +365,7 @@
 
           <form [formGroup]="colegioForm">
 
-            <div class="row g-3">
+            <div class="row g-2">
 
               <div class="col-12 col-md-4">
 
