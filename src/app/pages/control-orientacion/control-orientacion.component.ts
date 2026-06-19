@@ -201,6 +201,8 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.colegios = data;
         this.colegiosFiltrados = data;
+        this.actualizarOpcionesFiltros();
+        this.filtrarEstudiantes();
       },
       error: (err) => console.error('Error cargando colegios', err)
     });
@@ -402,9 +404,9 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
       idProvincia: m.idProvincia
     })) : [];
 
-    this.opcionesFiltros.colegios = Array.from(
-      new Set(this.estudiantes.map(e => e.colegio || 'No especificado'))
-    );
+    this.opcionesFiltros.colegios = this.colegios ? Array.from(
+      new Set(this.colegios.map(c => c.nombre))
+    ).sort() : [];
 
     this.opcionesFiltros.cursos = Array.from(
       new Set(this.estudiantes.map(e => e.curso || 'No especificado'))
@@ -479,7 +481,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
         (estudiante.apPaterno || '').toLowerCase().includes(busqueda) ||
         (estudiante.apMaterno || '').toLowerCase().includes(busqueda) ||
         (estudiante.ciEstudiante || '').toLowerCase().includes(busqueda) ||
-        (estudiante.colegio || '').toLowerCase().includes(busqueda)
+        (this.getColegioNombre(estudiante.idColegio)).toLowerCase().includes(busqueda)
       );
     }
 
@@ -505,7 +507,7 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
     // Filtros institucionales
     if (this.filtros.colegio) {
-      resultados = resultados.filter(estudiante => (estudiante.colegio || 'No especificado') === this.filtros.colegio);
+      resultados = resultados.filter(estudiante => this.getColegioNombre(estudiante.idColegio) === this.filtros.colegio);
     }
 
     if (this.filtros.curso) {
