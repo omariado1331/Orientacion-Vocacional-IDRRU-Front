@@ -22,6 +22,7 @@ export class EstudianteService {
       ap_paterno: estudiante.apPaterno,
       ap_materno: estudiante.apMaterno,
       id_municipio: estudiante.idMunicipio,
+      id_colegio: estudiante.idColegio,
       created_at: estudiante.createdAt
     };
   }
@@ -34,7 +35,9 @@ export class EstudianteService {
       apPaterno: data.ap_paterno ?? data.apPaterno,
       apMaterno: data.ap_materno ?? data.apMaterno,
       idMunicipio: data.id_municipio ?? data.idMunicipio,
-      createdAt: data.created_at ?? data.createdAt
+      idColegio: data.id_colegio ?? data.idColegio,
+      createdAt: data.created_at ?? data.createdAt,
+      colegio: data.nombreColegio ?? data.colegio ?? null
     };
   }
 

@@ -1,0 +1,171 @@
+/* === GLASSMORPHISM MODAL === */
+.glass-modal-content {
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow:
+    0 20px 60px rgba(13, 59, 102, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  overflow: hidden;
+}
+
+/* === HEADER GRADIENTE === */
+.glass-header {
+  background: linear-gradient(135deg, #0d3b66 0%, #1756a3 60%, #2980b9 100%);
+  color: white;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.glass-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* === FOOTER === */
+.glass-footer {
+  background: rgba(248, 249, 250, 0.9);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  backdrop-filter: blur(10px);
+}
+
+/* === SECTION TITLE === */
+.section-title {
+  color: #0d3b66;
+  font-weight: 700;
+  border-left: 4px solid #1756a3;
+  padding-left: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+/* === FORM CONTROLS === */
+.form-floating > .form-control,
+.form-floating > .form-select {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+
+.form-floating > .form-control:focus,
+.form-floating > .form-select:focus {
+  background: #ffffff;
+  border-color: #1756a3;
+  box-shadow: 0 0 0 0.2rem rgba(23, 86, 163, 0.2);
+}
+
+.form-floating > .form-control.is-invalid,
+.form-floating > .form-select.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+}
+
+/* === EVALUATION CARDS === */
+.eval-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.9) 100%);
+  border: 1px solid rgba(23, 86, 163, 0.1);
+  border-radius: 14px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.eval-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1756a3, #2980b9);
+}
+
+.eval-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(23, 86, 163, 0.12);
+  border-color: rgba(23, 86, 163, 0.25);
+}
+
+/* === MODAL BODY === */
+.modal-body {
+  background: linear-gradient(180deg, rgba(235,245,255,0.4) 0%, rgba(248,249,250,0.6) 100%);
+}
+
+/* === ANIMATIONS === */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal.show .modal-dialog {
+  animation: modalSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* === BADGES Y NUMBERING === */
+.eval-badge {
+  background: linear-gradient(135deg, #1756a3, #0d3b66);
+  color: white;
+  border-radius: 0 0 12px 0;
+  padding: 4px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* === BUTTONS === */
+.btn-primary {
+  background: linear-gradient(135deg, #1756a3, #0d3b66);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0d3b66, #1756a3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(23, 86, 163, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* === INPUT GROUP === */
+.input-group .input-group-text {
+  border-radius: 0 10px 10px 0;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  border-left: none;
+}
+
+.input-group .form-control {
+  border-radius: 10px 0 0 10px;
+}

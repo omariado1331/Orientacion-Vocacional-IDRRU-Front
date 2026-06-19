@@ -132,11 +132,11 @@ export class AuthService {
   }
 
   esAdministrador(): boolean {
-    return this.obtenerRol() === 'ROLE_ADMINISTRADOR';
+    return this.obtenerRol() === 'ROLE_ADMINISTRADOR' || this.obtenerRol() === 'ADMINISTRADOR';
   }
 
   esEvaluador(): boolean {
-    return this.obtenerRol() === 'ROLE_EVALUADOR';
+    return this.obtenerRol() === 'ROLE_EVALUADOR' || this.obtenerRol() === 'EVALUADOR';
   }
 
   getUsuarios(): Observable<UsuarioRegistrado[]> {

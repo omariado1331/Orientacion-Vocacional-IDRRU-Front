@@ -1,0 +1,199 @@
+/* === GLASSMORPHISM MODAL === */
+.glass-modal-content {
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow:
+    0 20px 60px rgba(13, 59, 102, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  overflow: hidden;
+}
+
+/* === RESULT CARDS === */
+.result-card {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.35s ease;
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+.result-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.15) !important;
+}
+
+/* === SCORE DISPLAY === */
+.score-display {
+  position: relative;
+}
+
+.score-display::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.3;
+}
+
+/* === CHASIDE CARD === */
+.chaside-bg {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+  color: white !important;
+}
+
+.chaside-bg .card-header,
+.chaside-bg .card-body {
+  color: white !important;
+}
+
+.chaside-letter {
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, #e2e8f0, #a0aec0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+}
+
+/* === HOLLAND CARD === */
+.holland-bg {
+  background: linear-gradient(135deg, #134e5e 0%, #71b280 100%) !important;
+  color: white !important;
+}
+
+.holland-bg .card-header,
+.holland-bg .card-body {
+  color: white !important;
+}
+
+/* === SCORE CARD (Interes/Aptitud) === */
+.score-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+/* === NAV PILLS === */
+.nav-pills .nav-link {
+  color: #1756a3;
+  background: rgba(23, 86, 163, 0.06);
+  border: 1.5px solid rgba(23, 86, 163, 0.15);
+  border-radius: 50px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: #fff;
+  background: linear-gradient(135deg, #1756a3, #0d3b66);
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(23, 86, 163, 0.35);
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+  background: rgba(23, 86, 163, 0.12);
+  border-color: rgba(23, 86, 163, 0.3);
+  transform: translateY(-1px);
+}
+
+/* === INFO CARDS === */
+.info-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid rgba(23, 86, 163, 0.08);
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  border-color: rgba(23, 86, 163, 0.2);
+  box-shadow: 0 4px 16px rgba(23, 86, 163, 0.08);
+}
+
+/* === SCORE CIRCLES === */
+.score-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.score-circle-interest {
+  background: conic-gradient(#3b82f6 0%, #eff6ff 0%);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+}
+
+.score-circle-aptitude {
+  background: conic-gradient(#10b981 0%, #ecfdf5 0%);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+}
+
+/* === ANIMATIONS === */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal.show .modal-dialog {
+  animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.result-card {
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.result-card:nth-child(1) { animation-delay: 0.05s; }
+.result-card:nth-child(2) { animation-delay: 0.1s; }
+.result-card:nth-child(3) { animation-delay: 0.15s; }
+
+/* === BADGE PILL === */
+.badge-pill-umsa {
+  background: linear-gradient(135deg, #1756a3, #0d3b66);
+  color: white;
+  border-radius: 50px;
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* === VERTICAL SEPARATOR === */
+.vr {
+  width: 1.5px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 2px;
+}
+
+/* === MODAL BODY === */
+.modal-body {
+  background: linear-gradient(180deg, rgba(235,245,255,0.3) 0%, rgba(248,249,250,0.5) 100%);
+}
