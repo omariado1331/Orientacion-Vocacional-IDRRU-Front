@@ -29,7 +29,7 @@ export interface LoginResponse {
  * Representa la estructura de datos de la respuesta de obtener todos los usuarios y modificar un usuario.
  */
 export interface UsuarioRegistrado {
-  idUsuario?: number;
+  idUsuario: number;
   username: string;
   password?: string;
   nombre: string;

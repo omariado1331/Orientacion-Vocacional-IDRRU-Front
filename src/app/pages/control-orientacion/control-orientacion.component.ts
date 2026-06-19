@@ -165,13 +165,18 @@ export class ControlOrientacionComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.isAuthenticated = this.authService.estaAutenticado();
+    // redirecciona a la vista de admin si tiene el rol de administrador
+    if (this.isAuthenticated && this.authService.esAdministrador()){
+      this.router.navigate(['/admin/configuracion']);
+      return;
+    }
     this.authService.obtenerEstadoAutenticacion().subscribe(estado => {
       this.isAuthenticated = estado;
       if (estado) {
         this.cargarDatos();
       }
     });
-
+    
     if (this.isAuthenticated) {
       this.cargarDatos();
     }
