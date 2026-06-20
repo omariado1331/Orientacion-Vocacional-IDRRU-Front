@@ -1,0 +1,298 @@
+<div class="modal fade" [ngClass]="{ 'show d-block': visible }" tabindex="-1"
+  [ngStyle]="{ display: visible ? 'block' : 'none', background: visible ? 'rgba(10,20,40,0.6)' : 'none' }"
+  aria-labelledby="editarEstudianteModalLabel" style="backdrop-filter: blur(4px);">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content glass-modal-content">
+
+      <!-- HEADER -->
+      <div class="modal-header glass-header px-4 py-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-white bg-opacity-25 rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center"
+            style="width: 48px; height: 48px;">
+            <i class="bi bi-person-lines-fill fs-4 text-white"></i>
+          </div>
+          <div>
+            <h5 class="modal-title mb-0 fw-bold" id="editarEstudianteModalLabel">Editar Estudiante</h5>
+            <small class="text-white-50">Modifique los datos personales y resultados vocacionales</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-auto" (click)="cerrarModal()" aria-label="Close"></button>
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body p-4">
+
+        <!-- DATOS PERSONALES -->
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <i class="bi bi-person-badge text-primary fs-5"></i>
+          <h6 class="section-title mb-0">Datos Personales</h6>
+        </div>
+
+        <form *ngIf="editarForm" [formGroup]="editarForm" class="mb-5">
+          <div class="row g-3">
+
+            <!-- CI -->
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="ciEstudiante" formControlName="ciEstudiante"
+                  placeholder="CI"
+                  [ngClass]="{'is-invalid': editarForm.controls['ciEstudiante'].invalid && editarForm.controls['ciEstudiante'].touched}">
+                <label for="ciEstudiante"><i class="bi bi-card-text me-2 text-muted small"></i>CI *</label>
+                <div class="invalid-feedback">El CI es requerido</div>
+              </div>
+            </div>
+
+            <!-- Nombre -->
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="nombre" formControlName="nombre"
+                  placeholder="Nombre"
+                  [ngClass]="{'is-invalid': editarForm.controls['nombre'].invalid && editarForm.controls['nombre'].touched}">
+                <label for="nombre"><i class="bi bi-person me-2 text-muted small"></i>Nombre *</label>
+                <div class="invalid-feedback">El nombre es requerido</div>
+              </div>
+            </div>
+
+            <!-- Ap. Paterno -->
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="apPaterno" formControlName="apPaterno"
+                  placeholder="Apellido Paterno"
+                  [ngClass]="{'is-invalid': editarForm.controls['apPaterno'].invalid && editarForm.controls['apPaterno'].touched}">
+                <label for="apPaterno"><i class="bi bi-person me-2 text-muted small"></i>Apellido Paterno *</label>
+                <div class="invalid-feedback">El apellido paterno es requerido</div>
+              </div>
+            </div>
+
+            <!-- Ap. Materno -->
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="apMaterno" formControlName="apMaterno"
+                  placeholder="Apellido Materno">
+                <label for="apMaterno"><i class="bi bi-person me-2 text-muted small"></i>Apellido Materno</label>
+              </div>
+            </div>
+
+            <!-- Edad -->
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="number" class="form-control" id="edad" formControlName="edad"
+                  placeholder="Edad" min="10" max="30"
+                  [ngClass]="{'is-invalid': editarForm.controls['edad'].invalid && editarForm.controls['edad'].touched}">
+                <label for="edad"><i class="bi bi-calendar3 me-2 text-muted small"></i>Edad *</label>
+                <div class="invalid-feedback">Edad entre 10 y 30 años</div>
+              </div>
+            </div>
+
+            <!-- Celular -->
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="celular" formControlName="celular"
+                  placeholder="Celular"
+                  [ngClass]="{'is-invalid': editarForm.controls['celular'].invalid && editarForm.controls['celular'].touched}">
+                <label for="celular"><i class="bi bi-phone me-2 text-muted small"></i>Celular</label>
+                <div class="invalid-feedback">Solo se permiten números</div>
+              </div>
+            </div>
+
+            <!-- Provincia -->
+            <div class="col-md-3">
+              <div class="form-floating">
+                <select class="form-select" id="idProvincia" formControlName="idProvincia"
+                  (change)="onProvinciaChangeEditar($event)"
+                  [ngClass]="{'is-invalid': editarForm.controls['idProvincia'].invalid && editarForm.controls['idProvincia'].touched}">
+                  <option [ngValue]="null">Seleccione...</option>
+                  <option *ngFor="let prov of provincias" [ngValue]="prov.idProvincia">{{ prov.nombre }}</option>
+                </select>
+                <label for="idProvincia"><i class="bi bi-map me-2 text-muted small"></i>Provincia *</label>
+                <div class="invalid-feedback">Seleccione una provincia</div>
+              </div>
+            </div>
+
+            <!-- Municipio -->
+            <div class="col-md-3">
+              <div class="form-floating">
+                <select class="form-select" id="idMunicipio" formControlName="idMunicipio"
+                  (change)="onMunicipioChangeEditar($event)"
+                  [ngClass]="{'is-invalid': editarForm.controls['idMunicipio'].invalid && editarForm.controls['idMunicipio'].touched}">
+                  <option [ngValue]="null">Seleccione...</option>
+                  <option *ngFor="let mun of municipiosFiltrados" [ngValue]="mun.idMunicipio">{{ mun.nombre }}</option>
+                </select>
+                <label for="idMunicipio"><i class="bi bi-pin-map me-2 text-muted small"></i>Municipio *</label>
+                <div class="invalid-feedback">Seleccione un municipio</div>
+              </div>
+            </div>
+
+            <!-- Colegio -->
+            <div class="col-md-4">
+              <div class="form-floating">
+                <select class="form-select" id="idColegio" formControlName="idColegio"
+                  [ngClass]="{'is-invalid': editarForm.controls['idColegio'].invalid && editarForm.controls['idColegio'].touched}">
+                  <option [ngValue]="null">Seleccione colegio...</option>
+                  <option *ngFor="let col of colegiosFiltrados" [ngValue]="col.idColegio">{{ col.nombre }}</option>
+                </select>
+                <label for="idColegio"><i class="bi bi-building me-2 text-muted small"></i>Colegio *</label>
+                <div class="invalid-feedback">Seleccione un colegio</div>
+              </div>
+            </div>
+
+            <!-- Curso -->
+            <div class="col-md-2">
+              <div class="form-floating">
+                <select class="form-select" id="curso" formControlName="curso"
+                  [ngClass]="{'is-invalid': editarForm.controls['curso'].invalid && editarForm.controls['curso'].touched}">
+                  <option [ngValue]="null">Seleccione</option>
+                  <option value="1ro SECUNDARIA">1ro SEC</option>
+                  <option value="2do SECUNDARIA">2do SEC</option>
+                  <option value="3ro SECUNDARIA">3ro SEC</option>
+                  <option value="4to SECUNDARIA">4to SEC</option>
+                  <option value="5to SECUNDARIA">5to SEC</option>
+                  <option value="6to SECUNDARIA">6to SEC</option>
+                </select>
+                <label for="curso"><i class="bi bi-book me-2 text-muted small"></i>Curso *</label>
+                <div class="invalid-feedback">Seleccione un curso</div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+        <!-- RESULTADOS VOCACIONALES -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-graph-up text-primary fs-5"></i>
+            <h6 class="section-title mb-0">Resultados Vocacionales</h6>
+          </div>
+          <!-- <button type="button"
+            class="btn btn-sm rounded-pill fw-semibold shadow-sm text-white px-3"
+            style="background: linear-gradient(135deg,#198754,#146c43);"
+            (click)="agregarNuevoResultado()">
+            <i class="bi bi-plus-lg me-1"></i>Añadir Evaluación
+          </button> -->
+        </div>
+
+        <!-- Sin resultados -->
+        <div *ngIf="resultadosFormGroups.controls.length === 0"
+          class="alert border-0 shadow-sm rounded-3 d-flex align-items-center gap-3"
+          style="background: linear-gradient(135deg,#fff3cd,#ffeeba);">
+          <i class="bi bi-info-circle-fill text-warning fs-4 flex-shrink-0"></i>
+          <p class="mb-0 fw-medium text-dark small">El estudiante no tiene resultados registrados. Puede añadir uno nuevo con el botón de arriba.</p>
+        </div>
+
+        <!-- Lista de resultados -->
+        <div class="d-flex flex-column gap-3" *ngIf="resultadosFormGroups.controls.length > 0">
+          <ng-container *ngFor="let control of resultadosFormGroups.controls; let i = index">
+            <div class="eval-card p-4" [formGroup]="asFormGroup(control)">
+              <!-- Badge numeración -->
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="eval-badge">
+                  <i class="bi bi-clipboard-data me-1"></i>Evaluación #{{ i + 1 }}
+                </span>
+                <!-- <button type="button"
+                  class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                  (click)="eliminarResultado(i)"
+                  title="Eliminar evaluación">
+                  <i class="bi bi-trash-fill me-1"></i>Eliminar
+                </button> -->
+              </div>
+
+              <div class="row g-3 align-items-end">
+
+                <!-- Fecha -->
+                <div class="col-md-2">
+                  <label class="form-label text-muted small fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                    <i class="bi bi-calendar me-1"></i>FECHA
+                  </label>
+                  <input type="date" class="form-control form-control-sm rounded-3" formControlName="fecha">
+                </div>
+
+                <!-- Interés -->
+                <div class="col-md-2">
+                  <label class="form-label text-muted small fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                    <i class="bi bi-star me-1"></i>INTERÉS
+                  </label>
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control rounded-start-3" formControlName="interes"
+                      placeholder="0-100" min="0" max="100"
+                      [ngClass]="{'is-invalid': asFormGroup(control).get('interes')?.invalid && asFormGroup(control).get('interes')?.touched}">
+                    <span class="input-group-text bg-white fw-bold text-primary rounded-end-3">%</span>
+                  </div>
+                  <div class="text-danger small" *ngIf="asFormGroup(control).get('interes')?.invalid && asFormGroup(control).get('interes')?.touched">
+                    Valor 0-100
+                  </div>
+                </div>
+
+                <!-- Aptitud -->
+                <div class="col-md-2">
+                  <label class="form-label text-muted small fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                    <i class="bi bi-lightning me-1"></i>APTITUD
+                  </label>
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control rounded-start-3" formControlName="aptitud"
+                      placeholder="0-100" min="0" max="100"
+                      [ngClass]="{'is-invalid': asFormGroup(control).get('aptitud')?.invalid && asFormGroup(control).get('aptitud')?.touched}">
+                    <span class="input-group-text bg-white fw-bold text-success rounded-end-3">%</span>
+                  </div>
+                  <div class="text-danger small" *ngIf="asFormGroup(control).get('aptitud')?.invalid && asFormGroup(control).get('aptitud')?.touched">
+                    Valor 0-100
+                  </div>
+                </div>
+
+                <!-- CHASIDE -->
+                <div class="col-md-3">
+                  <label class="form-label text-muted small fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                    <i class="bi bi-clipboard-data me-1"></i>CHASIDE
+                  </label>
+                  <select class="form-select form-select-sm rounded-3" formControlName="idChaside"
+                    [ngClass]="{'is-invalid': asFormGroup(control).get('idChaside')?.invalid && asFormGroup(control).get('idChaside')?.touched}">
+                    <option [ngValue]="null">Seleccionar perfil...</option>
+                    <option *ngFor="let ch of chasideOpciones" [ngValue]="ch.idChaside">
+                      {{ ch.codigo }} - {{ ch.descripcion }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback">Seleccione un perfil CHASIDE</div>
+                </div>
+
+                <!-- Holland -->
+                <div class="col-md-3">
+                  <label class="form-label text-muted small fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                    <i class="bi bi-compass me-1"></i>HOLLAND
+                  </label>
+                  <select class="form-select form-select-sm rounded-3" formControlName="idHolland"
+                    [ngClass]="{'is-invalid': asFormGroup(control).get('idHolland')?.invalid && asFormGroup(control).get('idHolland')?.touched}">
+                    <option [ngValue]="null">Seleccionar tipo...</option>
+                    <option *ngFor="let h of hollandOpciones" [ngValue]="h.idHolland">{{ h.nombre }}</option>
+                  </select>
+                  <div class="invalid-feedback">Seleccione un tipo Holland</div>
+                </div>
+
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+      </div><!-- modal-body -->
+
+      <!-- FOOTER -->
+      <div class="modal-footer glass-footer px-4 py-3">
+        <button type="button" class="btn btn-light rounded-pill px-4 fw-semibold border shadow-sm" (click)="cerrarModal()">
+          <i class="bi bi-x-lg me-2"></i>Cancelar
+        </button>
+        <button type="button"
+          class="btn rounded-pill px-5 fw-bold shadow-sm text-white"
+          style="background: linear-gradient(135deg,#1756a3,#0d3b66);"
+          [disabled]="loading"
+          (click)="guardarEdicion()">
+          <span *ngIf="!loading">
+            <i class="bi bi-check2-circle me-2"></i>Guardar Cambios
+          </span>
+          <span *ngIf="loading" class="d-flex align-items-center gap-2">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Guardando...
+          </span>
+        </button>
+      </div>
+
+    </div><!-- modal-content -->
+  </div><!-- modal-dialog -->
+</div>

@@ -1,0 +1,246 @@
+<div class="modal fade" [ngClass]="{ 'show d-block': visible }" tabindex="-1"
+  [ngStyle]="{ display: visible ? 'block' : 'none', background: visible ? 'rgba(10,20,40,0.6)' : 'none' }"
+  aria-labelledby="perfilEstudianteModalLabel" style="backdrop-filter: blur(4px);">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content glass-modal-content border-0">
+
+      <!-- HEADER -->
+      <div class="modal-header text-white px-4 py-4 position-relative overflow-hidden"
+        style="background: linear-gradient(135deg, #0d3b66 0%, #1756a3 60%, #2980b9 100%); border-radius: 20px 20px 0 0;">
+        <!-- Decoración -->
+        <div class="position-absolute rounded-circle bg-white" style="width: 250px; height: 250px; top: -80px; right: -60px; opacity: 0.06;"></div>
+        <div class="position-absolute rounded-circle bg-white" style="width: 120px; height: 120px; bottom: -40px; left: 30%; opacity: 0.04;"></div>
+
+        <div class="d-flex align-items-center position-relative z-1 gap-3">
+          <div class="bg-white rounded-circle shadow d-flex align-items-center justify-content-center flex-shrink-0"
+            style="width: 56px; height: 56px;">
+            <i class="bi bi-person-bounding-box fs-3 text-primary"></i>
+          </div>
+          <div>
+            <h4 class="modal-title mb-0 fw-bold" id="perfilEstudianteModalLabel">Perfil del Estudiante</h4>
+            <p class="mb-0 text-white-50" *ngIf="estudiante">
+              {{ estudiante.nombre }} {{ estudiante.apPaterno }} {{ estudiante.apMaterno }}
+            </p>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white position-relative z-1 ms-auto" (click)="cerrarModal()" aria-label="Close"></button>
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body p-0">
+
+        <!-- Loading -->
+        <div *ngIf="!estudiante" class="p-5 text-center text-muted">
+          <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+          <p class="fw-medium">Cargando perfil...</p>
+        </div>
+
+        <div *ngIf="estudiante" class="p-4">
+
+          <!-- INFORMACIÓN GENERAL -->
+          <div class="card info-card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+              <h6 class="fw-bold mb-4 text-primary d-flex align-items-center gap-2">
+                <i class="bi bi-person-circle fs-5"></i>
+                Información General
+              </h6>
+              <div class="row g-3">
+                <div class="col-6 col-md-3">
+                  <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.08em;">CI</p>
+                  <p class="fs-6 fw-bold mb-0 text-dark">{{ estudiante.ciEstudiante }}</p>
+                </div>
+                <div class="col-6 col-md-3">
+                  <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.08em;">Edad</p>
+                  <p class="fs-6 fw-bold mb-0 text-dark">{{ estudiante.edad }} años</p>
+                </div>
+                <div class="col-6 col-md-3">
+                  <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.08em;">Celular</p>
+                  <p class="fs-6 fw-bold mb-0 text-dark">
+                    <i class="bi bi-telephone-fill text-success me-1 small"></i>
+                    {{ estudiante.celular || 'No registrado' }}
+                  </p>
+                </div>
+                <div class="col-6 col-md-3">
+                  <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.08em;">Curso</p>
+                  <span class="badge rounded-pill px-3 py-2" style="background: linear-gradient(135deg,#1756a3,#0d3b66); font-size: 0.78rem;">
+                    {{ estudiante.curso }}
+                  </span>
+                </div>
+                <div class="col-12 col-md-6" *ngIf="estudiante.colegio">
+                  <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.08em;">Colegio</p>
+                  <p class="fs-6 fw-bold mb-0 text-dark">
+                    <i class="bi bi-building me-1 text-muted small"></i>
+                    {{ estudiante.colegio }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SIN EVALUACIONES -->
+          <div *ngIf="resultados.length === 0"
+            class="alert border-0 shadow-sm rounded-4 d-flex align-items-center gap-4 p-4"
+            style="background: linear-gradient(135deg, #eff6ff, #dbeafe);">
+            <i class="bi bi-info-circle-fill fs-1 text-primary flex-shrink-0"></i>
+            <div>
+              <h6 class="fw-bold mb-1 text-primary">Sin evaluaciones registradas</h6>
+              <p class="mb-0 text-muted small">Este estudiante no ha completado ningún test de orientación vocacional.</p>
+            </div>
+          </div>
+
+          <!-- EVALUACIONES -->
+          <div *ngIf="resultados.length > 0">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <i class="bi bi-journal-check text-primary fs-5"></i>
+              <h6 class="fw-bold mb-0 text-primary">Evaluaciones Realizadas
+                <span class="badge rounded-pill ms-2" style="background: rgba(23,86,163,0.1); color: #1756a3; font-size: 0.75rem;">
+                  {{ resultados.length }}
+                </span>
+              </h6>
+            </div>
+
+            <!-- Tabs -->
+            <ul class="nav nav-pills mb-4 gap-2 flex-wrap" id="pills-tab" role="tablist">
+              <li class="nav-item" role="presentation" *ngFor="let r of resultados; let i = index">
+                <button class="nav-link rounded-pill px-4 fw-semibold"
+                  [ngClass]="{'active': i === 0}"
+                  [id]="'pills-res-' + i + '-tab'"
+                  data-bs-toggle="pill"
+                  [attr.data-bs-target]="'#pills-res-' + i"
+                  type="button" role="tab"
+                  [attr.aria-controls]="'pills-res-' + i"
+                  [attr.aria-selected]="i === 0">
+                  <i class="bi bi-clipboard-data me-2 small"></i>Evaluación {{ i + 1 }}
+                </button>
+              </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="pills-tabContent">
+              <div class="tab-pane fade"
+                [ngClass]="{'show active': i === 0}"
+                *ngFor="let resultado of resultados; let i = index"
+                [id]="'pills-res-' + i"
+                role="tabpanel"
+                [attr.aria-labelledby]="'pills-res-' + i + '-tab'" tabindex="0">
+
+                <div class="row g-4">
+
+                  <!-- INTERÉS Y APTITUD -->
+                  <div class="col-md-4">
+                    <div class="card result-card score-card border-0 shadow-sm rounded-4 h-100">
+                      <div class="card-body p-4">
+                        <h6 class="fw-bold text-uppercase mb-4 d-flex align-items-center gap-2"
+                          style="color: #1756a3; font-size: 0.72rem; letter-spacing: 0.1em;">
+                          <i class="bi bi-star-fill text-warning"></i>Rendimiento Base
+                        </h6>
+                        <!-- Interés -->
+                        <div class="mb-4">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold text-muted small text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em;">Interés</span>
+                            <span class="fw-black fs-5 text-primary">{{ resultado.interes }}</span>
+                          </div>
+                          <div class="progress rounded-pill" style="height: 10px; background: rgba(23,86,163,0.1);">
+                            <div class="progress-bar rounded-pill"
+                              [style.width]="resultado.interes + '%'"
+                              style="background: linear-gradient(90deg,#1756a3,#2980b9); transition: width 1s ease;">
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Aptitud -->
+                        <div>
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold text-muted small text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em;">Aptitud</span>
+                            <span class="fw-black fs-5 text-success">{{ resultado.aptitud }}</span>
+                          </div>
+                          <div class="progress rounded-pill" style="height: 10px; background: rgba(16,185,129,0.1);">
+                            <div class="progress-bar rounded-pill"
+                              [style.width]="resultado.aptitud + '%'"
+                              style="background: linear-gradient(90deg,#10b981,#059669); transition: width 1s ease;">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- CHASIDE -->
+                  <div class="col-md-4">
+                    <div class="card result-card border-0 shadow-sm rounded-4 h-100 chaside-bg">
+                      <div class="card-body p-4 d-flex flex-column">
+                        <h6 class="fw-bold text-uppercase mb-3 d-flex align-items-center gap-2"
+                          style="font-size: 0.72rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.8);">
+                          <i class="bi bi-puzzle-fill text-warning"></i>Test CHASIDE
+                        </h6>
+                        <div class="text-center flex-grow-1 d-flex flex-column align-items-center justify-content-center">
+                          <div class="chaside-letter mb-2">{{ getChasideCode(resultado) }}</div>
+                          <p class="fw-bold fs-6 mb-2" style="color: rgba(255,255,255,0.95);">
+                            {{ getChasideDescription(resultado) }}
+                          </p>
+                          <p class="small mb-0" style="color: rgba(255,255,255,0.6); font-size: 0.78rem;">
+                            Área de estudio recomendada según intereses predominantes
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- HOLLAND -->
+                  <div class="col-md-4">
+                    <div class="card result-card border-0 shadow-sm rounded-4 h-100 holland-bg">
+                      <div class="card-body p-4 d-flex flex-column">
+                        <h6 class="fw-bold text-uppercase mb-3 d-flex align-items-center gap-2"
+                          style="font-size: 0.72rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.8);">
+                          <i class="bi bi-compass-fill text-warning"></i>Test HOLLAND
+                        </h6>
+                        <div class="text-center flex-grow-1 d-flex flex-column align-items-center justify-content-center">
+                          <div class="mb-2" style="font-size: 1.6rem; font-weight: 900; color: white; letter-spacing: 0.05em;">
+                            {{ getHollandName(resultado) }}
+                          </div>
+                          <p class="fw-medium mb-3 small" style="color: rgba(255,255,255,0.85); font-size: 0.82rem;">
+                            {{ getHollandDescription(resultado) }}
+                          </p>
+                          <span *ngIf="resultado.puntajeHolland"
+                            class="badge rounded-pill px-3 py-2 shadow-sm"
+                            style="background: rgba(255,255,255,0.2); color: white; font-size: 0.78rem; border: 1px solid rgba(255,255,255,0.3);">
+                            <i class="bi bi-tag me-1"></i>{{ resultado.puntajeHolland }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div><!-- row -->
+              </div><!-- tab-pane -->
+            </div><!-- tab-content -->
+          </div><!-- evaluaciones -->
+        </div><!-- *ngIf estudiante -->
+      </div><!-- modal-body -->
+
+      <!-- FOOTER -->
+      <div class="modal-footer px-4 py-3 border-0 justify-content-between"
+        style="background: rgba(248,249,250,0.95); border-radius: 0 0 20px 20px;">
+        <button type="button"
+          class="btn btn-light rounded-pill px-4 fw-semibold border shadow-sm"
+          (click)="cerrarModal()">
+          <i class="bi bi-x-lg me-2"></i>Cerrar
+        </button>
+        <button type="button"
+          class="btn rounded-pill px-4 fw-bold shadow-sm text-white"
+          style="background: linear-gradient(135deg,#dc3545,#b02a37);"
+          *ngIf="estudiante"
+          [disabled]="exportando"
+          (click)="exportarPerfilPDF()">
+          <span *ngIf="!exportando">
+            <i class="bi bi-file-earmark-pdf-fill me-2"></i>Exportar PDF
+          </span>
+          <span *ngIf="exportando" class="d-flex align-items-center gap-2">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Generando...
+          </span>
+        </button>
+      </div>
+
+    </div><!-- modal-content -->
+  </div><!-- modal-dialog -->
+</div>

@@ -3,7 +3,7 @@
     <div class="umsa-header">
       <div class="umsa-title">
         <h1>
-          Instituto de Desarrollo Regional y Desconcentración Universitaria
+          Instituto de Desarrollo Regional y Desconcentracion Universitaria
         </h1>
         <h2>INICIA SESION</h2>
         <div class="umsa-divider"></div>
@@ -14,9 +14,9 @@
         <div class="login-header d-flex align-items-center bg-umsa-blue-dark text-white rounded mb-4 px-3 py-3">
           <img [src]="logoUrl" alt="Logo Universidad" class="logo-img me-3">
           <div>
-            <h5 class="mb-1 fw-bold">Sistema de Orientación Vocacional</h5>
+            <h5 class="mb-1 fw-bold">Sistema de Orientacion Vocacional</h5>
             <small class="text-light">
-              Inicie sesión para acceder al panel de control
+              Inicie sesion para acceder al panel de control
             </small>
           </div>
         </div>
@@ -40,19 +40,19 @@
           </div>
           <div class="form-floating mb-4">
             <input type="password" id="password" formControlName="password" class="form-control modern-input"
-              placeholder="Contraseña" [ngClass]="{
+              placeholder="Contrasena" [ngClass]="{
                 'is-invalid':
                   loginForm.get('password')?.touched &&
                   loginForm.get('password')?.invalid
               }">
             <label for="password">
               <i class="bi bi-lock-fill me-2"></i>
-              Contraseña
+              Contrasena
             </label>
             <div class="invalid-feedback" *ngIf="loginForm.get('password')?.touched &&
                 loginForm.get('password')?.invalid">
               <i class="bi bi-exclamation-circle me-1"></i>
-              Contraseña requerida
+              Contrasena requerida
             </div>
           </div>
           <div class="alert alert-danger modern-alert" *ngIf="error">
@@ -64,13 +64,13 @@
             <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
             <i *ngIf="!loading" class="bi bi-box-arrow-in-right me-2"></i>
             <span>
-              {{ loading ? "Iniciando Sesión..." : "Iniciar Sesión" }}
+              {{ loading ? "Iniciando Sesion..." : "Iniciar Sesion" }}
             </span>
           </button>
         </form>
         <div class="text-center">
           <small class="text-muted fw-medium">
-            © {{ 2025 }} UMSA - Sistema de Orientación Vocacional
+            © {{ 2025 }} UMSA - Sistema de Orientacion Vocacional
           </small>
         </div>
       </div>
@@ -81,7 +81,7 @@
 <!-- Panel de control autenticado -->
 <div *ngIf="isAuthenticated" class="panel-container" style="margin-top: 2%;">
   <div class="container-fluid px-4">
-    <!-- Sección de búsqueda y filtros -->
+    <!-- Seccion de busqueda y filtros -->
     <div class="card shadow-sm mb-2" style="border-radius: 12px; border: none">
       <div class="card-header py-2" style="background: linear-gradient(
             135deg,
@@ -93,7 +93,7 @@
         <div class="d-flex justify-content-between align-items-center flex-wrap">
           <h6 class="mb-0 d-flex align-items-center">
             <i class="bi bi-funnel-fill me-2"></i>
-            Filtros y Búsqueda
+            Filtros y Busqueda
           </h6>
           <div class="d-flex gap-2 mt-1 mt-md-0">
             <button class="btn btn-warning btn-sm" (click)="limpiarTodosFiltros()">
@@ -127,7 +127,7 @@
       </div>
 
       <div class="card-body p-3">
-        <!-- Búsqueda Global -->
+        <!-- Busqueda Global -->
         <div class="mb-3">
           <div class="input-group input-group-sm">
             <span class="input-group-text bg-umsa-blue text-white">
@@ -230,7 +230,7 @@
             <div class="col-12 col-lg-5">
               <label class="form-label text-muted fw-semibold mb-1">
                 <i class="bi bi-calendar-event me-1"></i>
-                Fecha Específica
+                Fecha Especifica
               </label>
               <select class="form-select form-select-sm" [(ngModel)]="filtros.fecha"
                 (change)="aplicarFiltro('fecha', filtros.fecha)">
@@ -244,717 +244,35 @@
         </div>
       </div>
     </div>
-    <!-- Modal para Ver Perfil de Estudiante -->
-    <div class="modal fade" [ngClass]="{ 'show d-block': modalPerfilVisible }" tabindex="-1"
-      [ngStyle]="{ display: modalPerfilVisible ? 'block' : 'none' }" aria-labelledby="perfilEstudianteModalLabel">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow">
-          <div class="modal-header text-white"
-            style="background: linear-gradient(135deg, var(--umsa-blue-dark), var(--umsa-blue)); border-radius: 0;">
-            <h5 class="modal-title" id="perfilEstudianteModalLabel">
-              <i class="bi bi-person-badge me-2"></i>
-              Perfil del Estudiante
-            </h5>
-            <button type="button" class="btn-close btn-close-white" (click)="cerrarModalPerfil()"></button>
-          </div>
-          <div class="modal-body p-0">
-            <!-- Spinner de carga -->
-            <div *ngIf="loading" class="text-center py-5">
-              <div class="spinner-border text-umsa-blue" role="status">
-                <span class="visually-hidden">Cargando...</span>
-              </div>
-              <p class="mt-2 text-muted">
-                Cargando información del estudiante...
-              </p>
-            </div>
-            <!-- Contenido del perfil -->
-            <div *ngIf="!loading && estudianteSeleccionado" class="perfil-container">
-              <!-- Banner y datos principales -->
-              <div class="bg-light p-4 mb-3 border-bottom position-relative">
-                <div class="row align-items-center">
-                  <div class="col-auto">
-                    <div class="text-white d-flex align-items-center justify-content-center px-3 py-2 rounded-circle"
-                      style="background: linear-gradient(135deg, var(--umsa-blue-dark), var(--umsa-blue));">
-                      <span class="fs-1">
-                        {{ estudianteSeleccionado.nombre.charAt(0)
-                        }}{{ estudianteSeleccionado.apPaterno.charAt(0) }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <h4 class="mb-1">
-                      {{ estudianteSeleccionado.nombre }}
-                      {{ estudianteSeleccionado.apPaterno }}
-                      {{ estudianteSeleccionado.apMaterno }}
-                    </h4>
-                    <div class="d-flex flex-wrap gap-3 text-muted">
-                      <div>
-                        <i class="bi bi-credit-card me-1"></i>
-                        {{ estudianteSeleccionado.ciEstudiante }}
-                      </div>
-                      <div>
-                        <i class="bi bi-mortarboard me-1"></i>
-                        {{ estudianteSeleccionado.curso }}
-                      </div>
-                      <div>
-                        <i class="bi bi-building me-1"></i>
-                        {{ estudianteSeleccionado.colegio }}
-                      </div>
-                      <div>
-                        <i class="bi bi-pin-map me-1"></i>
-                        {{ getMunicipioNombre(estudianteSeleccionado.idMunicipio) }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="px-4">
-                <!-- Información personal -->
-                <div class="card mb-4 border-0 shadow-sm">
-                  <div class="card-header bg-white py-2">
-                    <h5 class="mb-0 d-flex align-items-center">
-                      <i class="bi bi-person-lines-fill me-2 text-umsa-blue"></i>
-                      Datos Personales
-                    </h5>
-                  </div>
-                  <div class="card-body">
-                    <div class="row gx-3">
-                      <div class="col-md-6">
-                        <div class="info-item mb-3">
-                          <label class="d-block text-uppercase small text-muted mb-1">CI:</label>
-                          <p class="mb-0 fs-6">
-                            {{ estudianteSeleccionado.ciEstudiante }}
-                          </p>
-                        </div>
-                        <div class="info-item mb-3">
-                          <label class="d-block text-uppercase small text-muted mb-1">Nombre Completo:</label>
-                          <p class="mb-0 fs-6">
-                            {{ estudianteSeleccionado.nombre }}
-                            {{ estudianteSeleccionado.apPaterno }}
-                            {{ estudianteSeleccionado.apMaterno }}
-                          </p>
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="info-item mb-3">
-                          <label class="d-block text-uppercase small text-muted mb-1">Edad:</label>
-                          <p class="mb-0 fs-6">
-                            {{ estudianteSeleccionado.edad }} años
-                          </p>
-                        </div>
-                        <div class="info-item mb-3">
-                          <label class="d-block text-uppercase small text-muted mb-1">Celular:</label>
-                          <p class="mb-0 fs-6">
-                            <span *ngIf="estudianteSeleccionado.celular">
-                              <i class="bi bi-telephone me-1"></i>
-                              {{ estudianteSeleccionado.celular }}
-                            </span>
-                            <span *ngIf="!estudianteSeleccionado.celular" class="text-muted fst-italic">
-                              No especificado
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="info-item mb-3">
-                          <label class="d-block text-uppercase small text-muted mb-1">Colegio:</label>
-                          <p class="mb-0 fs-6">
-                            {{ estudianteSeleccionado.colegio }}
-                          </p>
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="info-item mb-3">
-                          <label class="d-block text-uppercase small text-muted mb-1">Curso:</label>
-                          <p class="mb-0 fs-6">
-                            {{ estudianteSeleccionado.curso }}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
-                <!-- Resultados de Orientación -->
-                <div *ngIf="resultadoEstudiante && resultadoEstudiante.length > 0">
-                  <h5 class="mb-2 d-flex align-items-center">
-                    <span class="badge rounded-pill me-2" style="background-color: var(--umsa-blue);">{{
-                      resultadoEstudiante.length
-                      }}</span>
-                    <i class="bi bi-graph-up me-2 text-umsa-blue"></i>
-                    Resultados de Orientación Vocacional
-                  </h5>
+    <!-- Modal Editar Componente -->
+    <app-modal-editar 
+      [visible]="modalEditarVisible"
+      [estudiante]="estudianteSeleccionado"
+      [resultados]="resultados"
+      [provincias]="provincias"
+      [municipios]="municipios"
+      [municipiosPorProvincia]="municipiosPorProvincia"
+      [colegios]="colegios"
+      [chasideOpciones]="chasideOpciones"
+      [hollandOpciones]="hollandOpciones"
+      (close)="cerrarModalEditar()"
+      (saved)="onSavedEstudiante()">
+    </app-modal-editar>
 
-                  <!-- Tabs para múltiples resultados -->
-                  <ul class="nav nav-tabs mb-1" *ngIf="resultadoEstudiante.length > 1">
-                    <li class="nav-item small" *ngFor="let resultado of resultadoEstudiante;
-                        let i = index">
-                      <button class="nav-link" [ngClass]="{ active: i === 0 }" data-bs-toggle="tab"
-                        [attr.data-bs-target]="'#resultado-' + i">
-                        Resultado {{ i + 1 }}<small class="ms-2 text-muted">
-                          {{
-                          estudianteSeleccionado.createdAt
-                          | date : "dd/MM/yyyy"
-                          }}
-                        </small>
-                      </button>
-                    </li>
-                  </ul>
-                  <div class="tab-content">
-                    <div class="tab-pane fade show" [ngClass]="{ active: i === 0 }" *ngFor="let resultado of resultadoEstudiante;
-                        let i = index" [attr.id]="'resultado-' + i">
-                      <div class="card mb-2 border-0 shadow-sm">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                          <h6 class="mb-0 d-flex align-items-center h6">
-                            <i class="bi bi-calendar-check me-2 text-umsa-blue"></i>
-                            Evaluación del
-                            {{
-                            estudianteSeleccionado.createdAt
-                            | date : "dd/MM/yyyy HH:mm"
-                            }}
-                          </h6>
-                          <span class="badge bg-success">Completado</span>
-                        </div>
-                        <div class="card-body">
-                          <div class="row mb-0">
-                            <div class="col-md-6">
-                              <div class="card h-100 border-0 bg-light">
-                                <div class="card-body">
-                                  <h6 class="card-title text-uppercase" style="color: var(--umsa-blue);">
-                                    <i class="bi bi-star me-2"></i>
-                                    Interés y Aptitud
-                                  </h6>
-                                  <div class="row">
-                                    <div class="col-md-6">
-                                      <div class="mb-2">
-                                        <label class="d-block text-uppercase small text-muted mb-1">Interés:</label>
-                                        <div class="d-flex align-items-center">
-                                          <span class="fs-5 me-2">{{
-                                            resultado.interes
-                                            }}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                      <div class="mb-0">
-                                        <label class="d-block text-uppercase small text-muted mb-1">Aptitud:</label>
-                                        <div class="d-flex align-items-center">
-                                          <span class="fs-5 me-2">{{
-                                            resultado.aptitud
-                                            }}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-6">
-                              <div class="card h-100 border-0 bg-light">
-                                <div class="card-body">
-                                  <h6 class="card-title text-uppercase" style="color: var(--umsa-blue);">
-                                    <i class="bi bi-award me-2"></i>
-                                    Evaluación Holland
-                                  </h6>
-                                  <label class="d-block text-uppercase small text-muted mb-1">PERSONALIDADES:</label>
-                                  <div class>
-                                    <span class="badge me-2 fs-6" style="background-color: var(--umsa-blue);" *ngFor="let letra of resultado.puntajeHolland.split(
-                                          ''
-                                        )">
-                                      {{ letra }}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+    <!-- Modal Perfil Componente -->
+    <app-modal-perfil
+      [visible]="modalPerfilVisible"
+      [estudiante]="estudianteSeleccionado"
+      [resultados]="resultadoEstudiante"
+      [colegios]="colegios"
+      [municipios]="municipios"
+      [provincias]="provincias"
+      [todasLasFacultades]="todasLasFacultades"
+      (close)="cerrarModalPerfil()">
+    </app-modal-perfil>
 
-                          <!-- Resultados detallados -->
-                          <div class="row mb-0">
-                            <!-- Datos CHASIDE específicos -->
-                            <div class="col-md-6 mb-3" *ngIf="resultado.chaside">
-                              <div class="card h-100 border-0 bg-light">
-                                <div class="card-body">
-                                  <h6 class="card-title d-flex align-items-center text-uppercase"
-                                    style="color: var(--umsa-blue);">
-                                    <i class="bi bi-clipboard-data me-2"></i>
-                                    Test CHASIDE
-                                  </h6>
-                                  <div class="mb-0">
-                                    <label class="d-block text-uppercase small text-muted mb-1">CODIGO:</label>
-                                    <div class="chaside-code">
-                                      <span class="text-uppercase me-1 fs-5">
-                                        {{
-                                        resultado.chaside.codigo | slice : -1
-                                        }}
-                                      </span>
-                                    </div>
-                                    <label class="d-block text-uppercase small text-muted mb-1 mt-2">AREA DE
-                                      ESTUDIO:</label>
-                                    <p class="mb-0 fw-semibold">
-                                      {{ resultado?.chaside?.descripcion }}
-                                    </p>
-                                    <p class="mt-3 small text-muted mb-0">
-                                      C: Administrativas y Contables, H:
-                                      Humanísticas, A: Artísticas, S: Medicina y
-                                      Cs. de la Salud, I: Ingeniería, D: Defensa
-                                      y Seguridad, E: Ciencias Exactas
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
 
-                            <!-- Datos Holland específicos -->
-                            <div class="col-md-6 mb-3" *ngIf="resultado.holland">
-                              <div class="card h-100 border-0 bg-light">
-                                <div class="card-body">
-                                  <h6 class="card-title d-flex align-items-center text-uppercase"
-                                    style="color: var(--umsa-blue);">
-                                    <i class="bi bi-person-bounding-box me-2"></i>
-                                    Test Holland
-                                  </h6>
-                                  <div class="mb-0">
-                                    <label class="d-block text-uppercase small text-muted mb-1">Tipo principal:</label>
-                                    <p class="mb-2 fs-5 text-uppercase">
-                                      {{ resultado.holland.nombre }}
-                                    </p>
-                                    <label class="d-block text-uppercase small text-muted mb-1">PERSONALIDAD:</label>
-                                    <p class="mb-2 fw-semibold">
-                                      {{ resultado?.holland?.descripcion }}
-                                    </p>
-                                    <p class="mt-3 small text-muted mb-0">
-                                      R: Realista, I: Investigador, A:
-                                      Artístico, S: Social, E: Emprendedor, C:
-                                      Convencional
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!-- Recomendaciones específicas -->
-                          <div class="card border-0 mb-0" style="background-color: rgba(23, 86, 163, 0.08);">
-                            <div class="card-body">
-                              <h6 class="card-title" style="color: var(--umsa-blue);">
-                                <i class="bi bi-lightbulb me-2"></i>
-                                Recomendaciones
-                              </h6>
-                              <p class="mb-2">
-                                Basado en los resultados de los tests:
-                              </p>
-                              <ul class="mb-0">
-                                <li *ngIf="resultado.facultades &&
-                                    resultado.facultades.length > 0">
-
-                                  <strong>Facultades recomendadas:</strong>
-
-                                  <ul class="mt-1">
-                                    <li *ngFor="let facultad of resultado.facultades">
-                                      {{ facultad.nombre }}
-                                      <small class="text-muted" *ngIf="facultad.carreras &&
-                                          facultad.carreras.length > 0">
-                                        ({{ facultad.carreras.length }}
-                                        carreras)
-                                      </small>
-                                    </li>
-                                  </ul>
-                                </li>
-                              </ul>
-                              <p class="mt-2 mb-0 small text-muted">
-                                Es importante complementar estos resultados con
-                                una orientación personalizada.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="alert alert-info d-flex align-items-center" *ngIf="!resultadoEstudiante.length">
-                  <i class="bi bi-info-circle fs-4 me-3"></i>
-                  <div>
-                    <h6 class="mb-1">Sin resultados disponibles</h6>
-                    <p class="mb-0">
-                      Este estudiante aún no tiene resultados de orientación
-                      vocacional registrados.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer bg-light">
-            <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold"
-              (click)="cerrarModalPerfil()">
-              <i class="bi bi-x-circle me-2"></i>
-              Cerrar
-            </button>
-            <button type="button" class="btn btn-umsa-modern px-4 py-2 rounded-pill fw-semibold shadow-sm"
-              *ngIf="estudianteSeleccionado" (click)="exportarPerfilPDF()">
-              <i class="bi bi-file-earmark-pdf me-2"></i>
-              Exportar PDF
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Modal para Editar Estudiante y Resultados -->
-    <div class="modal fade" [ngClass]="{ 'show d-block': modalEditarVisible }" tabindex="-1"
-      [ngStyle]="{ display: modalEditarVisible ? 'block' : 'none' }" aria-labelledby="editarEstudianteModalLabel">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content shadow-lg border-0 rounded-4">
-          <div class="modal-header text-white"
-            style="background: linear-gradient(135deg, var(--umsa-blue-dark), var(--umsa-blue)); border-radius: 0;">
-            <div class="d-flex align-items-center">
-              <div>
-                <h4 class="modal-title mb-1 fw-bold" id="editarEstudianteModalLabel">
-                  Editar Estudiante
-                </h4>
-              </div>
-            </div>
-            <button type="button" class="btn-close btn-close-white opacity-75" (click)="cerrarModalEditar()"></button>
-          </div>
-
-          <div class="modal-body p-0">
-            <!-- Sección de Información Personal -->
-            <div class="p-4 border-bottom bg-light bg-opacity-50">
-              <div class="d-flex align-items-center mb-4">
-                <div>
-                  <h5 class="mb-1 fw-bold text-primary">Datos Personales</h5>
-                </div>
-              </div>
-
-              <form *ngIf="editarForm" [formGroup]="editarForm">
-                <div class="row g-4">
-                  <!-- CI y Nombre -->
-                  <div class="col-md-6">
-                    <div class="form-floating">
-                      <input type="text" class="form-control border-2 rounded-3" id="ciEstudiante"
-                        formControlName="ciEstudiante" placeholder="CI" [ngClass]="{
-                          'is-invalid border-danger':
-                            editarForm.controls['ciEstudiante'].invalid &&
-                            editarForm.controls['ciEstudiante'].touched
-                        }">
-                      <label for="ciEstudiante" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-card-text me-2"></i>
-                        CI *
-                      </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['ciEstudiante'].invalid &&
-                          editarForm.controls['ciEstudiante'].touched">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        El CI es requerido y debe ser único
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-floating">
-                      <input type="text" class="form-control border-2 rounded-3" id="nombre" formControlName="nombre"
-                        placeholder="Nombre" [ngClass]="{
-                          'is-invalid border-danger':
-                            editarForm.controls['nombre'].invalid &&
-                            editarForm.controls['nombre'].touched
-                        }">
-                      <label for="nombre" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-person me-2"></i>
-                        Nombre *
-                      </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['nombre'].invalid &&
-                          editarForm.controls['nombre'].touched">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        El nombre es requerido
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Apellidos -->
-                  <div class="col-md-6">
-                    <div class="form-floating">
-                      <input type="text" class="form-control border-2 rounded-3" id="apPaterno"
-                        formControlName="apPaterno" placeholder="Apellido Paterno" [ngClass]="{
-                          'is-invalid border-danger':
-                            editarForm.controls['apPaterno'].invalid &&
-                            editarForm.controls['apPaterno'].touched
-                        }">
-                      <label for="apPaterno" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-person-badge me-2"></i>
-                        Apellido Paterno *
-                      </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['apPaterno'].invalid &&
-                          editarForm.controls['apPaterno'].touched">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        El apellido paterno es requerido
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-floating">
-                      <input type="text" class="form-control border-2 rounded-3" id="apMaterno"
-                        formControlName="apMaterno" placeholder="Apellido Materno">
-                      <label for="apMaterno" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-person-badge me-2"></i>
-                        Apellido Materno
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-floating">
-                      <input type="text" class="form-control border-2 rounded-3" id="colegio" formControlName="colegio"
-                        placeholder="Colegio" [ngClass]="{
-                          'is-invalid border-danger':
-                            editarForm.controls['colegio'].invalid &&
-                            editarForm.controls['colegio'].touched
-                        }">
-                      <label for="colegio" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-building me-2"></i>
-                        Colegio *
-                      </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['colegio'].invalid &&
-                          editarForm.controls['colegio'].touched">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        El colegio es requerido
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-floating">
-                      <select class="form-select border-2 rounded-3" id="curso" formControlName="curso" [ngClass]="{
-                          'is-invalid border-danger':
-                            editarForm.controls['curso'].invalid &&
-                            editarForm.controls['curso'].touched
-                        }">
-                        <option value disabled>
-                          Seleccione un curso
-                        </option>
-                        <option value="1ro SECUNDARIA">1ro SECUNDARIA</option>
-                        <option value="2do SECUNDARIA">2do SECUNDARIA</option>
-                        <option value="3ro SECUNDARIA">3ro SECUNDARIA</option>
-                        <option value="4to SECUNDARIA">4to SECUNDARIA</option>
-                        <option value="5to SECUNDARIA">5to SECUNDARIA</option>
-                        <option value="6to SECUNDARIA">6to SECUNDARIA</option>
-                      </select>
-                      <label for="curso" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-book me-2"></i>
-                        Curso *
-                      </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['curso'].invalid &&
-                          editarForm.controls['curso'].touched">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        El curso es requerido
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-md-4">
-                    <div class="form-floating">
-                      <input type="number" class="form-control border-2 rounded-3" id="edad" formControlName="edad"
-                        placeholder="Edad" [ngClass]="{
-                          'is-invalid border-danger':
-                            editarForm.controls['edad'].invalid &&
-                            editarForm.controls['edad'].touched
-                        }">
-                      <label for="edad" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-calendar3 me-2"></i>
-                        Edad *
-                      </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['edad'].invalid &&
-                          editarForm.controls['edad'].touched">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        La edad debe ser entre 10 y 30 años
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-md-8">
-                    <div class="form-floating">
-                      <input type="text" class="form-control border-2 rounded-3" id="celular" formControlName="celular"
-                        placeholder="Celular" [ngClass]="{
-                          'is-invalid border-danger':
-                            editarForm.controls['celular'].invalid &&
-                            editarForm.controls['celular'].touched
-                        }">
-                      <label for="celular" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-phone me-2"></i>
-                        Celular
-                      </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['celular'].invalid &&
-                          editarForm.controls['celular'].touched">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        El celular debe contener solo números
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-floating">
-                      <select class="form-select border-2 rounded-3" id="idProvincia" formControlName="idProvincia"
-                        [ngClass]="{
-                          'is-invalid border-danger':
-                            editarForm.controls['idProvincia'].invalid &&
-                            editarForm.controls['idProvincia'].touched
-                        }" (change)="onProvinciaChangeEditar($event)">
-                        <option [value]="null">Seleccione una provincia</option>
-                        <option *ngFor="let provincia of provincias" [value]="provincia.idProvincia">
-                          {{ provincia.nombre }}
-                        </option>
-                      </select>
-                      <label for="idProvincia" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-map me-2"></i>
-                        Provincia *
-                      </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['idProvincia'].invalid &&
-                          editarForm.controls['idProvincia'].touched">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        Seleccione una provincia
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-floating">
-                      <select class="form-select border-2 rounded-3" id="idMunicipio" formControlName="idMunicipio"
-                        (change)="onMunicipioChangeEditar($event)" [ngClass]="{
-                          'is-invalid border-danger':
-                            editarForm.controls['idMunicipio'].invalid &&
-                            editarForm.controls['idMunicipio'].touched
-                        }">
-                        <option [value]="null">Seleccione un municipio</option>
-                        <option *ngFor="let municipio of municipiosFiltrados" [value]="municipio.idMunicipio">
-                          {{ municipio.nombre }}
-                        </option>
-                      </select>
-                      <label for="idMunicipio" class="text-muted" style="font-size: var(--tx-base) !important">
-                        <i class="bi bi-pin-map me-2"></i>
-                        Municipio *
-                      </label>
-                      <div class="invalid-feedback fw-semibold" *ngIf="editarForm.controls['idMunicipio'].invalid &&
-                          editarForm.controls['idMunicipio'].touched">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        Seleccione un municipio
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-
-            <!-- Resultados de Orientación Vocacional -->
-            <div class="p-4">
-              <div class="d-flex align-items-center mb-4">
-                <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
-                  <i class="bi bi-graph-up text-success fs-5"></i>
-                </div>
-                <div>
-                  <h5 class="mb-1 fw-bold text-success">
-                    Resultados de Orientación Vocacional
-                  </h5>
-                  <small class="text-muted">Historial de evaluaciones realizadas</small>
-                </div>
-              </div>
-
-              <div *ngIf="resultados.length === 0"
-                class="alert alert-info border-0 rounded-4 d-flex align-items-center">
-                <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
-                  <i class="bi bi-info-circle text-info"></i>
-                </div>
-                <div>
-                  <strong>Sin resultados</strong>
-                  <br>
-                  <small>
-                    No hay resultados de orientación registrados para este
-                    estudiante
-                  </small>
-                </div>
-              </div>
-
-              <div *ngIf="resultados.length > 0" class="table-responsive rounded-3 border">
-                <table class="table mb-0 align-middle">
-                  <thead class="table-light">
-                    <tr>
-                      
-                      <th class="border-0 fw-bold text-muted py-3">Interés</th>
-                      <th class="border-0 fw-bold text-muted py-3">Aptitud</th>
-                      <th class="border-0 fw-bold text-muted py-3">CHASIDE</th>
-                      <th class="border-0 fw-bold text-muted py-3">Holland</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let r of resultados; let i = index" class="border-bottom">
-
-                      <td class="py-3">
-                        <span class="badge px-3 py-2 rounded-pill fw-semibold"
-                          style="background-color: rgba(23,86,163,0.12); color: var(--umsa-blue);">
-                          {{ r.interes }}
-                        </span>
-                      </td>
-
-                      <td class="py-3">
-                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-semibold">
-                          {{ r.aptitud }}
-                        </span>
-                      </td>
-
-                      <td class="py-3" *ngIf="r.chaside; else chasideEmpty">
-                        <div class="bg-warning bg-opacity-10 rounded-3 p-2">
-                          <div class="fw-bold text-warning mb-1">{{ r.chaside.codigo }}</div>
-                          <small class="text-muted">
-                            {{
-                            r.chaside?.descripcion
-                            }}
-                          </small>
-                        </div>
-                      </td>
-                      <ng-template #chasideEmpty>
-                        <td class="py-3">
-                          <span class="text-muted">—</span>
-                        </td>
-                      </ng-template>
-
-                      <td class="py-3" *ngIf="r.holland; else hollandEmpty">
-                        <div class="bg-info bg-opacity-10 rounded-3 p-2">
-                          <div class="fw-bold text-info mb-1">{{ r.holland.nombre }}</div>
-                          <small *ngIf="r.puntajeHolland" class="text-muted">
-                            Puntaje: {{ r.puntajeHolland }}
-                          </small>
-                        </div>
-                      </td>
-                      <ng-template #hollandEmpty>
-                        <td class="py-3">
-                          <span class="text-muted">—</span>
-                        </td>
-                      </ng-template>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer bg-light bg-opacity-50 border-0 p-4">
-            <div class="d-flex justify-content-end gap-3 w-100">
-              <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold"
-                (click)="cerrarModalEditar()">
-                <i class="bi bi-x-circle me-2"></i>
-                Cancelar
-              </button>
-              <button type="button" class="btn btn-umsa-modern px-4 py-2 rounded-pill fw-semibold shadow-sm"
-                [disabled]="editarForm.invalid || !estudianteSeleccionado || loading"
-                (click)="guardarEdicionCompletaEstudiante()">
-                <i class="bi bi-check-circle me-2"></i>
-                <span *ngIf="!loading">Guardar Cambios</span>
-                <span *ngIf="loading">
-                  <i class="bi bi-arrow-clockwise me-2"></i>
-                  Guardando...
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
     <!-- Tabla de estudiantes -->
     <div class="card shadow mb-4 border-0 rounded-4">
       <div class="card-header" style="background: linear-gradient(
@@ -970,7 +288,7 @@
         </h5>
       </div>
       <div class="card-body">
-        <!-- Selector de items por página -->
+        <!-- Selector de items por pagina -->
         <div class="row mb-2">
           <div class="col-md-6">
             <div class="d-flex align-items-center">
@@ -1006,7 +324,7 @@
           </div>
         </div>
 
-        <!-- Botón para eliminar estudiantes seleccionados -->
+        <!-- Boton para eliminar estudiantes seleccionados -->
         <div class="mb-3" *ngIf="tieneEstudiantesSeleccionados">
           <button class="btn btn-danger btn-sm" (click)="eliminarEstudiantesSeleccionados()"
             title="Eliminar estudiantes seleccionados">
@@ -1059,7 +377,7 @@
                 <td colspan="8" class="text-center py-4">
                   <i class="bi bi-exclamation-circle text-muted me-2"></i>
                   No se encontraron registros que coincidan con los criterios de
-                  búsqueda
+                  busqueda
                 </td>
               </tr>
               <tr *ngFor="let estudiante of estudiantesPaginados; let i = index">
@@ -1072,7 +390,7 @@
                 <td>
                   {{ estudiante.apPaterno }} {{ estudiante.apMaterno }}
                 </td>
-                <td>{{ estudiante.colegio }}</td>
+                <td>{{ getColegioNombre(estudiante.idColegio) }}</td>
                 <td>{{ estudiante.celular }}</td>
                 <td>
                   {{ getMunicipioNombre(estudiante.idMunicipio) }}
@@ -1100,13 +418,13 @@
             </tbody>
           </table>
         </div>
-        <!-- Paginación -->
+        <!-- Paginacion -->
         <div class="d-flex justify-content-center mt-3" *ngIf="paginacion.totalPaginas > 1">
-          <nav aria-label="Paginación de resultados">
+          <nav aria-label="Paginacion de resultados">
             <ul class="pagination">
               <li class="page-item" [ngClass]="{ disabled: paginacion.paginaActual === 1 }">
                 <a class="page-link" (click)="cambiarPagina(1)" aria-label="Primera" tabindex="-1"><span
-                    aria-hidden="true">«</span>
+                    aria-hidden="true">Â«</span>
                 </a>
               </li>
               <li class="page-item" [ngClass]="{ disabled: paginacion.paginaActual === 1 }">
@@ -1144,8 +462,8 @@
               <li class="page-item" [ngClass]="{
                   disabled: paginacion.paginaActual === paginacion.totalPaginas
                 }">
-                <a class="page-link" (click)="cambiarPagina(paginacion.totalPaginas)" aria-label="Última"
-                  tabindex="-1"><span aria-hidden="true">»</span>
+                <a class="page-link" (click)="cambiarPagina(paginacion.totalPaginas)" aria-label="Ãšltima"
+                  tabindex="-1"><span aria-hidden="true">Â»</span>
                 </a>
               </li>
             </ul>
