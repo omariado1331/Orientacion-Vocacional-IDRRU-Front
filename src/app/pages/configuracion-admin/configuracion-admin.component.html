@@ -12,7 +12,7 @@
       (click)="cambiarTab('configuracion')">
 
       <i class="bi bi-sliders campo-icono"></i>
-      Configuración
+        Configuración
 
     </button>
 
@@ -22,7 +22,7 @@
       (click)="cambiarTab('usuarios')">
 
       <i class="bi bi-people-fill campo-icono"></i>
-      Usuarios
+        Usuarios
 
     </button>
 
@@ -32,7 +32,7 @@
       (click)="cambiarTab('municipios')">
 
       <i class="bi bi-geo-alt-fill campo-icono"></i>
-      Municipios
+        Municipios
 
     </button>
 
@@ -42,7 +42,7 @@
       (click)="cambiarTab('colegios')">
 
       <i class="bi bi-building-fill campo-icono"></i>
-      Colegios
+        Colegios
 
     </button>
 
@@ -61,7 +61,7 @@
               <div class="col-12 col-md-6">
                 <label class="form-label">
                   <i class="bi bi-ui-checks campo-icono"></i>
-                  Formulario habilitado
+                    Formulario habilitado
                 </label>
                 <select class="form-select" formControlName="formularioHabilitado">
                   <option [ngValue]="true">Habilitado</option>
@@ -72,7 +72,7 @@
               <div class="col-12 col-md-6">
                 <label class="form-label">
                   <i class="bi bi-database-fill-check campo-icono"></i>
-                  Guardar Resultados
+                    Guardar Resultados
                 </label>
                 <select class="form-select" formControlName="guardarResultados">
                   <option [ngValue]="true">Sí</option>
@@ -98,7 +98,7 @@
 
         <div class="card-header">
           <i class="bi bi-person-plus-fill campo-icono"></i>
-          Nuevo Usuario
+            Nuevo Usuario
         </div>
 
         <div class="card-body">
@@ -170,42 +170,51 @@
 
           <tbody>
 
-            @for(usuario of usuarios; track usuario.idUsuario){
+            @if (usuariosFiltrados.length === 0) {
+              <tr>
+                <td colspan="4" class="text-center text-muted py-2" style="height: 150px; vertical-align: middle;">
+                  <i class="bi bi-info-circle" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                    No se encuentra usuarios
+                </td>
+              </tr>
+            } @else {
+              @for(usuario of usuarios; track usuario.idUsuario){
 
-            <tr>
+                <tr>
 
-              <td>{{ usuario.nombre }}</td>
-              <td>{{ usuario.username }}</td>
-              <td>{{ usuario.rol }}</td>
+                  <td>{{ usuario.nombre }}</td>
+                  <td>{{ usuario.username }}</td>
+                  <td>{{ usuario.rol }}</td>
 
-              <td>
+                  <td>
 
-                <div class="action-buttons">
+                    <div class="action-buttons">
 
-                  <button
-                    class="btn btn-warning btn-sm btn-action"
-                    (click)="editarUsuario(usuario.idUsuario)">
+                      <button
+                        class="btn btn-warning btn-sm btn-action"
+                        (click)="editarUsuario(usuario.idUsuario)">
 
-                    <i class="bi bi-pencil-fill"></i>
-                    Editar
+                        <i class="bi bi-pencil-fill"></i>
+                        Editar
 
-                  </button>
+                      </button>
 
-                  <button
-                    class="btn btn-danger btn-sm btn-action"
-                    (click)="eliminarUsuario(usuario.idUsuario)">
+                      <button
+                        class="btn btn-danger btn-sm btn-action"
+                        (click)="eliminarUsuario(usuario.idUsuario)">
 
-                    <i class="bi bi-trash-fill"></i>
-                    Eliminar
+                        <i class="bi bi-trash-fill"></i>
+                        Eliminar
 
-                  </button>
+                      </button>
 
-                </div>
+                    </div>
 
-              </td>
+                  </td>
 
-            </tr>
+                </tr>
 
+              }
             }
 
           </tbody>
@@ -380,9 +389,9 @@
 
                   @for(provincia of provincias; track provincia.idProvincia){
 
-                  <option [value]="provincia.idProvincia">
-                    {{ provincia.nombre }}
-                  </option>
+                    <option [value]="provincia.idProvincia">
+                      {{ provincia.nombre }}
+                    </option>
 
                   }
 
@@ -403,9 +412,9 @@
 
                   @for(municipio of municipiosFiltrados; track municipio.idMunicipio){
 
-                  <option [value]="municipio.idMunicipio">
-                    {{ municipio.nombre }}
-                  </option>
+                    <option [value]="municipio.idMunicipio">
+                      {{ municipio.nombre }}
+                    </option>
 
                   }
 
@@ -441,6 +450,7 @@
             </div>
 
           </form>
+
         </div>
 
           <div class="table-responsive">
@@ -459,43 +469,72 @@
 
             <tbody>
 
-              @for(colegio of colegios; track colegio.idColegio){
-
+              @if (!provinciaSeleccionada) {
                 <tr>
-
-                  <td>{{ colegio.nombre }}</td>
-                  <td>{{ colegio.nombre }}</td>
-
-                  <td>
-
-                    <div class="action-buttons">
-
-                      <button
-                      class="btn btn-warning btn-sm btn-action"
-                      (click)="editarColegio(colegio.idColegio)">
-
-                        <i class="bi bi-pencil-fill"></i>
-                          Editar
-
-                      </button>
-
-                      <button
-                      class="btn btn-danger btn-sm btn-action"
-                      (click)="eliminarColegio(colegio.idColegio)">
-
-                        <i class="bi bi-trash-fill"></i>
-                          Eliminar
-
-                      </button>
-
-                    </div>
-
+                  <td colspan="3" class="text-center text-muted py-2" style="height: 150px; vertical-align: middle;">
+                    <i class="bi bi-info-circle" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                      Debe seleccionar la provincia
                   </td>
-
                 </tr>
+              } @else if (municipiosFiltrados.length === 0) {
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-2" style="height: 150px; vertical-align: middle;">
+                    <i class="bi bi-info-circle" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                      No se encuentran Municipios para la provincia seleccionada
+                  </td>
+                </tr>
+              } @else if (!municipioSeleccionado) {
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-2" style="height: 150px; vertical-align: middle;">
+                    <i class="bi bi-info-circle" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                      Debe seleccionar el municipio
+                  </td>
+                </tr>
+              } @else if (colegiosFiltrados.length === 0) {
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-2" style="height: 150px; vertical-align: middle;">
+                    <i class="bi bi-info-circle" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                      No existen colegios para el municipio seleccionado
+                  </td>
+                </tr>
+              } @else {
+                @for(colegio of colegios; track colegio.idColegio){
 
+                  <tr>
+
+                    <td>{{ colegio.nombre }}</td>
+                    <td>{{ colegio.nombre }}</td>
+
+                    <td>
+
+                      <div class="action-buttons">
+
+                        <button
+                        class="btn btn-warning btn-sm btn-action"
+                        (click)="editarColegio(colegio.idColegio)">
+
+                          <i class="bi bi-pencil-fill"></i>
+                            Editar
+
+                        </button>
+
+                        <button
+                        class="btn btn-danger btn-sm btn-action"
+                        (click)="eliminarColegio(colegio.idColegio)">
+
+                          <i class="bi bi-trash-fill"></i>
+                            Eliminar
+
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                }
               }
-
             </tbody>
 
             </table>
@@ -505,3 +544,5 @@
       </div>
 
     }
+    
+</div>

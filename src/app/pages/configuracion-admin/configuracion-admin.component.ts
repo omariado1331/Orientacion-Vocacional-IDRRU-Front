@@ -58,9 +58,13 @@ export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
   // variables de seleccion
   provinciaSeleccionada: number | null = null;
   municipioSeleccionado: number | null = null; 
+  usuarioSeleccionado: number | null = null;
+  colegioSeleccionado: number | null = null;
 
   // inicializacion de variables para filtrar
   municipiosFiltrados: Municipio[] = [];
+  colegiosFiltrados: Colegio[] = [];
+  usuariosFiltrados: Usuario[] = [];
 
   // formularios
   configuracionForm!: FormGroup;
@@ -76,7 +80,7 @@ export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
   // variable para roles
   roles = [
     {
-      value: 'ADMIN',
+      value: 'ADMINISTRADOR',
       label: 'Administrador'
     },
     {
@@ -102,7 +106,8 @@ export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
 
     this.colegioForm = this.fb.group({
       nombre: ['', Validators.required],
-      idMunicipio: [null, Validators.required]
+      idMunicipio: [null, Validators.required],
+      idProvincia: [null, Validators.required]
     })
 
     this.usuarioForm = this.fb.group({
