@@ -48,7 +48,7 @@
 
   </div>
 
-      @if (tabActiva === 'configuracion') {
+    @if (tabActiva === 'configuracion') {
       <div class="card admin-card section-spacing">
         <div class="card-header">
           <i class="bi bi-sliders campo-icono"></i>
@@ -56,39 +56,55 @@
         </div>
 
         <div class="card-body">
-          <form [formGroup]="configuracionForm">
-            <div class="row g-2">
-              <div class="col-12 col-md-6">
-                <label class="form-label">
-                  <i class="bi bi-ui-checks campo-icono"></i>
+          <div class="row g-3">
+            <!-- Switch Formulario Habilitado -->
+            <div class="col-12 col-md-6">
+              <div class="switch-container">
+                <div class="switch-wrapper">
+                  <label class="switch-label">
+                    <i class="bi bi-ui-checks campo-icono"></i>
                     Formulario habilitado
-                </label>
-                <select class="form-select" formControlName="formularioHabilitado">
-                  <option [ngValue]="true">Habilitado</option>
-                  <option [ngValue]="false">Deshabilitado</option>
-                </select>
-              </div> 
-
-              <div class="col-12 col-md-6">
-                <label class="form-label">
-                  <i class="bi bi-database-fill-check campo-icono"></i>
-                    Guardar Resultados
-                </label>
-                <select class="form-select" formControlName="guardarResultados">
-                  <option [ngValue]="true">Sí</option>
-                  <option [ngValue]="false">No</option>
-                </select>
-                
+                  </label>
+                </div>
+                <div class="switch-wrapper">
+                  <label class="switch">
+                    <input 
+                      type="checkbox" 
+                      [checked]="configuracionForm.get('formularioHabilitado')?.value"
+                      (change)="toggleFormularioHabilitado($event)">
+                    <span class="slider"></span>
+                  </label>
+                  <span class="switch-status" [class.active]="configuracionForm.get('formularioHabilitado')?.value" [class.inactive]="!configuracionForm.get('formularioHabilitado')?.value">
+                    {{ configuracionForm.get('formularioHabilitado')?.value ? 'Habilitado' : 'Deshabilitado' }}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div class="mt-4">
-              <button type="button" class="btn btn-primary" (click)="guardarConfiguracion()">
-                <i class="bi bi-floppy-fill"></i>
-                  Guardar Configuración
-              </button>
+            <!-- Switch Guardar Resultados -->
+            <div class="col-12 col-md-6">
+              <div class="switch-container">
+                <div class="switch-wrapper">
+                  <label class="switch-label">
+                    <i class="bi bi-database-fill-check campo-icono"></i>
+                    Guardar Resultados
+                  </label>
+                </div>
+                <div class="switch-wrapper">
+                  <label class="switch">
+                    <input 
+                      type="checkbox" 
+                      [checked]="configuracionForm.get('guardarResultados')?.value"
+                      (change)="toggleGuardarResultados($event)">
+                    <span class="slider"></span>
+                  </label>
+                  <span class="switch-status" [class.active]="configuracionForm.get('guardarResultados')?.value" [class.inactive]="!configuracionForm.get('guardarResultados')?.value">
+                    {{ configuracionForm.get('guardarResultados')?.value ? 'Sí' : 'No' }}
+                  </span>
+                </div>
+              </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     }

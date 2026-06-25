@@ -14,11 +14,11 @@ export class ConfiguracionService {
   constructor(private http: HttpClient) { }
 
   getConfiguracion(): Observable<Configuracion> {
-    return this.http.get<Configuracion>(`${this.apiUrl}/1`);
+    return this.http.get<Configuracion>(this.apiUrl);
   }
 
   updateConfiguracion(configuracion: Configuracion): Observable<Configuracion> {
-    return this.http.put<Configuracion>(`${this.apiUrl}/${configuracion.idConfiguracion}`, configuracion);
+    return this.http.put<Configuracion>(`${this.apiUrl}/1`, configuracion);
   } 
 
 }

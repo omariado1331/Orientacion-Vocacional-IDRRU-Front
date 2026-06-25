@@ -125,6 +125,7 @@ export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
       return;
     }
     this.inicializarFormularios();
+    this.cargarConfiguracion();
   }
 
   ngOnDestroy(): void {
@@ -148,6 +149,18 @@ export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
     });
   }
 
+  toggleFormularioHabilitado(event: any) {
+    const value = event.target.checked;
+    this.configuracionForm.get('formularioHabilitado')?.setValue(value);
+    this.guardarConfiguracion(); // Guarda automáticamente
+  }
+
+  toggleGuardarResultados(event: any) {
+    const value = event.target.checked;
+    this.configuracionForm.get('guardarResultados')?.setValue(value);
+    this.guardarConfiguracion(); // Guarda automáticamente
+  }
+  
   // guardado de configuracion
   guardarConfiguracion(): void {
     const configuracion: Configuracion = {
