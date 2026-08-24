@@ -1,13 +1,7 @@
 export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8080'
+  production: true,
+  apiUrl: 'https://backend-test-vocacional.onrender.com'
 };
-
-
-
-
-
-
 
 
 // Para subir a produccion se debe comentar 

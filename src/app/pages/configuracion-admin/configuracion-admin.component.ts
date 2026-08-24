@@ -1,29 +1,71 @@
-import { Component, OnDestroy, OnInit, PLATFORM_ID, Inject} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
 import { ConfiguracionService } from '../../services/configuracion.service';
 import { MunicipioService } from '../../services/municipio.service';
 import { ColegioService } from '../../services/colegio.service';
 import { AuthService } from '../../services/auth.service';
-import { FormBuilder, FormGroup, Validators, ɵInternalFormsSharedModule, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ProvinciaService } from '../../services/provincia.service';
+import { NotificacionService } from '../../services/notificacion.service';
+
 import { Configuracion } from '../../interfaces/configuracion-interface';
 import { Municipio } from '../../interfaces/municipio-interface';
 import { Colegio } from '../../interfaces/colegio-interface';
-import { Usuario, UsuarioRegistrado } from '../../interfaces/auth.interface';
+import { UsuarioRegistrado } from '../../interfaces/auth.interface';
 import { Provincia } from '../../interfaces/provincia-interface';
-import { ProvinciaService } from '../../services/provincia.service';
-import { Subject } from 'rxjs';
-import { NotificacionService } from '../../services/notificacion.service';
 
 @Component({
   selector: 'app-configuracion-admin',
-  imports: [ɵInternalFormsSharedModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './configuracion-admin.component.html',
   styleUrl: './configuracion-admin.component.css'
 })
-export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
+export class ConfiguracionAdminComponent implements OnInit, OnDestroy {
+
+  private destroy$ = new Subject<void>();
+
+  // ─── Navegación por tabs ────────────────────────────────────────────────────
+  tabActiva: 'configuracion' | 'usuarios' | 'municipios' | 'colegios' = 'configuracion';
+
+  // ─── Listas de datos ────────────────────────────────────────────────────────
+  configuracion!: Configuracion;
+  provincias: Provincia[] = [];
+  municipios: Municipio[] = [];
+  municipiosFiltradosColegio: Municipio[] = [];
+  colegios: Colegio[] = [];
+  usuarios: UsuarioRegistrado[] = [];
+
+  // ─── Estado de carga ────────────────────────────────────────────────────────
+  cargandoUsuarios = false;
+  cargandoMunicipios = false;
+  cargandoColegios = false;
+
+  // ─── Formularios ────────────────────────────────────────────────────────────
+  configuracionForm!: FormGroup;
+  municipioForm!: FormGroup;
+  colegioForm!: FormGroup;
+  usuarioForm!: FormGroup;
+
+  // ─── Estado de edición ──────────────────────────────────────────────────────
+  idMunicipioEditar: number | null = null;
+  idColegioEditar: number | null = null;
+  idUsuarioEditar: number | null = null;
+
+  // Selector de provincia para el formulario de Colegio (fuera del form group)
+  provinciaSeleccionadaColegio: number | null = null;
+
+  // ─── Opciones de roles ──────────────────────────────────────────────────────
+  readonly roles = [
+    { value: 'ADMINISTRADOR', label: 'Administrador' },
+    { value: 'EVALUADOR',     label: 'Evaluador'     }
+  ];
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
     private configuracionService: ConfiguracionService,
     private provinciaService: ProvinciaService,
     private municipioService: MunicipioService,
@@ -32,100 +74,22 @@ export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
     private notificacionService: NotificacionService,
     private fb: FormBuilder,
     private router: Router
-  ) {
-    this.inicializarFormularios;
-  }
+  ) {}
 
-  private destroy$ = new Subject<void>();
-
-  // navegacion entre PESTAÑAS
-  tabActiva: 'configuracion' | 'usuarios' | 'municipios' | 'colegios' = 'configuracion';
-
-  cambiarTab(tab: 'configuracion' | 'usuarios' | 'municipios' | 'colegios'): void {
-    this.tabActiva = tab;
-  }
-
-  // variables de estado
-  configuracion!: Configuracion;
-  configuracionGuardada = false;
-
-  // inicializacion de variables para listar
-  provincias: Provincia[] = [];
-  municipios: Municipio[] = [];
-  colegios: Colegio[] = [];
-  usuarios: UsuarioRegistrado[] = [];
-
-  // variables de seleccion
-  provinciaSeleccionada: number | null = null;
-  municipioSeleccionado: number | null = null; 
-  usuarioSeleccionado: number | null = null;
-  colegioSeleccionado: number | null = null;
-
-  // inicializacion de variables para filtrar
-  municipiosFiltrados: Municipio[] = [];
-  colegiosFiltrados: Colegio[] = [];
-  usuariosFiltrados: Usuario[] = [];
-
-  // formularios
-  configuracionForm!: FormGroup;
-  municipioForm!: FormGroup;
-  colegioForm!: FormGroup;
-  usuarioForm!: FormGroup;
-
-  // variables para editar 
-  idMunicipioEditar: number | null = null;
-  idColegioEditar: number | null = null;
-  idUsuarioEditar: number | null = null;
-
-  // variable para roles
-  roles = [
-    {
-      value: 'ADMINISTRADOR',
-      label: 'Administrador'
-    },
-    {
-      value: 'EVALUADOR',
-      label: 'Evaluador'
-    }
-  ];
-
-  // Autenticacion
-  isAuthenticated = false;
-
-  private inicializarFormularios(): void{
-    //  inicio de formularios
-    this.configuracionForm = this.fb.group({
-      guardarResultados: [false],
-      formularioHabilitado: [true]
-    });
-
-    this.municipioForm = this.fb.group({
-      nombre: ['', Validators.required],
-      idProvincia: [null, Validators.required]
-    });
-
-    this.colegioForm = this.fb.group({
-      nombre: ['', Validators.required],
-      idMunicipio: [null, Validators.required],
-      idProvincia: [null, Validators.required]
-    })
-
-    this.usuarioForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required],
-      nombre: ['', Validators.required],
-      rol: ['EVALUADOR', Validators.required]
-    })
-  }
+  // ════════════════════════════════════════════════════════════════════════════
+  // Ciclo de vida
+  // ════════════════════════════════════════════════════════════════════════════
 
   ngOnInit(): void {
-    this.isAuthenticated = this.authService.estaAutenticado();
     if (!this.authService.esAdministrador()) {
       this.router.navigate(['/']);
       return;
     }
     this.inicializarFormularios();
-    this.cargarConfiguracion();
+    // Carga inicial según tab activa por defecto
+    this.cargarDatosPorTab(this.tabActiva);
+    // Las provincias se necesitan en múltiples tabs
+    this.cargarProvincias();
   }
 
   ngOnDestroy(): void {
@@ -133,224 +97,455 @@ export class ConfiguracionAdminComponent implements OnInit, OnDestroy{
     this.destroy$.complete();
   }
 
-  // cargamos la configuracion del sistema
-  cargarConfiguracion(): void {
-    this.configuracionService.getConfiguracion().subscribe({
-      next: (data) => {
-        this.configuracion = data;
-        this.configuracionForm.patchValue({
-          guardarResultados: data.guardarResultados,
-          formularioHabilitado: data.formularioHabilitado
-        });
-      },
-      error: (err) => {
-        console.error(err);
-      }
+  // ════════════════════════════════════════════════════════════════════════════
+  // Navegación de tabs
+  // ════════════════════════════════════════════════════════════════════════════
+
+  cambiarTab(tab: 'configuracion' | 'usuarios' | 'municipios' | 'colegios'): void {
+    this.tabActiva = tab;
+    this.cargarDatosPorTab(tab);
+  }
+
+  private cargarDatosPorTab(tab: string): void {
+    switch (tab) {
+      case 'configuracion': this.cargarConfiguracion();  break;
+      case 'usuarios':      this.cargarUsuarios();       break;
+      case 'municipios':    this.cargarMunicipios();     break;
+      case 'colegios':
+        this.cargarMunicipios();
+        this.cargarColegios();
+        break;
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // Inicialización de formularios
+  // ════════════════════════════════════════════════════════════════════════════
+
+  private inicializarFormularios(): void {
+    this.configuracionForm = this.fb.group({
+      guardarResultados:    [false],
+      formularioHabilitado: [true]
+    });
+
+    this.municipioForm = this.fb.group({
+      nombre:      ['', Validators.required],
+      idProvincia: [null, Validators.required]
+    });
+
+    this.colegioForm = this.fb.group({
+      nombre:      ['', Validators.required],
+      // Starts disabled until a province is selected
+      idMunicipio: [{ value: null, disabled: true }, Validators.required]
+    });
+
+    this.usuarioForm = this.fb.group({
+      username: ['', Validators.required],
+      password: [''],
+      nombre:   ['', Validators.required],
+      rol:      ['EVALUADOR', Validators.required]
     });
   }
 
-  toggleFormularioHabilitado(event: any) {
-    const value = event.target.checked;
-    this.configuracionForm.get('formularioHabilitado')?.setValue(value);
-    this.guardarConfiguracion(); // Guarda automáticamente
+  // ════════════════════════════════════════════════════════════════════════════
+  // Configuración del sistema
+  // ════════════════════════════════════════════════════════════════════════════
+
+  cargarConfiguracion(): void {
+    this.configuracionService.getConfiguracion()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.configuracion = data;
+          this.configuracionForm.patchValue({
+            guardarResultados:    data.guardarResultados,
+            formularioHabilitado: data.formularioHabilitado
+          });
+        },
+        error: (err) => {
+          console.error('Error al cargar configuración:', err);
+          // this.notificacionService.mostrar('Error al cargar la configuración', 'error');
+        }
+      });
   }
 
-  toggleGuardarResultados(event: any) {
-    const value = event.target.checked;
-    this.configuracionForm.get('guardarResultados')?.setValue(value);
-    this.guardarConfiguracion(); // Guarda automáticamente
-  }
-  
-  // guardado de configuracion
   guardarConfiguracion(): void {
+    if (!this.configuracion || !this.configuracion.idConfiguracion) {
+      this.notificacionService.mostrar('Error al guardar: La configuración no fue cargada.', 'error');
+      return;
+    }
+
     const configuracion: Configuracion = {
       ...this.configuracion,
       ...this.configuracionForm.value
     };
-    this.configuracionService.updateConfiguracion(configuracion).subscribe({
-      next: () => {
-        this.notificacionService.mostrar("Configuracion Guardada", "success")
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    })
+    this.configuracionService.updateConfiguracion(configuracion)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.notificacionService.mostrar('Configuración guardada exitosamente', 'success');
+        },
+        error: (err) => {
+          console.error('Error al guardar configuración:', err);
+          this.notificacionService.mostrar('Error al guardar la configuración', 'error');
+        }
+      });
   }
 
-  // cargar todos los usuarios:
-  cargarUsuarios(): void {
-    this.authService.getUsuarios().subscribe({
-      next: (data) => {
-        this.usuarios = data;
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    });
-  }
+  // ════════════════════════════════════════════════════════════════════════════
+  // Provincias (catálogo de soporte)
+  // ════════════════════════════════════════════════════════════════════════════
 
-  // creacion de usuario
-  crearUsuario(): void {
-    if (this.usuarioForm.invalid) {
-      return;
-    }
-
-    this.authService.create(this.usuarioForm.value).subscribe({
-      next: () => {
-        this.usuarioForm.reset();
-        this.cargarUsuarios();
-        this.notificacionService.mostrar('Usuario creado exitosamente', 'success');
-      },
-      error: (err) => {
-        console.error(err);
-        this.notificacionService.mostrar('Error al crear usuario', 'error');
-      }
-    })
-  }
-
-  // modificar un USUARIO
-  editarUsuario(id: number): void {
-    
-  }
-
-  // eliminar un USUARIO
-  eliminarUsuario(id: number): void{
-    if (!confirm("¿Esta segur@ de eliminar el usuario?")){
-      return;
-    }
-
-    this.authService.delete(id).subscribe({
-      next: () => {
-        this.cargarUsuarios();
-        this.notificacionService.mostrar('Usuario elminado', 'success');
-      },
-      error: (err) => {
-        console.error(err);
-        this.notificacionService.mostrar('Error al eliminar usuario', 'error');
-      }
-    });
-  }
-
-  // Cargar las PROVINCIAS
   cargarProvincias(): void {
-    this.provinciaService.getProvincias().subscribe({
-      next: (data) => {
-        this.provincias= data;
-      },
-      error : (err) => {
-        console.error(err)
-      }
-    });
+    this.provinciaService.getProvincias()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => { this.provincias = data; },
+        error: (err) => { console.error('Error al cargar provincias:', err); }
+      });
   }
 
-  // Cargar los MUNICIPIOS
+  /** Helper: obtiene el nombre de la provincia dado su id */
+  getNombreProvincia(idProvincia: number): string {
+    return this.provincias.find(p => p.idProvincia === idProvincia)?.nombre ?? '—';
+  }
+
+  /** Helper: obtiene el nombre del municipio dado su id */
+  getNombreMunicipio(idMunicipio: number): string {
+    return this.municipios.find(m => m.idMunicipio === idMunicipio)?.nombre ?? '—';
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // Usuarios
+  // ════════════════════════════════════════════════════════════════════════════
+
+  cargarUsuarios(): void {
+    this.cargandoUsuarios = true;
+    this.authService.getUsuarios()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.usuarios = data;
+          this.cargandoUsuarios = false;
+        },
+        error: (err) => {
+          console.error('Error al cargar usuarios:', err);
+          this.notificacionService.mostrar('Error al cargar la lista de usuarios', 'error');
+          this.cargandoUsuarios = false;
+        }
+      });
+  }
+
+  guardarUsuario(): void {
+    if (this.usuarioForm.invalid) {
+      this.usuarioForm.markAllAsTouched();
+      return;
+    }
+
+    const esEdicion = this.idUsuarioEditar !== null;
+
+    if (esEdicion) {
+      // En edición, solo enviar password si fue modificada
+      const payload: UsuarioRegistrado = { ...this.usuarioForm.value };
+      if (!payload.password) {
+        delete payload.password;
+      }
+
+      this.authService.update(this.idUsuarioEditar!, payload)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.cancelarEdicionUsuario();
+            this.cargarUsuarios();
+            this.notificacionService.mostrar('Usuario actualizado exitosamente', 'success');
+          },
+          error: (err) => {
+            console.error('Error al actualizar usuario:', err);
+            this.notificacionService.mostrar('Error al actualizar el usuario', 'error');
+          }
+        });
+    } else {
+      // Modo creación: password obligatoria
+      if (!this.usuarioForm.get('password')?.value) {
+        this.usuarioForm.get('password')?.setErrors({ required: true });
+        this.usuarioForm.markAllAsTouched();
+        return;
+      }
+
+      this.authService.create(this.usuarioForm.value)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.cancelarEdicionUsuario();
+            this.cargarUsuarios();
+            this.notificacionService.mostrar('Usuario creado exitosamente', 'success');
+          },
+          error: (err) => {
+            console.error('Error al crear usuario:', err);
+            this.notificacionService.mostrar('Error al crear el usuario', 'error');
+          }
+        });
+    }
+  }
+
+  editarUsuario(id: number): void {
+    const usuario = this.usuarios.find(u => u.idUsuario === id);
+    if (!usuario) return;
+
+    this.idUsuarioEditar = id;
+    this.usuarioForm.patchValue({
+      username: usuario.username,
+      password: '',           // por seguridad, no pre-llenar contraseña
+      nombre:   usuario.nombre,
+      rol:      usuario.rol
+    });
+    // Hacer el campo password opcional en modo edición
+    this.usuarioForm.get('password')?.clearValidators();
+    this.usuarioForm.get('password')?.updateValueAndValidity();
+  }
+
+  cancelarEdicionUsuario(): void {
+    this.idUsuarioEditar = null;
+    this.usuarioForm.reset({ rol: 'EVALUADOR' });
+    // Restaurar validación de password para modo creación
+    this.usuarioForm.get('password')?.clearValidators();
+    this.usuarioForm.get('password')?.updateValueAndValidity();
+  }
+
+  eliminarUsuario(id: number): void {
+    if (!confirm('¿Está seguro de eliminar este usuario? Esta acción no se puede deshacer.')) {
+      return;
+    }
+    this.authService.delete(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.cargarUsuarios();
+          this.notificacionService.mostrar('Usuario eliminado exitosamente', 'success');
+        },
+        error: (err) => {
+          console.error('Error al eliminar usuario:', err);
+          this.notificacionService.mostrar('Error al eliminar el usuario', 'error');
+        }
+      });
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // Municipios
+  // ════════════════════════════════════════════════════════════════════════════
+
   cargarMunicipios(): void {
-    this.municipioService.getAllMunicipios().subscribe({
-      next: (data) => {
-        this.municipios = data;
-      },
-      error : (err) => {
-        console.error(err);
-      }
-    });
+    this.cargandoMunicipios = true;
+    this.municipioService.getAllMunicipios()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.municipios = data;
+          this.cargandoMunicipios = false;
+        },
+        error: (err) => {
+          console.error('Error al cargar municipios:', err);
+          this.notificacionService.mostrar('Error al cargar la lista de municipios', 'error');
+          this.cargandoMunicipios = false;
+        }
+      });
   }
 
-  // crear un MUNICIPIO
-  crearMunicipio(): void {
+  guardarMunicipio(): void {
     if (this.municipioForm.invalid) {
+      this.municipioForm.markAllAsTouched();
       return;
     }
 
-    this.municipioService.create(this.municipioForm.value).subscribe({
-      next: () =>{
-        this.municipioForm.reset();
-        this.cargarMunicipios();
+    const esEdicion = this.idMunicipioEditar !== null;
 
-        this.notificacionService.mostrar("Municipio creado exitosamente", 'success');
-      },
-      error: (err) => {
-        console.error(err);
-        this.notificacionService.mostrar("Error al crear el municipio", 'error');
-      }
-    })
+    if (esEdicion) {
+      this.municipioService.update(this.idMunicipioEditar!, this.municipioForm.value)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.cancelarEdicionMunicipio();
+            this.cargarMunicipios();
+            this.notificacionService.mostrar('Municipio actualizado exitosamente', 'success');
+          },
+          error: (err) => {
+            console.error('Error al actualizar municipio:', err);
+            this.notificacionService.mostrar('Error al actualizar el municipio', 'error');
+          }
+        });
+    } else {
+      this.municipioService.create(this.municipioForm.value)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.cancelarEdicionMunicipio();
+            this.cargarMunicipios();
+            this.notificacionService.mostrar('Municipio creado exitosamente', 'success');
+          },
+          error: (err) => {
+            console.error('Error al crear municipio:', err);
+            this.notificacionService.mostrar('Error al crear el municipio', 'error');
+          }
+        });
+    }
   }
 
-  // Modificar un MUNICIPIO
   editarMunicipio(id: number): void {
-    // por determinar
+    const municipio = this.municipios.find(m => m.idMunicipio === id);
+    if (!municipio) return;
+
+    this.idMunicipioEditar = id;
+    this.municipioForm.patchValue({
+      nombre:      municipio.nombre,
+      idProvincia: municipio.idProvincia
+    });
   }
 
-  // Eliminar un MUNICIPIO
+  cancelarEdicionMunicipio(): void {
+    this.idMunicipioEditar = null;
+    this.municipioForm.reset();
+  }
+
   eliminarMunicipio(id: number): void {
-    if (!confirm("¿Esta segur@ de eliminar el municipio?")){
+    if (!confirm('¿Está seguro de eliminar este municipio?')) {
       return;
     }
-
-    this.municipioService.delete(id).subscribe({
-      next: ()=> {
-        this.cargarMunicipios();
-        this.notificacionService.mostrar('Municipio eliminado', 'success');
-      },
-      error: (err) => {
-        console.error(err);
-        this.notificacionService.mostrar('Error al eliminar el municipio', 'error');
-      }
-    });
+    this.municipioService.delete(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.cargarMunicipios();
+          this.notificacionService.mostrar('Municipio eliminado exitosamente', 'success');
+        },
+        error: (err) => {
+          console.error('Error al eliminar municipio:', err);
+          this.notificacionService.mostrar('Error al eliminar el municipio', 'error');
+        }
+      });
   }
 
-  // listar los COLEGIOS
+  // ════════════════════════════════════════════════════════════════════════════
+  // Colegios
+  // ════════════════════════════════════════════════════════════════════════════
+
+  /** Filtra los municipios según la provincia seleccionada en el form de Colegio */
+  onProvinciaColegioChange(event: Event): void {
+    const idProvincia = +(event.target as HTMLSelectElement).value;
+    this.provinciaSeleccionadaColegio = idProvincia || null;
+    if (idProvincia) {
+      this.municipiosFiltradosColegio = this.municipios.filter(m => m.idProvincia === idProvincia);
+      this.colegioForm.get('idMunicipio')?.enable();
+    } else {
+      this.municipiosFiltradosColegio = [];
+      this.colegioForm.get('idMunicipio')?.disable();
+    }
+    // Resetear municipio seleccionado al cambiar provincia
+    this.colegioForm.patchValue({ idMunicipio: null });
+  }
+
   cargarColegios(): void {
-    this.colegioService.getAllColegios().subscribe({
-      next: (data) => {
-        this.colegios = data;
-      },
-      error : (err) => {
-        console.error(err);
-      }
-    })
+    this.cargandoColegios = true;
+    this.colegioService.getAllColegios()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.colegios = data;
+          this.cargandoColegios = false;
+        },
+        error: (err) => {
+          console.error('Error al cargar colegios:', err);
+          this.notificacionService.mostrar('Error al cargar la lista de colegios', 'error');
+          this.cargandoColegios = false;
+        }
+      });
   }
 
-  // crear COLEGIO
-  crearColegio(): void{
-    if (this.colegioForm.invalid){
+  guardarColegio(): void {
+    if (this.colegioForm.invalid) {
+      this.colegioForm.markAllAsTouched();
       return;
     }
 
-    this.colegioService.create(this.colegioForm.value).subscribe({
-      next: () => {
-        this.colegioForm.reset();
-        this.cargarColegios();
+    const esEdicion = this.idColegioEditar !== null;
 
-        this.notificacionService.mostrar('Colegio creado', 'success');
-      },
-      error: (err) => {
-        console.error(err);
-        this.notificacionService.mostrar('error al crear el Colegio', 'error');
-      }
+    if (esEdicion) {
+      this.colegioService.update(this.idColegioEditar!, this.colegioForm.value)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.cancelarEdicionColegio();
+            this.cargarColegios();
+            this.notificacionService.mostrar('Colegio actualizado exitosamente', 'success');
+          },
+          error: (err) => {
+            console.error('Error al actualizar colegio:', err);
+            this.notificacionService.mostrar('Error al actualizar el colegio', 'error');
+          }
+        });
+    } else {
+      this.colegioService.create(this.colegioForm.value)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.cancelarEdicionColegio();
+            this.cargarColegios();
+            this.notificacionService.mostrar('Colegio creado exitosamente', 'success');
+          },
+          error: (err) => {
+            console.error('Error al crear colegio:', err);
+            this.notificacionService.mostrar('Error al crear el colegio', 'error');
+          }
+        });
+    }
+  }
+
+  editarColegio(id: number): void {
+    const colegio = this.colegios.find(c => c.idColegio === id);
+    if (!colegio) return;
+
+    this.idColegioEditar = id;
+
+    // Determinar provincia del municipio del colegio para pre-llenar el selector de provincia
+    const municipio = this.municipios.find(m => m.idMunicipio === colegio.idMunicipio);
+    if (municipio) {
+      this.provinciaSeleccionadaColegio = municipio.idProvincia;
+      this.municipiosFiltradosColegio = this.municipios.filter(
+        m => m.idProvincia === municipio.idProvincia
+      );
+      this.colegioForm.get('idMunicipio')?.enable();
+    }
+
+    this.colegioForm.patchValue({
+      nombre:      colegio.nombre,
+      idMunicipio: colegio.idMunicipio
     });
   }
 
-  // modificar un COLEGIO
-  editarColegio(id: number): void {
-    // falta
+  cancelarEdicionColegio(): void {
+    this.idColegioEditar = null;
+    this.provinciaSeleccionadaColegio = null;
+    this.municipiosFiltradosColegio = [];
+    this.colegioForm.reset();
+    this.colegioForm.get('idMunicipio')?.disable();
   }
 
-  // eliminar un colegio
   eliminarColegio(id: number): void {
-    if (!confirm("¿Esta segur@ de eliminar el colegio? \n SE ELIMINARAN LAS EVALUACIONES DE ESTUDIANTES ASOCIADOS AL COLEGIO")){
+    if (!confirm(
+      '¿Está seguro de eliminar este colegio?\nSE ELIMINARÁN LAS EVALUACIONES DE ESTUDIANTES ASOCIADOS AL COLEGIO.'
+    )) {
       return;
     }
-
-    this.colegioService.delete(id).subscribe({
-      next: () => {
-        this.cargarColegios();
-        this.notificacionService.mostrar('Colegio eliminado exitosamente', 'success');
-      },
-      error: (err) => {
-        console.error(err);
-        this.notificacionService.mostrar('Error al eliminar el colegio', 'error');
-      }
-    })
+    this.colegioService.delete(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.cargarColegios();
+          this.notificacionService.mostrar('Colegio eliminado exitosamente', 'success');
+        },
+        error: (err) => {
+          console.error('Error al eliminar colegio:', err);
+          this.notificacionService.mostrar('Error al eliminar el colegio', 'error');
+        }
+      });
   }
-
 }

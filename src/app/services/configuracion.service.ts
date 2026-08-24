@@ -18,7 +18,7 @@ export class ConfiguracionService {
   }
 
   updateConfiguracion(configuracion: Configuracion): Observable<Configuracion> {
-    return this.http.put<Configuracion>(`${this.apiUrl}/1`, configuracion);
+    return this.http.put<Configuracion>(`${this.apiUrl}/${configuracion.idConfiguracion}`, configuracion);
   } 
 
 }

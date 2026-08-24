@@ -44,10 +44,14 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
 
   // ── Datos de selección de ubicación ─────────────────────────────────────────
   provincias: Provincia[] = [];
+
   municipios: Municipio[] = [];
-  municipiosFiltrados: Municipio[] = [];
+  municipiosDeProvincia: Municipio[] = [];
+  otrosMunicipios: Municipio[] = [];
+
   colegios: Colegio[] = [];
-  colegiosFiltrados: Colegio[] = [];
+  colegiosDeMunicipio: Colegio[] = [];
+  otrosColegios: Colegio[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -118,7 +122,7 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
     idChaside: 0,
     idHolland: 0
   };
-  chaside: Chaside[]= [];
+  chaside: Chaside[] = [];
   holland: Holland[] = [];
 
   constructor(
@@ -157,14 +161,13 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
       curso: new FormControl('', Validators.required),
       edad: new FormControl(null, [Validators.required, Validators.min(14), Validators.max(80)]),
       celular: new FormControl(null, [Validators.required, Validators.pattern(/^\d{8}$/)]),
-      // Guarda el idProvincia (number), NO el nombre
+      // Valores reales subyacentes que se enviarán (IDs)
       provincia: new FormControl<number | null>(null, Validators.required),
-      // Guarda el idMunicipio (number), NO el nombre
-      municipio: new FormControl<number | null>({ value: null, disabled: true }, Validators.required),
-      // Guarda el idColegio (number), NO el nombre
-      colegio: new FormControl< number | null >({ value: null, disabled: true }),
+      municipio: new FormControl<number | null>(null, Validators.required),
+      colegio: new FormControl<number | null>(null),
+
       usarNombreColegio: new FormControl(false),
-      nombreColegio: new FormControl< string | null>({ value: null, disabled: true}),
+      nombreColegio: new FormControl<string | null>({ value: null, disabled: true }),
       respuestasChI: this.formBuilder.array(this.pregChasideInteres.map(
         () => new FormControl(null, Validators.required)
       )),
@@ -228,108 +231,102 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.chasideService.getAll().subscribe(data => {
-        this.chaside = data;
+      this.chaside = data;
     })
 
     this.hollandService.getAll().subscribe(data => {
-        this.holland = data;
+      this.holland = data;
     })
 
     this.provinciaService.getProvincias().pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.provincias = data;
     });
-    
+
     this.municipioService.getAllMunicipios().pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.municipios = data;
-      // this.municipiosFiltrados = [...this.municipios];
+      this.municipiosDeProvincia = [];
+      this.otrosMunicipios = data;
     });
 
-    this.provincia!.valueChanges
-  .pipe(takeUntil(this.destroy$))
-  .subscribe((idProvincia: number | null) => {
+    this.colegioService.getAllColegios().pipe(takeUntil(this.destroy$)).subscribe(data => {
+      this.colegios = data;
+      this.colegiosDeMunicipio = [];
+      this.otrosColegios = data;
+    });
 
-    this.municipio!.reset();
-    this.colegio!.reset();
-
-    this.colegio!.disable();
-
-    if (!idProvincia) {
-        this.municipio!.disable();
-        this.municipiosFiltrados = [];
-        return;
-    }
-
-    this.municipio!.enable();
-
-    if (idProvincia !== null) {
-        this.municipioService.getMunicipiosPorProvinciaHttp(idProvincia).subscribe (data => {
-            this.municipiosFiltrados = data
-        })
-    }
-
-    // if (this._syncingLocation) return;
-    // this._syncingLocation = true;
-    // try {
-    //   if (idProvincia === null || idProvincia <= 0) {
-    //     this.municipio!.setValue(null, { emitEvent: false });
-    //   }
-    // } finally {
-    //   this._syncingLocation = false;
-    // }
-  });
-
-    this.municipio!.valueChanges
+    // ── Lógica de Autocompletado No Restrictivo ──────────────
+    // 1. Cuando el estudiante selecciona una provincia
+    this.form.get('provincia')!.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe((idMunicipio: number | null) => {
-        // if (this._syncingLocation) return;
-        if (idMunicipio === null || idMunicipio === 0) return;
-
-        this.colegio!.reset();
-
-        if (!idMunicipio) {
-            this.colegio!.disable();
-            this.colegiosFiltrados = [];
-            return;
+      .subscribe((idProvincia: number | null) => {
+        if (!idProvincia) {
+          this.municipiosDeProvincia = [];
+          this.otrosMunicipios = [...this.municipios];
+          return;
+        }
+        const munActual = this.municipios.find(m => m.idMunicipio === this.municipio?.value);
+        if (munActual && munActual.idProvincia !== idProvincia) {
+          this.municipio?.setValue(null, { emitEvent: false });
+          this.colegiosDeMunicipio = [];
+          this.otrosColegios = [...this.colegios];
         }
 
-        this.colegio!.enable();
-
-        this.colegioService.getColegiosPorMunicipioHttp(idMunicipio).subscribe(data => {
-            this.colegiosFiltrados = data
-        });
-
-        // this._syncingLocation = true;
-        // try {
-        //   const idProvinciaDelMunicipio = this.todosMunicipios.find(m => m.idMunicipio === idMunicipio)?.idProvincia ?? null;
-        //   if (idProvinciaDelMunicipio !== null) {
-        //     const idProvinciaActual: number | null = this.provincia!.value;
-        //     if (idProvinciaActual !== idProvinciaDelMunicipio) {
-        //       this.provincia!.setValue(idProvinciaDelMunicipio, { emitEvent: false });
-        //     }
-        //   }
-        // } finally {
-        //   this._syncingLocation = false;
-        // }
+        this.municipiosDeProvincia = this.municipios.filter(m => m.idProvincia === idProvincia);
+        this.otrosMunicipios = this.municipios.filter(m => m.idProvincia !== idProvincia);
       });
 
-      this.form.get('usarNombreColegio')!.valueChanges
+    // 2. Cuando el estudiante selecciona un municipio
+    this.form.get('municipio')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((idMunicipio: number | null) => {
+        if (!idMunicipio) {
+          this.colegiosDeMunicipio = [];
+          this.otrosColegios = [...this.colegios];
+          return;
+        }
+
+        const municipioSeleccionado = this.municipios.find(m => m.idMunicipio === idMunicipio);
+        if (municipioSeleccionado) {
+          if (this.provincia?.value !== municipioSeleccionado.idProvincia) {
+            this.provincia?.setValue(municipioSeleccionado.idProvincia, { emitEvent: false });
+          }
+          this.municipiosDeProvincia = this.municipios.filter(m => m.idProvincia === municipioSeleccionado.idProvincia);
+          this.otrosMunicipios = this.municipios.filter(m => m.idProvincia !== municipioSeleccionado.idProvincia);
+        }
+        const colActual = this.colegios.find(c => c.idColegio === this.colegio?.value);
+        if (colActual && colActual.idMunicipio !== idMunicipio) {
+          this.colegio?.setValue(null, { emitEvent: false });
+        }
+        this.colegiosDeMunicipio = this.colegios.filter(c => c.idMunicipio === idMunicipio);
+        this.otrosColegios = this.colegios.filter(c => c.idMunicipio !== idMunicipio);
+      });
+
+    // 3. Cuando el estudiante selecciona un colegio
+    this.form.get('colegio')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((idColegio: number | null) => {
+        if (!idColegio) return;
+
+        const colegioSeleccionado = this.colegios.find(c => c.idColegio === idColegio);
+        if (colegioSeleccionado) {
+          // Autocompletar municipio (lo cual dispara el valueChanges de municipio que autocompleta la provincia)
+          this.municipio!.setValue(colegioSeleccionado.idMunicipio);
+        }
+      });
+
+    // 4. Lógica para "Mi colegio no aparece"
+    this.form.get('usarNombreColegio')!.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((usarNombre: boolean) => {
         if (usarNombre) {
-            this.colegio!.setValue(null);
+          this.colegio!.setValue(null);
 
-            this.colegio!.disable();
-            this.nombreColegio!.enable();
+          this.nombreColegio!.enable();
         } else {
-            this.nombreColegio!.setValue(null);
-
-            this.nombreColegio!.disable();
-
-            if (this.municipio?.value) {
-                this.colegio!.enable();
-            }
+          this.nombreColegio!.setValue(null);
+          this.nombreColegio!.disable();
         }
-      })
+      });
 
     if (typeof window !== 'undefined') {
       window.addEventListener('beforeunload', this.beforeUnloadHandler);
@@ -347,10 +344,15 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
   // ── funcion aux para validar el colegio ──────────────────────────────────────
 
   colegioValido(): boolean {
-    const colegio = this.colegio?.value;
-    const nombreColegio = this.nombreColegio?.value?.trim();
+    const colegioAsignado = this.colegio?.value;
+    const nombreColegioText = this.nombreColegio?.value?.trim();
+    const usarNombre = this.usarNombreColegio?.value;
 
-    return !!colegio || !!nombreColegio;
+    if (usarNombre) {
+      return !!nombreColegioText;
+    } else {
+      return !!colegioAsignado;
+    }
   }
 
   // ── Guard de salida ──────────────────────────────────────────────────────────
@@ -383,7 +385,7 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
     const nombreColegio = this.nombreColegio?.value;
     if (
       this.carnetNum?.invalid || this.carnetExt?.invalid || this.nombre?.invalid ||
-      this.apMaterno?.invalid || this.apPaterno?.invalid || this.curso?.invalid || 
+      this.apMaterno?.invalid || this.apPaterno?.invalid || this.curso?.invalid ||
       this.municipio?.invalid || this.provincia?.invalid || !this.colegioValido()
     ) {
       this.mostrarNotificacionIncompleto('Debes llenar todos los campos');
@@ -397,9 +399,12 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
       this.mostrarNotificacionIncompleto('Debes ingresar un número de celular válido (8 dígitos)');
       this.enviadoEst.set(true);
       return;
-    } else if (colegio && nombreColegio){
-        this.mostrarNotificacionIncompleto('Solo puede completarse un campo en colegio')
-        return;
+    } else if (this.usarNombreColegio?.value && !nombreColegio) {
+      this.mostrarNotificacionIncompleto('Debes escribir el nombre de tu colegio');
+      return;
+    } else if (!this.usarNombreColegio?.value && !colegio) {
+      this.mostrarNotificacionIncompleto('Debes seleccionar un colegio válido de la lista o marcar la casilla si no aparece');
+      return;
     }
     else {
       this.formularioActived = true;
@@ -618,9 +623,9 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
 
     // obtener puntaje chaside
     const puntajeChaside = Object.entries(resultadoChaside)
-        .sort((a, b) => b[1] - a[1])
-        .map(([letra]) => letra)
-        .join('');
+      .sort((a, b) => b[1] - a[1])
+      .map(([letra]) => letra)
+      .join('');
 
     // obtener el idChaside correspondiente al puntaje obtenido, tambien obtener el puntaje de interes y de aptitud
     const letraPrincipalChaside = puntajeChaside[0];
@@ -629,7 +634,7 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
     this.puntajeAptitud = resultadoAptitud[letraPrincipalChaside as keyof typeof resultadoAptitud];
 
     const objChasideEncontrado = this.chaside.find(
-        c => c.puntaje === letraPrincipalChaside
+      c => c.puntaje === letraPrincipalChaside
     );
     const idChaside = objChasideEncontrado?.idChaside ?? null;
 
@@ -651,15 +656,15 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
 
     // obtener el puntaje holland de acuerdo a las preguntas del formulario
     const puntajeHolland = Object.entries(resultadoHolland)
-        .sort((a,b) => b[1] - a[1])
-        .map(([letra]) => letra)
-        .join('');
+      .sort((a, b) => b[1] - a[1])
+      .map(([letra]) => letra)
+      .join('');
 
     // obtener el idHolland asociado a la respuestas del formulario
     const letraPrincipalHolland = puntajeHolland[0];
 
     const objHollandEncontrado = this.holland.find(
-        h => h.codigo === letraPrincipalHolland
+      h => h.codigo === letraPrincipalHolland
     );
     const idHolland = objHollandEncontrado?.idHolland ?? null;
 
@@ -668,56 +673,56 @@ export class FormEstudianteComponent implements OnInit, OnDestroy {
     const fechaStr = new Date().toLocaleDateString();
 
     const payload = {
-        estudianteDto: {
-            ciEstudiante : carnet,
-            nombre: this.nombre?.value,
-            apPaterno: this.apPaterno?.value,
-            apMaterno: this.apMaterno?.value,
-            idColegio: this.colegio?.value,
-            nombreColegio: this.nombreColegio?.value,
-            curso: this.curso?.value,
-            edad: this.edad?.value,
-            celular: this.celular?.value,
-            id_municipio: this.municipio?.value
-        },
-        resultadoDto: {
-            interes: this.puntajeInteres,
-            aptitud: this.puntajeAptitud,
-            puntajeHolland,
-            puntajeChaside,
-            fecha: fechaStr,
-            idChaside,
-            idHolland
-        }
+      estudianteDto: {
+        ciEstudiante: carnet,
+        nombre: this.nombre?.value,
+        apPaterno: this.apPaterno?.value,
+        apMaterno: this.apMaterno?.value,
+        idColegio: this.colegio?.value,
+        nombreColegio: this.nombreColegio?.value,
+        curso: this.curso?.value,
+        edad: this.edad?.value,
+        celular: this.celular?.value,
+        id_municipio: this.municipio?.value
+      },
+      resultadoDto: {
+        interes: this.puntajeInteres,
+        aptitud: this.puntajeAptitud,
+        puntajeHolland,
+        puntajeChaside,
+        fecha: fechaStr,
+        idChaside,
+        idHolland
+      }
     }
     console.log(payload)
 
     this.evaluacionService.guardarEvaluacion(payload).subscribe({
-        next: response => {
-            const navigationExtras: NavigationExtras = {
-                state: {
-                    bdform: response.guardarResultado,
-                    nombre: [`${response.nombre} ${response.apPaterno} ${response.apMaterno}`],
-                    carnet: response.ciEstudiante,
-                    interes: response.puntajeInteres,
-                    aptitud: response.puntajeAptitud,
-                    holland: response.holland,
-                    colegio: response.nombreColegio,
-                    chaside: response.chaside[0],
-                    celular: response.celular,
-                    curso: response.curso,
-                    edad: response.edad,
-                    municipio: response.municipio,
-                    provincia: response.provincia
-                }
-            };
-            this.router.navigate(['formulario/resultado'], navigationExtras);
-        },
-        error: (error:any) => {
-            console.error('error al guardar la evaluacion', error);
-        }
+      next: response => {
+        const navigationExtras: NavigationExtras = {
+          state: {
+            bdform: response.guardarResultado,
+            nombre: [`${response.nombre} ${response.apPaterno} ${response.apMaterno}`],
+            carnet: response.ciEstudiante,
+            interes: response.puntajeInteres,
+            aptitud: response.puntajeAptitud,
+            holland: response.holland,
+            colegio: response.nombreColegio,
+            chaside: response.chaside[0],
+            celular: response.celular,
+            curso: response.curso,
+            edad: response.edad,
+            municipio: response.municipio,
+            provincia: response.provincia
+          }
+        };
+        this.router.navigate(['formulario/resultado'], navigationExtras);
+      },
+      error: (error: any) => {
+        console.error('error al guardar la evaluacion', error);
+      }
     })
-  
+
   }
 
 }

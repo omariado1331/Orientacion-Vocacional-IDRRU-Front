@@ -139,22 +139,49 @@
 
                         </div>
 
-                        <!-- Provincia -->
+                        <!-- Colegio -->
                         <div class="col-md-4">
-                            <label class="campo-label" [class.error]="enviadoEst() && provincia?.invalid">
-                                <i class="bi bi-map-fill campo-icono"></i>
-                                Provincia *
+                            <label class="campo-label" [class.error]="enviadoEst() && !colegioValido()">
+                                <i class="bi bi-building-fill campo-icono"></i>
+                                Colegio *
                             </label>
-                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && provincia?.invalid">
-                                <select class="campo-input" formControlName="provincia">
-                                    <option [ngValue]="null" disabled selected>-- Selecciona tu Provincia --</option>
-                                    @for (prov of provincias; track prov.idProvincia) {
-                                    <option [ngValue]="prov.idProvincia">{{prov.nombre}}</option>
+
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && !colegioValido()">
+                                <select class="campo-input uppercase-input" formControlName="colegio">
+                                    <option [ngValue]="null" disabled selected>-- Selecciona tu Colegio --</option>
+                                    @if (colegiosDeMunicipio.length > 0) {
+                                    <optgroup label="Colegios de tu municipio">
+                                        @for (col of colegiosDeMunicipio; track col.idColegio) {
+                                        <option [ngValue]="col.idColegio">{{col.nombre}}</option>
+                                        }
+                                    </optgroup>
+                                    <optgroup label="Otros colegios">
+                                        @for (col of otrosColegios; track col.idColegio) {
+                                        <option [ngValue]="col.idColegio">{{col.nombre}}</option>
+                                        }
+                                    </optgroup>
+                                    } @else {
+                                    @for (col of otrosColegios; track col.idColegio) {
+                                    <option [ngValue]="col.idColegio">{{col.nombre}}</option>
+                                    }
                                     }
                                 </select>
                             </div>
-                            @if (enviadoEst() && provincia?.invalid) {
-                            <div class="campo-error-msg">Debes seleccionar una provincia.</div>
+
+                            <!-- <div class="form-check mt-2 mb-2">
+                                <input class="form-check-input" type="checkbox" id="usarNombreColegio"
+                                    formControlName="usarNombreColegio">
+                                <label class="form-check-label" for="usarNombreColegio">Mi colegio no aparece en la
+                                    lista</label>
+                            </div>
+
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && !colegioValido()">
+                                <input type="text" class="campo-input uppercase-input" formControlName="nombreColegio"
+                                    placeholder="Escribe el nombre de tu colegio">
+                            </div> -->
+
+                            @if (enviadoEst() && !colegioValido()) {
+                            <div class="campo-error-msg">Busca tu colegio en la lista o escribe su nombre.</div>
                             }
                         </div>
 
@@ -165,65 +192,47 @@
                                 Municipio *
                             </label>
                             <div class="campo-wrapper" [class.campo-error]="enviadoEst() && municipio?.invalid">
-                                <select class="campo-input" formControlName="municipio">
+                                <select class="campo-input uppercase-input" formControlName="municipio">
                                     <option [ngValue]="null" disabled selected>-- Selecciona tu Municipio --</option>
-
-                                    
-                                    @for (mun of municipiosFiltrados; track mun.idMunicipio) {
-                                        <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
-                                    
-                                    <!-- <optgroup label="Otros municipios">
-                                        @for (mun of municipios; track mun.idMunicipio) {
-                                        @if (mun.idProvincia !== provincia!.value) {
+                                    @if (municipiosDeProvincia.length > 0) {
+                                    <optgroup label="Municipios de tu provincia">
+                                        @for (mun of municipiosDeProvincia; track mun.idMunicipio) {
                                         <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
                                         }
+                                    </optgroup>
+                                    <optgroup label="Otros municipios">
+                                        @for (mun of otrosMunicipios; track mun.idMunicipio) {
+                                        <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
                                         }
-                                    </optgroup> -->
-                                    <!-- } @else {
-                                    @for (mun of municipios; track mun.idMunicipio) {
+                                    </optgroup>
+                                    } @else {
+                                    @for (mun of otrosMunicipios; track mun.idMunicipio) {
                                     <option [ngValue]="mun.idMunicipio">{{mun.nombre}}</option>
                                     }
-                                    } -->
                                     }
                                 </select>
                             </div>
                             @if (enviadoEst() && municipio?.invalid) {
-                            <div class="campo-error-msg">Debes seleccionar un municipio.</div>
+                            <div class="campo-error-msg">Selecciona tu municipio en la lista.</div>
                             }
                         </div>
 
-                        <div class="col-md-4"> 
-                            <label class="campo-label" [class.error]="enviadoEst() && !colegioValido()">
-                                <i class="bi bi-building-fill campo-icono"></i>
-                                Colegio *
+                        <!-- Provincia -->
+                        <div class="col-md-4">
+                            <label class="campo-label" [class.error]="enviadoEst() && provincia?.invalid">
+                                <i class="bi bi-map-fill campo-icono"></i>
+                                Provincia *
                             </label>
-
-                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && !colegioValido()">
-
-                                <select class="campo-input" formControlName="colegio">
-                                    <option [ngValue]="null">-- Selecciona el Colegio -- </option>
-
-                                    @for (col of colegiosFiltrados; track col.idColegio) {
-                                        <option [ngValue]="col.idColegio">
-                                            {{col.nombre}}
-                                        </option>
+                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && provincia?.invalid">
+                                <select class="campo-input" formControlName="provincia">
+                                    <option [ngValue]="null" disabled selected>-- SELECCIONA TU PROVINCIA --</option>
+                                    @for (prov of provincias; track prov.idProvincia) {
+                                    <option [ngValue]="prov.idProvincia">{{prov.nombre}}</option>
                                     }
-
                                 </select>
-
                             </div>
-
-                            <div class="form-check mt-2 mb-2">
-                                <input class="form-check-input" type="checkbox" id="usarNombreColegio" formControlName="usarNombreColegio">
-                                <label class="form-check-label" for="usarNombreColegio">Mi Colegio no aparece en la lista</label>
-                            </div>
-
-                            <div class="campo-wrapper" [class.campo-error]="enviadoEst() && !colegioValido()">
-                                <input type="text" class="campo-input" formControlName="nombreColegio" placeholder="Escribe el nombre de tu colegio">
-                            </div>
-
-                            @if (enviadoEst() && !colegioValido()) {
-                                <div class="campo-error-msg">Debes seleccionar un colegio o escribir su nombre.</div>
+                            @if (enviadoEst() && provincia?.invalid) {
+                            <div class="campo-error-msg">Selecciona una provincia.</div>
                             }
                         </div>
                     </div>
@@ -268,22 +277,22 @@
                             <div class="row align-items-center">
                                 <div class="col-md-9">
                                     <p [class.error]="enviadoCh() && respuestasChI.at(i).invalid"> {{i+1}}.
-                                {{preguntain.pregunta}}</p>
-                        </div>
-                        <div class="col-auto selected-option mb-4">
-                            @for (val of [1,0]; track val) {
-                            @if(val===1){
-                            <label class="form-check-label mx-4"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="i.toString()">
-                            </label>
-                            }@else{
-                            <label class="form-check-label mx-4"> NO
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="i.toString()">
-                            </label>
-                            }
-                            }
+                                        {{preguntain.pregunta}}</p>
+                                </div>
+                                <div class="col-auto selected-option mb-4">
+                                    @for (val of [1,0]; track val) {
+                                    @if(val===1){
+                                    <label class="form-check-label mx-4"> SI
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="i.toString()">
+                                    </label>
+                                    }@else{
+                                    <label class="form-check-label mx-4"> NO
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="i.toString()">
+                                    </label>
+                                    }
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -329,23 +338,23 @@
                             <div class="row align-items-center">
                                 <div class="col-md-9">
                                     <p [class.error]="enviadoChDos() && respuestasChIDos.at(i).invalid">{{i+1}}.
-                                {{preguntain.pregunta}}</p>
-                        </div>
-                        <div class="col-auto selected-option mb-4">
-                            @for (val of [1,0]; track val) {
-                            @if(val===1){
-                            <label class="form-check-label"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="i.toString()">
-                            </label>
-                            }@else{
-                            <label class="form-check-label mx-4"> NO
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="i.toString()">
-                            </label>
-                            }
+                                        {{preguntain.pregunta}}</p>
+                                </div>
+                                <div class="col-auto selected-option mb-4">
+                                    @for (val of [1,0]; track val) {
+                                    @if(val===1){
+                                    <label class="form-check-label"> SI
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="i.toString()">
+                                    </label>
+                                    }@else{
+                                    <label class="form-check-label mx-4"> NO
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="i.toString()">
+                                    </label>
+                                    }
 
-                            }
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -388,22 +397,22 @@
                             <div class="row align-items-center">
                                 <div class="col-md-9">
                                     <p [class.error]="enviadoChTres() && respuestasChITres.at(i).invalid">{{i+1}}.
-                                {{preguntain.pregunta}}</p>
-                        </div>
-                        <div class="col-auto selected-option mb-4">
-                            @for (val of [1,0]; track val) {
-                            @if(val===1){
-                            <label class="form-check-label"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="i.toString()">
-                            </label>
-                            }@else{
-                            <label class="form-check-label mx-4"> NO
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="i.toString()">
-                            </label>
-                            }
-                            }
+                                        {{preguntain.pregunta}}</p>
+                                </div>
+                                <div class="col-auto selected-option mb-4">
+                                    @for (val of [1,0]; track val) {
+                                    @if(val===1){
+                                    <label class="form-check-label"> SI
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="i.toString()">
+                                    </label>
+                                    }@else{
+                                    <label class="form-check-label mx-4"> NO
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="i.toString()">
+                                    </label>
+                                    }
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -447,23 +456,23 @@
                             <div class="row align-items-center">
                                 <div class="col-md-9">
                                     <p [class.error]="enviadoChCuatro() && respuestasChICuatro.at(i).invalid">{{i+1}}.
-                                {{preguntain.pregunta}}</p>
-                        </div>
-                        <div class="col-auto selected-option mb-4">
-                            @for (val of [1,0]; track val) {
-                            @if(val===1){
-                            <label class="form-check-label"> SI
-                                <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="i.toString()">
-                            </label>
-                            }@else{
-                            <label class="form-check-label mx-4"> NO
-                                <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="i.toString()">
-                            </label>
-                            }
-                            }
-                        </div>
+                                        {{preguntain.pregunta}}</p>
+                                </div>
+                                <div class="col-auto selected-option mb-4">
+                                    @for (val of [1,0]; track val) {
+                                    @if(val===1){
+                                    <label class="form-check-label"> SI
+                                        <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio"
+                                            [value]="val" [formControlName]="i.toString()">
+                                    </label>
+                                    }@else{
+                                    <label class="form-check-label mx-4"> NO
+                                        <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio"
+                                            [value]="val" [formControlName]="i.toString()">
+                                    </label>
+                                    }
+                                    }
+                                </div>
                             </div>
                         </div>
                         }
@@ -508,24 +517,24 @@
                             <div class="row align-items-center">
                                 <div class="col-md-9">
                                     <p [class.error]="enviadoChCinco() && respuestasChA.at(j).invalid">{{j+1}}.
-                                {{preguntaap.pregunta}}</p>
-                        </div>
-                        <div class="col-auto selected-option mb-4">
-                            @for (val of [1,0]; track val) {
+                                        {{preguntaap.pregunta}}</p>
+                                </div>
+                                <div class="col-auto selected-option mb-4">
+                                    @for (val of [1,0]; track val) {
 
-                            @if (val === 1) {
-                            <label class="form-check-label"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="j.toString()">
-                            </label>
-                            }@else {
-                            <label class="form-check-label mx-4">NO
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="j.toString()">
-                            </label>
-                            }
+                                    @if (val === 1) {
+                                    <label class="form-check-label"> SI
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="j.toString()">
+                                    </label>
+                                    }@else {
+                                    <label class="form-check-label mx-4">NO
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="j.toString()">
+                                    </label>
+                                    }
 
-                            }
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -568,22 +577,22 @@
                             <div class="row align-items-center">
                                 <div class="col-md-9">
                                     <p [class.error]="enviadoChSeis() && respuestasChADos.at(j).invalid">{{j+1}}.
-                                {{preguntaap.pregunta}}</p>
-                        </div>
-                        <div class="col-auto selected-option mb-4">
-                            @for (val of [1,0]; track val) {
-                            @if (val === 1) {
-                            <label class="form-check-label"> SI
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="j.toString()">
-                            </label>
-                            }@else {
-                            <label class="form-check-label mx-4">NO
-                                <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="j.toString()">
-                            </label>
-                            }
-                            }
+                                        {{preguntaap.pregunta}}</p>
+                                </div>
+                                <div class="col-auto selected-option mb-4">
+                                    @for (val of [1,0]; track val) {
+                                    @if (val === 1) {
+                                    <label class="form-check-label"> SI
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="j.toString()">
+                                    </label>
+                                    }@else {
+                                    <label class="form-check-label mx-4">NO
+                                        <input class="form-check-input mx-1" style="border: 1px solid #1c1b1b;"
+                                            type="radio" [value]="val" [formControlName]="j.toString()">
+                                    </label>
+                                    }
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -620,8 +629,8 @@
                             <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <p>{{preguntahf.pregunta}}</p>
-                        </div>
-                        <div class="col-md-4">
+                                </div>
+                                <div class="col-md-4">
                                     <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="checkbox"
                                         [value]="1" [formControlName]="i">
                                 </div>
@@ -662,8 +671,8 @@
                             <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <p>{{preguntahs.pregunta}}</p>
-                        </div>
-                        <div class="col-md-4">
+                                </div>
+                                <div class="col-md-4">
                                     <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="checkbox"
                                         [value]="1" [formControlName]="i">
                                 </div>
@@ -702,8 +711,8 @@
                             <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <p>{{preguntaht.pregunta}}</p>
-                        </div>
-                        <div class="col-md-4">
+                                </div>
+                                <div class="col-md-4">
                                     <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="checkbox"
                                         [value]="1" [formControlName]="i">
                                 </div>
@@ -739,15 +748,16 @@
                         <div class="col-12 question-row px-3 py-1 rounded transition-all">
                             <div class="row align-items-center">
                                 <div class="col-md-4">
-                                    <p [class.error]="enviadoHlCuatro() && respuestasHA.at(l).invalid">{{preguntahav.pregunta}}</p>
+                                    <p [class.error]="enviadoHlCuatro() && respuestasHA.at(l).invalid">
+                                        {{preguntahav.pregunta}}</p>
                                 </div>
-                        <div class="col-md-8 mb-3">
-                            @for (val of [1,2,3,4,5,6,7]; track val) {
-                            <label class="form-check-label opcion-radio">{{val}}
-                                <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio"
-                                    [value]="val" [formControlName]="l.toString()">
-                            </label>
-                            }
+                                <div class="col-md-8 mb-3">
+                                    @for (val of [1,2,3,4,5,6,7]; track val) {
+                                    <label class="form-check-label opcion-radio">{{val}}
+                                        <input class="form-check-input" style="border: 1px solid #1c1b1b;" type="radio"
+                                            [value]="val" [formControlName]="l.toString()">
+                                    </label>
+                                    }
                                 </div>
                             </div>
                         </div>

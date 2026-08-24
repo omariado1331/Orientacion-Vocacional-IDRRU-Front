@@ -13,6 +13,16 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "allowedCommonJsDependencies": [
+              "canvg",
+              "rgbcolor",
+              "core-js",
+              "raf",
+              "html2canvas",
+              "dompurify",
+              "sweetalert2",
+              "jspdf-autotable"
+            ],
             "outputPath": "dist/orientacion-vocacional-idrru-front",
             "index": "src/index.html",
             "browser": "src/main.ts",
@@ -53,8 +63,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "15kB",
+                  "maximumError": "20kB"
                 }
               ]
             },
